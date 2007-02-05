@@ -42,23 +42,15 @@ namespace EPG
 			class ConnectionBodyBase
 			{
 			public:
-				ConnectionBodyBase(const boost::function<void (const ConnectionBodyBase*)> &disconnectCallback):
-					_disconnectCallback(disconnectCallback), _connected(true)
+				ConnectionBodyBase(): _connected(true)
 				{}
 				virtual ~ConnectionBodyBase() {}
 				void disconnect()
 				{
-					bool wasConnected;
+					boost::mutex::scoped_lock lock(mutex);
+					if(_connected)
 					{
-						boost::mutex::scoped_lock lock(mutex);
-						if((wasConnected = _connected))
-						{
-							_connected = false;
-						}
-					} // scoped_lock destructs here
-					if(wasConnected)
-					{
-						_disconnectCallback(this);
+						_connected = false;
 					}
 				}
 				bool connected() const
@@ -70,7 +62,6 @@ namespace EPG
 
 				mutable boost::mutex mutex;
 			private:
-				const boost::function<void (const ConnectionBodyBase*)> _disconnectCallback;
 				bool _connected;
 			};
 
@@ -78,9 +69,8 @@ namespace EPG
 			class ConnectionBody: public ConnectionBodyBase
 			{
 			public:
-				ConnectionBody(const boost::function<Signature> &slotParameter,
-					const boost::function<void (const ConnectionBodyBase*)> &disconnectCallback):
-					ConnectionBodyBase(disconnectCallback), slot(slotParameter)
+				ConnectionBody(const boost::function<Signature> &slotParameter):
+					ConnectionBodyBase(), slot(slotParameter)
 				{}
 				virtual ~ConnectionBody() {}
 				/* base class mutex should be locked and nolock_connected() checked

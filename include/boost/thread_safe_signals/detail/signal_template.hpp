@@ -73,9 +73,20 @@ namespace EPG
 				EPG::signalslib::connection connect(const slot_type &slot)
 				{
 					boost::mutex::scoped_lock lock(_mutex);
+					// clean up disconnected connections
+					ConnectionList::iterator it;
+					for(it = _connectionBodies.begin(); it != _connectionBodies.end();)
+					{
+						if((*it)->connected() == false)
+						{
+							it = _connectionBodies.erase(it);
+						}else
+						{
+							++it;
+						}
+					}
 					_connectionBodies.push_back(boost::shared_ptr<ConnectionBody<Signature> >(
-						new ConnectionBody<Signature>(slot,
-							boost::bind(&EPG::signalslib::detail::EPG_SIGNAL_CLASS_NAME<Signature>::dropConnection, this, _1))));
+						new ConnectionBody<Signature>(slot)));
 					return EPG::signalslib::connection(_connectionBodies.back());
 				}
 				// emit signal
