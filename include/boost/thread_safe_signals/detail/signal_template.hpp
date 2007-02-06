@@ -50,27 +50,12 @@ namespace EPG
 				typedef boost::function<Signature> slot_type;
 				typedef void result_type;
 
-				EPG_SIGNAL_CLASS_NAME(): _disableDropConnection(false) {};
+				EPG_SIGNAL_CLASS_NAME() {};
 				virtual ~EPG_SIGNAL_CLASS_NAME()
-				{
-					/* Eliminate possibility of dropConnection() getting called
-					after the signal's destruction by calling disconnect() on all connections.
-					*/
-					/* set _disableDropConnection so we can call disconnect()
-					on the connections without worrying about what the dropConnection()
-					callbacks are doing to _connectionBodies */
-					{
-						boost::mutex::scoped_lock lock(_mutex);
-						_disableDropConnection = true;
-					}
-					typename ConnectionList::iterator it;
-					for(it = _connectionBodies.begin(); it != _connectionBodies.end(); ++it)
-					{
-						(*it)->disconnect();
-					}
-				}
+				{}
 				// connect slot
-				EPG::signalslib::connection connect(const slot_type &slot)
+				template<typename SlotType>
+				EPG::signalslib::connection connect(const SlotType &slot)
 				{
 					boost::mutex::scoped_lock lock(_mutex);
 					// clean up disconnected connections
@@ -85,8 +70,10 @@ namespace EPG
 							++it;
 						}
 					}
-					_connectionBodies.push_back(boost::shared_ptr<ConnectionBody<Signature> >(
-						new ConnectionBody<Signature>(slot)));
+					boost::shared_ptr<ConnectionBody<Signature> > newConnectionBody(new ConnectionBody<Signature>(slot));
+					tracked_objects_visitor visitor(newConnectionBody.get());
+					boost::visit_each(visitor, slot, 0);
+					_connectionBodies.push_back(newConnectionBody);
 					return EPG::signalslib::connection(_connectionBodies.back());
 				}
 				// emit signal
@@ -99,6 +86,7 @@ namespace EPG
 						bool slotDisconnected;
 						{
 							boost::mutex::scoped_lock connectionLock((*it)->mutex);
+							ConnectionBodyBase::shared_ptrs_type trackedPtrs = (*it)->grabTrackedObjects();
 							if((*it)->nolock_connected())
 							{
 								(*it)->slot(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
@@ -126,22 +114,8 @@ namespace EPG
 			private:
 				typedef std::list<boost::shared_ptr<ConnectionBody<Signature> > > ConnectionList;
 
-				void dropConnection(const ConnectionBodyBase *connection)
-				{
-					boost::mutex::scoped_lock lock(_mutex);
-					if(_disableDropConnection) return;
-					typename ConnectionList::iterator it;
-					for(it = _connectionBodies.begin(); it != _connectionBodies.end(); ++it)
-					{
-						if(it->get() == connection) break;
-					}
-					if(it != _connectionBodies.end())
-						_connectionBodies.erase(it);
-				}
-
 				ConnectionList _connectionBodies;
 				mutable boost::mutex _mutex;
-				bool _disableDropConnection;
 			};
 
 			template<unsigned arity, typename Signature> class SignalN;
