@@ -50,7 +50,8 @@ namespace EPG
 				typedef boost::function<Signature> slot_type;
 				typedef void result_type;
 
-				EPG_SIGNAL_CLASS_NAME() {};
+				EPG_SIGNAL_CLASS_NAME(): _connectionBodies(new ConnectionList)
+				{};
 				virtual ~EPG_SIGNAL_CLASS_NAME()
 				{}
 				// connect slot
@@ -58,63 +59,60 @@ namespace EPG
 				EPG::signalslib::connection connect(const SlotType &slot)
 				{
 					boost::mutex::scoped_lock lock(_mutex);
-					// clean up disconnected connections
-					ConnectionList::iterator it;
-					for(it = _connectionBodies.begin(); it != _connectionBodies.end();)
+					/* Make a new copy of the slot list if it is currently being iterated through
+					by signal invocation. */
+					if(_connectionBodies.use_count() > 1)
 					{
-						if((*it)->connected() == false)
-						{
-							it = _connectionBodies.erase(it);
-						}else
-						{
-							++it;
-						}
+						boost::shared_ptr<ConnectionList> newList(new ConnectionList(*_connectionBodies));
+						_connectionBodies = newList;
 					}
+					nolockCleanupConnections();
 					boost::shared_ptr<ConnectionBody<Signature> > newConnectionBody(new ConnectionBody<Signature>(slot));
 					tracked_objects_visitor visitor(newConnectionBody.get());
 					boost::visit_each(visitor, slot, 0);
-					_connectionBodies.push_back(newConnectionBody);
-					return EPG::signalslib::connection(_connectionBodies.back());
+					_connectionBodies->push_back(newConnectionBody);
+					return EPG::signalslib::connection(_connectionBodies->back());
 				}
 				// emit signal
 				result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, Signature))
 				{
-					boost::mutex::scoped_lock listLock(_mutex);
+					boost::shared_ptr<ConnectionList> localConnectionBodies;
 					typename ConnectionList::iterator it;
-					for(it = _connectionBodies.begin(); it != _connectionBodies.end();)
 					{
-						bool slotDisconnected;
+						boost::mutex::scoped_lock listLock(_mutex);
+						nolockCleanupConnections();
+						localConnectionBodies = _connectionBodies;
+					}
+					for(it = localConnectionBodies->begin(); it != localConnectionBodies->end(); ++it)
+					{
+						ConnectionBodyBase::mutex_type::scoped_lock connectionLock((*it)->mutex);
+						ConnectionBodyBase::shared_ptrs_type trackedPtrs = (*it)->grabTrackedObjects();
+						if((*it)->nolock_connected())
 						{
-							boost::mutex::scoped_lock connectionLock((*it)->mutex);
-							ConnectionBodyBase::shared_ptrs_type trackedPtrs = (*it)->grabTrackedObjects();
-							if((*it)->nolock_connected())
-							{
-								(*it)->slot(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
-								slotDisconnected = false;
-							}else
-							{
-								slotDisconnected = true;
-							}
-						}
-						/* We have waited to erase the disconnected connection
-						until after the connectionLock has gone out of scope to prevent
-						connectionLock from manipulating its mutex after the
-						ConnectionBody that contains the mutex has destructed */
-						if(slotDisconnected)
-						{
-							/* erase() returns iterator to next unerased element, or end().  We
-							use the return value to avoid being stuck with an invalid iterator */
-							it = _connectionBodies.erase(it);
-						}else
-						{
-							++it;
+							(*it)->slot(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
 						}
 					}
 				}
 			private:
 				typedef std::list<boost::shared_ptr<ConnectionBody<Signature> > > ConnectionList;
 
-				ConnectionList _connectionBodies;
+				// clean up disconnected connections
+				void nolockCleanupConnections()
+				{
+					ConnectionList::iterator it;
+					for(it = _connectionBodies->begin(); it != _connectionBodies->end();)
+					{
+						if((*it)->connected() == false)
+						{
+							it = _connectionBodies->erase(it);
+						}else
+						{
+							++it;
+						}
+					}
+				}
+
+				boost::shared_ptr<ConnectionList> _connectionBodies;
 				mutable boost::mutex _mutex;
 			};
 

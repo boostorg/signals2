@@ -30,7 +30,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread_safe_signals/track.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/visit_each.hpp>
@@ -73,13 +73,14 @@ namespace EPG
 			{
 			public:
 				typedef std::vector<boost::shared_ptr<void> > shared_ptrs_type;
+                typedef boost::recursive_mutex mutex_type;
 
 				ConnectionBodyBase(): _connected(true)
 				{}
 				virtual ~ConnectionBodyBase() {}
 				void disconnect()
 				{
-					boost::mutex::scoped_lock lock(mutex);
+					mutex_type::scoped_lock lock(mutex);
 					if(_connected)
 					{
 						_connected = false;
@@ -87,7 +88,7 @@ namespace EPG
 				}
 				bool connected() const
 				{
-					boost::mutex::scoped_lock lock(mutex);
+					mutex_type::scoped_lock lock(mutex);
 					grabTrackedObjects();
 					return nolock_connected();
 				}
@@ -111,7 +112,7 @@ namespace EPG
 					}
 					return sharedPtrs;
 				}
-				mutable boost::mutex mutex;
+				mutable mutex_type mutex;
 			private:
 				typedef std::vector<boost::weak_ptr<void> > tracked_objects_type;
 

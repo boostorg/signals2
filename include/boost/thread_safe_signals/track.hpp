@@ -63,7 +63,7 @@ namespace boost {
     }
     // get_pointer lets mem_fn bind a tracked
     template<typename T>
-    T* get_pointer(const signalslib::tracked<T> &tracked) {return tracked.lock().get();}
+    T* get_pointer(const signalslib::tracked<T> &tracked) {return shared_ptr<T>(tracked).get();}
   } // end namespace BOOST_SIGNALS_NAMESPACE
 } // end namespace boost
 
