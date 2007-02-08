@@ -76,7 +76,8 @@ namespace EPG
                 typedef boost::recursive_try_mutex mutex_type;
 
 				ConnectionBodyBase(): _connected(true)
-				{}
+				{
+				}
 				virtual ~ConnectionBodyBase() {}
 				void disconnect()
 				{
@@ -124,15 +125,24 @@ namespace EPG
 			class ConnectionBody: public ConnectionBodyBase
 			{
 			public:
-				ConnectionBody(const boost::function<Signature> &slotParameter):
-					ConnectionBodyBase(), slot(slotParameter)
+				template<typename SlotType>
+				static boost::shared_ptr<ConnectionBody<Signature> > create(const SlotType &slot)
 				{
+					boost::shared_ptr<ConnectionBody<Signature> > newConnectionBody(new ConnectionBody<Signature>(slot));
+					tracked_objects_visitor visitor(newConnectionBody.get());
+					boost::visit_each(visitor, slot, 0);
+					return newConnectionBody;
 				}
 				virtual ~ConnectionBody() {}
 				/* base class mutex should be locked and nolock_connected() checked
 				before slot is called, to prevent races
 				with connect() and disconnect() */
 				const boost::function<Signature> slot;
+			protected:
+				ConnectionBody(const boost::function<Signature> &slotParameter):
+					ConnectionBodyBase(), slot(slotParameter)
+				{
+				}
 			};
 		}
 

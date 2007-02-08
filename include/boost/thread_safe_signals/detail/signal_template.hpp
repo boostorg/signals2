@@ -43,14 +43,20 @@ namespace EPG
 	{
 		namespace detail
 		{
-			template<typename Signature, typename Combiner>
+			template<typename Signature, typename Combiner, typename Group, typename GroupCompare>
 			class EPG_SIGNAL_CLASS_NAME
 			{
+			private:
+				typedef slot_group_map<Group, GroupCompare>::key_type group_key_type;
+				typedef slot_group_map<Group, GroupCompare>::map_type group_map_type;
 			public:
+				typedef boost::function<Signature> slot_function_type;
 				typedef boost::function<Signature> slot_type;
 				typedef typename boost::function<Signature>::result_type slot_result_type;
 				typedef Combiner combiner_type;
 				typedef typename combiner_type::result_type result_type;
+				typedef Group group_type;
+				typedef GroupCompare group_compare_type;
 
 				EPG_SIGNAL_CLASS_NAME(combiner_type combiner = combiner_type()):
                 	_combiner(combiner), _connectionBodies(new ConnectionList)
@@ -59,22 +65,52 @@ namespace EPG
 				{}
 				// connect slot
 				template<typename SlotType>
-				EPG::signalslib::connection connect(const SlotType &slot)
+				EPG::signalslib::connection connect(const SlotType &slot, signalslib::connect_position position = at_back)
 				{
 					boost::mutex::scoped_lock lock(_mutex);
-					/* Make a new copy of the slot list if it is currently being iterated through
-					by signal invocation. */
-					if(_connectionBodies.use_count() > 1)
+					boost::shared_ptr<ConnectionBody<Signature> > newConnectionBody =
+						create_new_connection(slot);
+					group_key_type group_key;
+					if(position == at_back)
 					{
-						boost::shared_ptr<ConnectionList> newList(new ConnectionList(*_connectionBodies));
-						_connectionBodies = newList;
+						_connectionBodies->push_back(newConnectionBody);
+						group_key.first = back_ungrouped_slots;
+					}else
+					{
+						_connectionBodies->push_front(newConnectionBody);
+						group_key.first = front_ungrouped_slots;
 					}
-					nolockCleanupConnections(_connectionBodies);
-					boost::shared_ptr<ConnectionBody<Signature> > newConnectionBody(new ConnectionBody<Signature>(slot));
-					tracked_objects_visitor visitor(newConnectionBody.get());
-					boost::visit_each(visitor, slot, 0);
-					_connectionBodies->push_back(newConnectionBody);
-					return EPG::signalslib::connection(_connectionBodies->back());
+					_groupMap.insert(group_map_type::value_type(group_key, newConnectionBody));
+					return EPG::signalslib::connection(newConnectionBody);
+				}
+				template<typename SlotType>
+				EPG::signalslib::connection connect(const group_type &group,
+					const SlotType &slot, signalslib::connect_position position = at_back)
+				{
+					boost::mutex::scoped_lock lock(_mutex);
+					boost::shared_ptr<ConnectionBody<Signature> > newConnectionBody =
+						create_new_connection(slot);
+					group_key_type group_key(grouped_slots, group);
+					group_map_type::iterator it;
+					if(position == at_back)
+					{
+						it = _groupMap.upper_bound(group_key);
+					}else	// at_front
+					{
+						it = _groupMap.lower_bound(group_key);
+					}
+					if(it == _groupMap.end())
+					{
+						_connectionBodies->push_back(newConnectionBody);
+					}else
+					{
+						ConnectionList::iterator connectionIt =
+							std::find(_connectionBodies.begin(), _connectionBodies.end(), it->second);
+						assert(connectionIt != _connectionBodies.end());
+						_connectionBodies->insert(connectionIt, newConnectionBody);
+					}
+					_groupMap.insert(group_map_type::value_type(group_key, newConnectionBody));
+					return EPG::signalslib::connection(newConnectionBody);
 				}
 				// emit signal
 				result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, Signature))
@@ -136,7 +172,7 @@ namespace EPG
 				// clean up disconnected connections
 				void nolockCleanupConnections(boost::shared_ptr<ConnectionList> &connectionBodies)
 				{
-					assert(connectionBodies.use_count() <= 1);
+					assert(connectionBodies.use_count() == 1);
 					ConnectionList::iterator it;
 					for(it = connectionBodies->begin(); it != connectionBodies->end();)
 					{
@@ -145,6 +181,16 @@ namespace EPG
 						if(lock.locked() == false) continue;
 						if((*it)->nolock_connected() == false)
 						{
+							group_map_type::iterator map_it;
+							for(map_it = _groupMap.begin(); map_it != _groupMap.end(); ++map_it)
+							{
+								if(map_it->second == *it)
+								{
+									_groupMap.erase(map_it);
+									break;
+								}
+							}
+							assert(map_it != _groupMap.end());
 							it = connectionBodies->erase(it);
 						}else
 						{
@@ -152,18 +198,37 @@ namespace EPG
 						}
 					}
 				}
+				/* Make a new copy of the slot list if it is currently being iterated through
+				by signal invocation. */
+				void nolockForceUniqueConnectionList()
+				{
+					if(_connectionBodies.use_count() > 1)
+					{
+						boost::shared_ptr<ConnectionList> newList(new ConnectionList(*_connectionBodies));
+						_connectionBodies = newList;
+					}
+				}
+				template<typename SlotType>
+				boost::shared_ptr<ConnectionBody<Signature> > create_new_connection(const SlotType &slot)
+				{
+					nolockForceUniqueConnectionList();
+					nolockCleanupConnections(_connectionBodies);
+					return ConnectionBody<Signature>::create(slot);
+				}
 				combiner_type _combiner;
 				boost::shared_ptr<ConnectionList> _connectionBodies;
+				group_map_type _groupMap;
 				mutable boost::mutex _mutex;
 			};
 
-			template<unsigned arity, typename Signature, typename Combiner> class SignalN;
+			template<unsigned arity, typename Signature, typename Combiner,
+				typename Group, typename GroupCompare> class SignalN;
 			// partial template specialization
-			template<typename Signature, typename Combiner>
-			class SignalN<EPG_SIGNALS_NUM_ARGS, Signature, Combiner>
+			template<typename Signature, typename Combiner, typename Group, typename GroupCompare>
+			class SignalN<EPG_SIGNALS_NUM_ARGS, Signature, Combiner, Group, GroupCompare>
 			{
 			public:
-				typedef EPG_SIGNAL_CLASS_NAME<Signature, Combiner> type;
+				typedef EPG_SIGNAL_CLASS_NAME<Signature, Combiner, Group, GroupCompare> type;
 			};
 		}
 	}
