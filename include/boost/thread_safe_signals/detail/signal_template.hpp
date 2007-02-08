@@ -66,7 +66,7 @@ namespace EPG
 						boost::shared_ptr<ConnectionList> newList(new ConnectionList(*_connectionBodies));
 						_connectionBodies = newList;
 					}
-					nolockCleanupConnections();
+					nolockCleanupConnections(_connectionBodies);
 					boost::shared_ptr<ConnectionBody<Signature> > newConnectionBody(new ConnectionBody<Signature>(slot));
 					tracked_objects_visitor visitor(newConnectionBody.get());
 					boost::visit_each(visitor, slot, 0);
@@ -80,7 +80,9 @@ namespace EPG
 					typename ConnectionList::iterator it;
 					{
 						boost::mutex::scoped_lock listLock(_mutex);
-						nolockCleanupConnections();
+						// only clean up if it is safe to do so
+						if(_connectionBodies.use_count() == 1)
+							nolockCleanupConnections(_connectionBodies);
 						localConnectionBodies = _connectionBodies;
 					}
 					for(it = localConnectionBodies->begin(); it != localConnectionBodies->end(); ++it)
@@ -97,14 +99,18 @@ namespace EPG
 				typedef std::list<boost::shared_ptr<ConnectionBody<Signature> > > ConnectionList;
 
 				// clean up disconnected connections
-				void nolockCleanupConnections()
+				void nolockCleanupConnections(boost::shared_ptr<ConnectionList> &connectionBodies)
 				{
+					assert(connectionBodies.use_count() <= 1);
 					ConnectionList::iterator it;
-					for(it = _connectionBodies->begin(); it != _connectionBodies->end();)
+					for(it = connectionBodies->begin(); it != connectionBodies->end();)
 					{
-						if((*it)->connected() == false)
+						// skip over slots that are busy
+						ConnectionBodyBase::mutex_type::scoped_try_lock lock((*it)->mutex);
+						if(lock.locked() == false) continue;
+						if((*it)->nolock_connected() == false)
 						{
-							it = _connectionBodies->erase(it);
+							it = connectionBodies->erase(it);
 						}else
 						{
 							++it;

@@ -73,7 +73,7 @@ namespace EPG
 			{
 			public:
 				typedef std::vector<boost::shared_ptr<void> > shared_ptrs_type;
-                typedef boost::recursive_mutex mutex_type;
+                typedef boost::recursive_try_mutex mutex_type;
 
 				ConnectionBodyBase(): _connected(true)
 				{}
