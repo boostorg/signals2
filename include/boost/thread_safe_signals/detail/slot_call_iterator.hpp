@@ -86,8 +86,8 @@ namespace EPG {
           for(;iter != end; ++iter)
           {
             lock.reset(new lock_type((*iter)->mutex));
-            trackedPtrs = (*iter)->grabTrackedObjects();
-            if((*iter)->nolock_connected()) break;
+            trackedPtrs = (*iter)->nolock_grab_tracked_objects();
+            if((*iter)->nolock_nograb_connected()) break;
           }
           if(iter == end) lock.reset();
         }

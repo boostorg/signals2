@@ -1,13 +1,4 @@
 /*
-	A minimal thread-safe (partial) implementation of boost.signals.
-	If you are just doing single-threaded code, use the
-	real boost.signals instead.  This only exists because
-	boost.signals isn't thread-safe. This only supports signals
-	with a single parameter, and no return value.  There
-	is no implementation of signals::trackable.  For automatic
-	disconnection on object destruction, keep
-	scoped_connections in objects that have member functions
-	bound to signals,
 
 	Author: Frank Hess <frank.hess@nist.gov>
 	Begin: 2007-01-23
@@ -22,6 +13,10 @@
  * any other characteristic. We would appreciate acknowledgement if the
  * software is used.
  */
+// Use, modification and
+// distribution is subject to the Boost Software License, Version
+// 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef _EPG_SIGNALS_CONNECTION_H
 #define _EPG_SIGNALS_CONNECTION_H
@@ -31,6 +26,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread_safe_signals/slot.hpp>
 #include <boost/thread_safe_signals/track.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/visit_each.hpp>
@@ -43,39 +39,15 @@ namespace EPG
 	{
 		namespace detail
 		{
-			class ConnectionBodyBase;
-
-			// Visitor to collect tracked_base-derived objects from a bound function.
-			class tracked_objects_visitor
-			{
-			public:
-				tracked_objects_visitor(EPG::signalslib::detail::ConnectionBodyBase* slot) : slot_(slot)
-				{}
-				template<typename T>
-				void operator()(const T& t) const {
-					maybe_add_tracked(t, boost::mpl::bool_<boost::is_convertible<T*, boost::signalslib::detail::tracked_base*>::value>());
-					{}
-				}
-				template<typename T>
-				void operator()(boost::reference_wrapper<T> const & r) const {
-					maybe_add_tracked(r.get(), boost::mpl::bool_<boost::is_convertible<T*, boost::signalslib::detail::tracked_base*>::value>());
-					{}
-				}
-			private:
-				inline void maybe_add_tracked(const boost::signalslib::detail::tracked_base& t, boost::mpl::bool_<true>) const;
-				template<typename T>
-				void maybe_add_tracked(const T&, boost::mpl::bool_<false>) const {}
-
-				mutable EPG::signalslib::detail::ConnectionBodyBase* slot_;
-			};
-
 			class ConnectionBodyBase
 			{
 			public:
 				typedef std::vector<boost::shared_ptr<void> > shared_ptrs_type;
-                typedef boost::recursive_try_mutex mutex_type;
+				typedef boost::recursive_try_mutex mutex_type;
+				typedef std::vector<boost::weak_ptr<void> > tracked_objects_container;
 
-				ConnectionBodyBase(): _connected(true)
+				ConnectionBodyBase(const tracked_objects_container tracked_objects):
+					_tracked_objects(tracked_objects), _connected(true)
 				{
 				}
 				virtual ~ConnectionBodyBase() {}
@@ -90,49 +62,40 @@ namespace EPG
 				bool connected() const
 				{
 					mutex_type::scoped_lock lock(mutex);
-					grabTrackedObjects();
-					return nolock_connected();
+					nolock_grab_tracked_objects();
+					return nolock_nograb_connected();
 				}
-				bool nolock_connected() const {return _connected;}
-				void add_tracked(const boost::signalslib::detail::tracked_base &tracked)
-				{
-					_trackedObjects.push_back(tracked.get_shared_ptr());
-				}
+				bool nolock_nograb_connected() const {return _connected;}
 				// mutex should be locked when calling grabTrackedObjects
-				shared_ptrs_type grabTrackedObjects() const
+				shared_ptrs_type nolock_grab_tracked_objects() const
 				{
 					shared_ptrs_type sharedPtrs;
-					tracked_objects_type::const_iterator it;
-					for(it = _trackedObjects.begin(); it != _trackedObjects.end(); ++it)
+					tracked_objects_container::const_iterator it;
+					for(it = _tracked_objects.begin(); it != _tracked_objects.end(); ++it)
 					{
 						sharedPtrs.push_back(it->lock());
 						if(sharedPtrs.back() == 0)
 						{
 							_connected = false;
+							return shared_ptrs_type();
 						}
 					}
 					return sharedPtrs;
 				}
 				mutable mutex_type mutex;
 			private:
-				typedef std::vector<boost::weak_ptr<void> > tracked_objects_type;
-
+				tracked_objects_container _tracked_objects;
 				mutable bool _connected;
-				tracked_objects_type _trackedObjects;
 			};
 
-			template<typename Signature, typename GroupKey>
+			template<typename Signature, typename GroupKey, typename SlotFunction>
 			class ConnectionBody: public ConnectionBodyBase
 			{
 			public:
-				template<typename SlotType>
-				static boost::shared_ptr<ConnectionBody<Signature, GroupKey> > create(const SlotType &slot)
+				ConnectionBody(const slot<SlotFunction> &slot_in):
+					ConnectionBodyBase(slot_in.get_all_tracked()), slot(slot_in.get_slot_function())
 				{
-					boost::shared_ptr<ConnectionBody<Signature, GroupKey> > newConnectionBody(
-						new ConnectionBody<Signature, GroupKey>(slot));
-					tracked_objects_visitor visitor(newConnectionBody.get());
-					boost::visit_each(visitor, slot, 0);
-					return newConnectionBody;
+
 				}
 				virtual ~ConnectionBody() {}
 				const GroupKey& group_key() const {return _group_key;}
@@ -140,12 +103,7 @@ namespace EPG
 				/* base class mutex should be locked and nolock_connected() checked
 				before slot is called, to prevent races
 				with connect() and disconnect() */
-				const boost::function<Signature> slot;
-			protected:
-				ConnectionBody(const boost::function<Signature> &slotParameter):
-					ConnectionBodyBase(), slot(slotParameter)
-				{
-				}
+				const SlotFunction slot;
 			private:
 				GroupKey _group_key;
 			};
@@ -189,11 +147,6 @@ namespace EPG
 			}
 		};
 	}
-}
-
-void EPG::signalslib::detail::tracked_objects_visitor::maybe_add_tracked(const boost::signalslib::detail::tracked_base& t, boost::mpl::bool_<true>) const
-{
-	slot_->add_tracked(t);
 }
 
 #endif	// _EPG_SIGNALS_CONNECTION_H
