@@ -121,19 +121,22 @@ namespace EPG
 				tracked_objects_type _trackedObjects;
 			};
 
-			template<typename Signature>
+			template<typename Signature, typename GroupKey>
 			class ConnectionBody: public ConnectionBodyBase
 			{
 			public:
 				template<typename SlotType>
-				static boost::shared_ptr<ConnectionBody<Signature> > create(const SlotType &slot)
+				static boost::shared_ptr<ConnectionBody<Signature, GroupKey> > create(const SlotType &slot)
 				{
-					boost::shared_ptr<ConnectionBody<Signature> > newConnectionBody(new ConnectionBody<Signature>(slot));
+					boost::shared_ptr<ConnectionBody<Signature, GroupKey> > newConnectionBody(
+						new ConnectionBody<Signature, GroupKey>(slot));
 					tracked_objects_visitor visitor(newConnectionBody.get());
 					boost::visit_each(visitor, slot, 0);
 					return newConnectionBody;
 				}
 				virtual ~ConnectionBody() {}
+				const GroupKey& group_key() const {return _group_key;}
+				void set_group_key(const GroupKey &key) {_group_key = key;}
 				/* base class mutex should be locked and nolock_connected() checked
 				before slot is called, to prevent races
 				with connect() and disconnect() */
@@ -143,6 +146,8 @@ namespace EPG
 					ConnectionBodyBase(), slot(slotParameter)
 				{
 				}
+			private:
+				GroupKey _group_key;
 			};
 		}
 

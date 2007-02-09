@@ -23,22 +23,42 @@ namespace EPG {
 	namespace signalslib {
 		namespace detail {
 			enum slot_meta_group {front_ungrouped_slots, grouped_slots, back_ungrouped_slots};
+			template<typename Group>
+			struct group_key
+			{
+				typedef std::pair<enum slot_meta_group, boost::shared_ptr<Group> > type;
+			};
 			template<typename Group, typename GroupCompare>
-			class slot_group_map
+			class group_key_less
 			{
 			public:
-				typedef std::pair<enum slot_meta_group, Group> key_type;
-				struct group_key_less
+				group_key_less()
+				{}
+				group_key_less(const GroupCompare &group_compare): _group_compare(group_compare)
+				{}
+				bool operator ()(const typename group_key<Group>::type &key1, const typename group_key<Group>::type &key2) const
 				{
-					bool operator ()(const key_type &key1, const key_type &key2) const
-					{
-						if(key1.first < key2.first) return true;
-						return key1.second < key2.second;
-					}
-				};
-				typedef std::multimap<key_type, boost::shared_ptr<ConnectionBodyBase>,
-					group_key_less > map_type;
+					if(key1.first < key2.first) return true;
+					if(key1.second && key2.second)
+						return _group_compare(*key1.second, *key2.second);
+					return false;
+				}
+			private:
+				GroupCompare _group_compare;
 			};
+			template<typename Group, typename GroupCompare>
+			struct slot_group_map
+			{
+				typedef std::map<typename group_key<Group>::type, boost::shared_ptr<ConnectionBodyBase>,
+					group_key_less<Group, GroupCompare> > map_type;
+			};
+			template<typename T, typename Less>
+			bool weakly_equivalent(const Less &less, const T &arg1, const T &arg2)
+			{
+				if(less(arg1, arg2)) return false;
+				if(less(arg2, arg1)) return false;
+				return true;
+			}
 		} // end namespace detail
 		enum connect_position { at_back, at_front };
 	} // end namespace signalslib

@@ -30,13 +30,13 @@ namespace EPG {
       //   - calls the connected slots when dereferenced
       //   - caches the result of calling the slots
       template<typename Function, typename Iterator>
-      class slot_call_iterator
-        : public boost::iterator_facade<slot_call_iterator<Function, Iterator>,
+      class slot_call_iterator_t
+        : public boost::iterator_facade<slot_call_iterator_t<Function, Iterator>,
                                  typename Function::result_type,
                                  boost::single_pass_traversal_tag,
                                  typename Function::result_type const&>
       {
-        typedef boost::iterator_facade<slot_call_iterator<Function, Iterator>,
+        typedef boost::iterator_facade<slot_call_iterator_t<Function, Iterator>,
                                 typename Function::result_type,
                                 boost::single_pass_traversal_tag,
                                 typename Function::result_type const&>
@@ -47,7 +47,7 @@ namespace EPG {
         friend class boost::iterator_core_access;
 
       public:
-        slot_call_iterator(Iterator iter_in, Iterator end_in, Function f,
+        slot_call_iterator_t(Iterator iter_in, Iterator end_in, Function f,
                            boost::optional<result_type> &c)
           : iter(iter_in), end(end_in), f(f), cache(&c)
         {
@@ -71,7 +71,7 @@ namespace EPG {
           cache->reset();
         }
 
-        bool equal(const slot_call_iterator& other) const
+        bool equal(const slot_call_iterator_t& other) const
         {
           lockNextCallable();
           other.lockNextCallable();
