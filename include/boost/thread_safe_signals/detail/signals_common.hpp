@@ -15,7 +15,7 @@
 #  include BOOST_ABI_PREFIX
 #endif
 
-namespace EPG {
+namespace boost {
   namespace signalslib {
     namespace detail {
       // The unusable class is a placeholder for unused function arguments

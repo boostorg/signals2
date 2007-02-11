@@ -20,7 +20,7 @@
 #  include BOOST_ABI_PREFIX
 #endif
 
-namespace EPG
+namespace boost
 {
 	namespace signalslib
 	{
@@ -100,7 +100,7 @@ namespace EPG
 	};
 } // end namespace boost
 
-void EPG::signalslib::detail::tracked_objects_visitor::maybe_add_tracked(const boost::signalslib::detail::tracked_base& t, boost::mpl::bool_<true>) const
+void boost::signalslib::detail::tracked_objects_visitor::maybe_add_tracked(const boost::signalslib::detail::tracked_base& t, boost::mpl::bool_<true>) const
 {
 	slot_->add_tracked(t);
 }

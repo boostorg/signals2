@@ -33,7 +33,7 @@
 #include <boost/weak_ptr.hpp>
 #include <vector>
 
-namespace EPG
+namespace boost
 {
 	namespace signalslib
 	{
@@ -133,16 +133,16 @@ namespace EPG
 			boost::weak_ptr<detail::ConnectionBodyBase> _weakConnectionBody;
 		};
 
-		class scoped_connection: public EPG::signalslib::connection, boost::noncopyable
+		class scoped_connection: public boost::signalslib::connection, boost::noncopyable
 		{
 		public:
 			virtual ~scoped_connection()
 			{
 				disconnect();
 			}
-			const scoped_connection& operator=(const EPG::signalslib::connection &rhs)
+			const scoped_connection& operator=(const boost::signalslib::connection &rhs)
 			{
-				EPG::signalslib::connection::operator=(rhs);
+				boost::signalslib::connection::operator=(rhs);
 				return *this;
 			}
 		};

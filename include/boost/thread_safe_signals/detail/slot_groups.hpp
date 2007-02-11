@@ -19,7 +19,7 @@
 #include <boost/shared_ptr.hpp>
 #include <utility>
 
-namespace EPG {
+namespace boost {
 	namespace signalslib {
 		namespace detail {
 			enum slot_meta_group {front_ungrouped_slots, grouped_slots, back_ungrouped_slots};

@@ -38,7 +38,7 @@
 // arg1, arg2, ..., argn
 #define EPG_SIGNAL_SIGNATURE_ARG_NAMES(arity) BOOST_PP_ENUM(arity, EPG_SIGNAL_SIGNATURE_ARG_NAME, ~)
 
-namespace EPG
+namespace boost
 {
 	template<typename R, BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(EPG_SIGNALS_NUM_ARGS), typename T) BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS)
 		typename Combiner = boost::last_value<R>,
@@ -83,7 +83,7 @@ namespace EPG
 		virtual ~EPG_SIGNAL_CLASS_NAME()
 		{}
 		// connect slot
-		EPG::signalslib::connection connect(const slot_type &slot, signalslib::connect_position position = signalslib::at_back)
+		signalslib::connection connect(const slot_type &slot, signalslib::connect_position position = signalslib::at_back)
 		{
 			boost::mutex::scoped_lock lock(_mutex);
 			connection_body_type newConnectionBody =
@@ -99,9 +99,9 @@ namespace EPG
 				_connectionBodies->push_front(newConnectionBody);
 			}
 			newConnectionBody->set_group_key(group_key);
-			return EPG::signalslib::connection(newConnectionBody);
+			return signalslib::connection(newConnectionBody);
 		}
-		EPG::signalslib::connection connect(const group_type &group,
+		signalslib::connection connect(const group_type &group,
 			const slot_type &slot, signalslib::connect_position position = signalslib::at_back)
 		{
 			boost::mutex::scoped_lock lock(_mutex);
@@ -142,7 +142,7 @@ namespace EPG
 					_connectionBodies->insert(it, newConnectionBody);
 				}
 			}
-			return EPG::signalslib::connection(newConnectionBody);
+			return signalslib::connection(newConnectionBody);
 		}
 		// disconnect slot(s)
 		void disconnect_all_slots()
