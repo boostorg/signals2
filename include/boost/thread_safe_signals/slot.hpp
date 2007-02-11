@@ -27,7 +27,7 @@ namespace EPG
 		namespace detail
 		{
 			class slot_base;
-			template<typename Signature, typename GroupKey, typename SlotFunction>
+			template<typename GroupKey, typename SlotFunction>
 			class ConnectionBody;
 
 			// Visitor to collect tracked_base-derived objects from a bound function.

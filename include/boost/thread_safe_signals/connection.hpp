@@ -88,7 +88,7 @@ namespace EPG
 				mutable bool _connected;
 			};
 
-			template<typename Signature, typename GroupKey, typename SlotFunction>
+			template<typename GroupKey, typename SlotFunction>
 			class ConnectionBody: public ConnectionBodyBase
 			{
 			public:

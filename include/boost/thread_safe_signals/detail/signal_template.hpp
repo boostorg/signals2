@@ -43,273 +43,273 @@
 
 namespace EPG
 {
+	template<typename Signature, typename Combiner, typename Group,
+		typename GroupCompare, typename SlotFunction>
+	class EPG_SIGNAL_CLASS_NAME
+	{
+	private:
+		class slot_invoker;
+		typedef signalslib::detail::group_key<Group>::type group_key_type;
+		typedef boost::shared_ptr<signalslib::detail::ConnectionBody<group_key_type, SlotFunction> > connection_body_type;
+		typedef std::list<connection_body_type> ConnectionList;
+	public:
+		typedef SlotFunction slot_function_type;
+		typedef slot<slot_function_type> slot_type;
+		typedef typename slot_function_type::result_type slot_result_type;
+		typedef Combiner combiner_type;
+		typedef typename combiner_type::result_type result_type;
+		typedef Group group_type;
+		typedef GroupCompare group_compare_type;
+		typedef signalslib::detail::slot_call_iterator_t<slot_invoker, ConnectionList::iterator > slot_call_iterator;
+// typedef typename boost::function_traits<Signature>::argn_type argn_type
+#define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
+	typedef EPG_SIGNAL_SIGNATURE_ARG_TYPE(~, n, Signature) BOOST_PP_CAT(BOOST_PP_CAT(arg, BOOST_PP_INC(n)), _type);
+		BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, Signature)
+#undef EPG_SIGNAL_MISC_STATEMENT
+#if EPG_SIGNALS_NUM_ARGS == 1
+		typedef arg1_type argument_type;
+#elif EPG_SIGNALS_NUM_ARGS == 2
+		typedef arg1_type first_argument_type;
+		typedef arg2_type second_argument_type;
+#endif
+		static const int arity = EPG_SIGNALS_NUM_ARGS;
+
+		EPG_SIGNAL_CLASS_NAME(const combiner_type &combiner, const group_compare_type &group_compare):
+			_combiner(new combiner_type(combiner)), _connectionBodies(new ConnectionList),
+			_group_key_comparator(group_compare)
+		{};
+		virtual ~EPG_SIGNAL_CLASS_NAME()
+		{}
+		// connect slot
+		EPG::signalslib::connection connect(const slot_type &slot, signalslib::connect_position position = signalslib::at_back)
+		{
+			boost::mutex::scoped_lock lock(_mutex);
+			connection_body_type newConnectionBody =
+				create_new_connection(slot);
+			group_key_type group_key;
+			if(position == signalslib::at_back)
+			{
+				group_key.first = signalslib::detail::back_ungrouped_slots;
+				_connectionBodies->push_back(newConnectionBody);
+			}else
+			{
+				group_key.first = signalslib::detail::front_ungrouped_slots;
+				_connectionBodies->push_front(newConnectionBody);
+			}
+			newConnectionBody->set_group_key(group_key);
+			return EPG::signalslib::connection(newConnectionBody);
+		}
+		EPG::signalslib::connection connect(const group_type &group,
+			const slot_type &slot, signalslib::connect_position position = signalslib::at_back)
+		{
+			boost::mutex::scoped_lock lock(_mutex);
+			connection_body_type newConnectionBody =
+				create_new_connection(slot);
+			// update map to first connection body in group if needed
+			group_key_type group_key(signalslib::detail::grouped_slots,
+				boost::shared_ptr<group_type>(new group_type(group)));
+			newConnectionBody->set_group_key(group_key);
+			if(position == signalslib::at_back)
+			{
+				ConnectionList::reverse_iterator rit;
+				for(rit = _connectionBodies->rbegin(); rit != _connectionBodies->rend(); ++rit)
+				{
+					if(_group_key_comparator(group_key, (*rit)->group_key()) == false)
+					{
+						_connectionBodies->insert(rit.base(), newConnectionBody);
+						break;
+					}
+				}
+				if(rit == _connectionBodies->rend())
+				{
+					_connectionBodies->insert(rit.base(), newConnectionBody);
+				}
+			}else	// at_front
+			{
+				ConnectionList::iterator it;
+				for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
+				{
+					if(_group_key_comparator((*it)->group_key(), group_key) == false)
+					{
+						_connectionBodies->insert(it, newConnectionBody);
+						break;
+					}
+				}
+				if(it == _connectionBodies->end())
+				{
+					_connectionBodies->insert(it, newConnectionBody);
+				}
+			}
+			return EPG::signalslib::connection(newConnectionBody);
+		}
+		// disconnect slot(s)
+		void disconnect_all_slots()
+		{
+			boost::mutex::scoped_lock listLock(_mutex);
+			ConnectionList::iterator it;
+			for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
+			{
+				(*it)->disconnect();
+			}
+			_connectionBodies->clear();
+		}
+		void disconnect(const group_type &group)
+		{
+			boost::mutex::scoped_lock listLock(_mutex);
+			group_key_type group_key(signalslib::detail::grouped_slots,
+				boost::shared_ptr<group_type>(new group_type(group)));
+			ConnectionList::iterator it;
+			for(it = _connectionBodies->begin(); it != _connectionBodies->end();)
+			{
+				if(_group_key_comparator((*it)->group_key(), group_key))
+				{
+					++it;
+					continue;
+				}
+				if(_group_key_comparator(group_key, (*it)->group_key())) break;
+				(*it)->disconnect();
+				it = _connectionBodies->erase(it);
+			}
+		}
+		// emit signal
+		result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, Signature))
+		{
+			boost::shared_ptr<ConnectionList> localConnectionBodies;
+			boost::shared_ptr<combiner_type> local_combiner;
+			typename ConnectionList::iterator it;
+			{
+				boost::mutex::scoped_lock listLock(_mutex);
+				// only clean up if it is safe to do so
+				if(_connectionBodies.use_count() == 1)
+					nolockCleanupConnections(_connectionBodies, false);
+				localConnectionBodies = _connectionBodies;
+				/* make a local copy of _combiner while holding mutex, so we are
+				thread safe against the combiner getting modified by set_combiner()*/
+				local_combiner = _combiner;
+			}
+			slot_invoker invoker;
+// invoker.argn = argn;
+#define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
+	invoker.EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~) = EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~) ;
+			BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, ~)
+#undef EPG_SIGNAL_MISC_STATEMENT
+			boost::optional<signalslib::detail::slot_result_type_wrapper<slot_result_type>::type > cache;
+			slot_call_iterator slot_iter_begin(
+				localConnectionBodies->begin(), localConnectionBodies->end(), invoker, cache);
+			slot_call_iterator slot_iter_end(
+				localConnectionBodies->end(), localConnectionBodies->end(), invoker, cache);
+			return (*local_combiner)(slot_iter_begin, slot_iter_end);
+		}
+		std::size_t num_slots() const
+		{
+			boost::mutex::scoped_lock listLock(_mutex);
+			ConnectionList::iterator it;
+			std::size_t count = 0;
+			for(it = _connectionBodies.begin(); it != _connectionBodies.end(); ++it)
+			{
+				if((*it)->connected()) ++count;
+			}
+			return count;
+		}
+		bool empty() const
+		{
+			boost::mutex::scoped_lock listLock(_mutex);
+			ConnectionList::iterator it;
+			for(it = _connectionBodies.begin(); it != _connectionBodies.end(); ++it)
+			{
+				if((*it)->connected()) return false;
+			}
+			return true;
+		}
+		combiner_type combiner() const
+		{
+			boost::mutex::scoped_lock lock(_mutex);
+			return *_combiner;
+		}
+		void set_combiner(const combiner_type &combiner)
+		{
+			boost::mutex::scoped_lock lock(_mutex);
+			_combiner.reset(new combiner_type(combiner));
+		}
+	private:
+		// slot_invoker is passed to slot_call_iterator_t to run slots
+		class slot_invoker
+		{
+		public:
+			typedef typename signalslib::detail::slot_result_type_wrapper<slot_result_type>::type result_type;
+
+			result_type operator ()(const connection_body_type &connectionBody) const
+			{
+				result_type *resolver = 0;
+				return m_invoke(connectionBody,
+					EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS) BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS)
+					resolver);
+			}
+// typename boost::function_traits<Signature>::argn_type argn;
+#define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
+	EPG_SIGNAL_SIGNATURE_ARG_TYPE(~, n, Signature) EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~);
+			BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, Signature)
+#undef EPG_SIGNAL_MISC_STATEMENT
+		private:
+			signalslib::detail::unusable m_invoke(const connection_body_type &connectionBody,
+				const signalslib::detail::unusable *resolver) const
+			{
+				connectionBody->slot(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
+				return signalslib::detail::unusable();
+			}
+			result_type m_invoke(const connection_body_type &connectionBody, ...) const
+			{
+				return connectionBody->slot(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
+			}
+		};
+
+		// clean up disconnected connections
+		void nolockCleanupConnections(boost::shared_ptr<ConnectionList> &connectionBodies, bool grab_tracked)
+		{
+			assert(connectionBodies.use_count() == 1);
+			ConnectionList::iterator it;
+			for(it = connectionBodies->begin(); it != connectionBodies->end();)
+			{
+				// skip over slots that are busy
+				signalslib::detail::ConnectionBodyBase::mutex_type::scoped_try_lock lock((*it)->mutex);
+				if(lock.locked() == false) continue;
+				if(grab_tracked)
+					(*it)->nolock_grab_tracked_objects();
+				if((*it)->nolock_nograb_connected() == false)
+				{
+					it = connectionBodies->erase(it);
+				}else
+				{
+					++it;
+				}
+			}
+		}
+		/* Make a new copy of the slot list if it is currently being iterated through
+		by signal invocation. */
+		void nolockForceUniqueConnectionList()
+		{
+			if(_connectionBodies.use_count() > 1)
+			{
+				boost::shared_ptr<ConnectionList> newList(new ConnectionList(*_connectionBodies));
+				_connectionBodies = newList;
+			}
+		}
+		connection_body_type create_new_connection(const slot_type &slot)
+		{
+			nolockForceUniqueConnectionList();
+			nolockCleanupConnections(_connectionBodies, true);
+			return connection_body_type(new signalslib::detail::ConnectionBody<group_key_type, slot_function_type>(slot));
+		}
+		boost::shared_ptr<combiner_type> _combiner;
+		boost::shared_ptr<ConnectionList> _connectionBodies;
+		// holds first connection body of each group
+		signalslib::detail::group_key_less<Group, GroupCompare> _group_key_comparator;
+		mutable boost::mutex _mutex;
+	};
 	namespace signalslib
 	{
 		namespace detail
 		{
-			template<typename Signature, typename Combiner, typename Group,
-				typename GroupCompare, typename SlotFunction>
-			class EPG_SIGNAL_CLASS_NAME
-			{
-			private:
-				class slot_invoker;
-				typedef group_key<Group>::type group_key_type;
-				typedef boost::shared_ptr<ConnectionBody<Signature, group_key_type, SlotFunction> > connection_body_type;
-				typedef std::list<connection_body_type> ConnectionList;
-			public:
-				typedef SlotFunction slot_function_type;
-				typedef slot<slot_function_type> slot_type;
-				typedef typename slot_function_type::result_type slot_result_type;
-				typedef Combiner combiner_type;
-				typedef typename combiner_type::result_type result_type;
-				typedef Group group_type;
-				typedef GroupCompare group_compare_type;
-				typedef slot_call_iterator_t<slot_invoker, ConnectionList::iterator > slot_call_iterator;
-// typedef typename boost::function_traits<Signature>::argn_type argn_type
-#define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
-	typedef EPG_SIGNAL_SIGNATURE_ARG_TYPE(~, n, Signature) BOOST_PP_CAT(BOOST_PP_CAT(arg, BOOST_PP_INC(n)), _type);
-				BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, Signature)
-#undef EPG_SIGNAL_MISC_STATEMENT
-#if EPG_SIGNALS_NUM_ARGS == 1
-				typedef arg1_type argument_type;
-#elif EPG_SIGNALS_NUM_ARGS == 2
-				typedef arg1_type first_argument_type;
-				typedef arg2_type second_argument_type;
-#endif
-				static const int arity = EPG_SIGNALS_NUM_ARGS;
-
-				EPG_SIGNAL_CLASS_NAME(const combiner_type &combiner, const group_compare_type &group_compare):
-                	_combiner(new combiner_type(combiner)), _connectionBodies(new ConnectionList),
-					_group_key_comparator(group_compare)
-				{};
-				virtual ~EPG_SIGNAL_CLASS_NAME()
-				{}
-				// connect slot
-				EPG::signalslib::connection connect(const slot_type &slot, signalslib::connect_position position = at_back)
-				{
-					boost::mutex::scoped_lock lock(_mutex);
-					connection_body_type newConnectionBody =
-						create_new_connection(slot);
-					group_key_type group_key;
-					if(position == at_back)
-					{
-						group_key.first = back_ungrouped_slots;
-						_connectionBodies->push_back(newConnectionBody);
-					}else
-					{
-						group_key.first = front_ungrouped_slots;
-						_connectionBodies->push_front(newConnectionBody);
-					}
-					newConnectionBody->set_group_key(group_key);
-					return EPG::signalslib::connection(newConnectionBody);
-				}
-				EPG::signalslib::connection connect(const group_type &group,
-					const slot_type &slot, signalslib::connect_position position = at_back)
-				{
-					boost::mutex::scoped_lock lock(_mutex);
-					connection_body_type newConnectionBody =
-						create_new_connection(slot);
-					// update map to first connection body in group if needed
-					group_key_type group_key(grouped_slots,
-						boost::shared_ptr<group_type>(new group_type(group)));
-					newConnectionBody->set_group_key(group_key);
-					if(position == at_back)
-					{
-						ConnectionList::reverse_iterator rit;
-						for(rit = _connectionBodies->rbegin(); rit != _connectionBodies->rend(); ++rit)
-						{
-							if(_group_key_comparator(group_key, (*rit)->group_key()) == false)
-							{
-								_connectionBodies->insert(rit.base(), newConnectionBody);
-								break;
-							}
-						}
-						if(rit == _connectionBodies->rend())
-						{
-							_connectionBodies->insert(rit.base(), newConnectionBody);
-						}
-					}else	// at_front
-					{
-						ConnectionList::iterator it;
-						for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
-						{
-							if(_group_key_comparator((*it)->group_key(), group_key) == false)
-							{
-								_connectionBodies->insert(it, newConnectionBody);
-								break;
-							}
-						}
-						if(it == _connectionBodies->end())
-						{
-							_connectionBodies->insert(it, newConnectionBody);
-						}
-					}
-					return EPG::signalslib::connection(newConnectionBody);
-				}
-				// disconnect slot(s)
-				void disconnect_all_slots()
-				{
-					boost::mutex::scoped_lock listLock(_mutex);
-					ConnectionList::iterator it;
-					for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
-					{
-						(*it)->disconnect();
-					}
-					_connectionBodies->clear();
-				}
-				void disconnect(const group_type &group)
-				{
-					boost::mutex::scoped_lock listLock(_mutex);
-					group_key_type group_key(grouped_slots,
-						boost::shared_ptr<group_type>(new group_type(group)));
-					ConnectionList::iterator it;
-					for(it = _connectionBodies->begin(); it != _connectionBodies->end();)
-					{
-						if(_group_key_comparator((*it)->group_key(), group_key))
-						{
-							++it;
-							continue;
-						}
-						if(_group_key_comparator(group_key, (*it)->group_key())) break;
-						(*it)->disconnect();
-						it = _connectionBodies->erase(it);
-					}
-				}
-				// emit signal
-				result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, Signature))
-				{
-					boost::shared_ptr<ConnectionList> localConnectionBodies;
-					boost::shared_ptr<combiner_type> local_combiner;
-					typename ConnectionList::iterator it;
-					{
-						boost::mutex::scoped_lock listLock(_mutex);
-						// only clean up if it is safe to do so
-						if(_connectionBodies.use_count() == 1)
-							nolockCleanupConnections(_connectionBodies, false);
-						localConnectionBodies = _connectionBodies;
-						/* make a local copy of _combiner while holding mutex, so we are
-						thread safe against the combiner getting modified by set_combiner()*/
-						local_combiner = _combiner;
-					}
-					slot_invoker invoker;
-// invoker.argn = argn;
-#define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
-	invoker.EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~) = EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~) ;
-					BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, ~)
-#undef EPG_SIGNAL_MISC_STATEMENT
-					boost::optional<slot_result_type_wrapper<slot_result_type>::type > cache;
-					slot_call_iterator slot_iter_begin(
-						localConnectionBodies->begin(), localConnectionBodies->end(), invoker, cache);
-					slot_call_iterator slot_iter_end(
-						localConnectionBodies->end(), localConnectionBodies->end(), invoker, cache);
-					return (*local_combiner)(slot_iter_begin, slot_iter_end);
-				}
-				std::size_t num_slots() const
-				{
-					boost::mutex::scoped_lock listLock(_mutex);
-					ConnectionList::iterator it;
-					std::size_t count = 0;
-					for(it = _connectionBodies.begin(); it != _connectionBodies.end(); ++it)
-					{
-						if((*it)->connected()) ++count;
-					}
-					return count;
-				}
-				bool empty() const
-				{
-					boost::mutex::scoped_lock listLock(_mutex);
-					ConnectionList::iterator it;
-					for(it = _connectionBodies.begin(); it != _connectionBodies.end(); ++it)
-					{
-						if((*it)->connected()) return false;
-					}
-					return true;
-				}
-				combiner_type combiner() const
-				{
-					boost::mutex::scoped_lock lock(_mutex);
-					return *_combiner;
-				}
-				void set_combiner(const combiner_type &combiner)
-				{
-					boost::mutex::scoped_lock lock(_mutex);
-					_combiner.reset(new combiner_type(combiner));
-				}
-			private:
-				// slot_invoker is passed to slot_call_iterator_t to run slots
-				class slot_invoker
-				{
-				public:
-					typedef typename slot_result_type_wrapper<slot_result_type>::type result_type;
-
-					result_type operator ()(const connection_body_type &connectionBody) const
-					{
-						result_type *resolver = 0;
-						return m_invoke(connectionBody,
-							EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS) BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS)
-							resolver);
-					}
-// typename boost::function_traits<Signature>::argn_type argn;
-#define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
-	EPG_SIGNAL_SIGNATURE_ARG_TYPE(~, n, Signature) EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~);
-					BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, Signature)
-#undef EPG_SIGNAL_MISC_STATEMENT
-				private:
-					unusable m_invoke(const connection_body_type &connectionBody, const unusable *resolver) const
-					{
-						connectionBody->slot(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
-						return unusable();
-					}
-					result_type m_invoke(const connection_body_type &connectionBody, ...) const
-					{
-						return connectionBody->slot(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
-					}
-				};
-
-				// clean up disconnected connections
-				void nolockCleanupConnections(boost::shared_ptr<ConnectionList> &connectionBodies, bool grab_tracked)
-				{
-					assert(connectionBodies.use_count() == 1);
-					ConnectionList::iterator it;
-					for(it = connectionBodies->begin(); it != connectionBodies->end();)
-					{
-						// skip over slots that are busy
-						ConnectionBodyBase::mutex_type::scoped_try_lock lock((*it)->mutex);
-						if(lock.locked() == false) continue;
-						if(grab_tracked)
-							(*it)->nolock_grab_tracked_objects();
-						if((*it)->nolock_nograb_connected() == false)
-						{
-							it = connectionBodies->erase(it);
-						}else
-						{
-							++it;
-						}
-					}
-				}
-				/* Make a new copy of the slot list if it is currently being iterated through
-				by signal invocation. */
-				void nolockForceUniqueConnectionList()
-				{
-					if(_connectionBodies.use_count() > 1)
-					{
-						boost::shared_ptr<ConnectionList> newList(new ConnectionList(*_connectionBodies));
-						_connectionBodies = newList;
-					}
-				}
-				connection_body_type create_new_connection(const slot_type &slot)
-				{
-					nolockForceUniqueConnectionList();
-					nolockCleanupConnections(_connectionBodies, true);
-					return connection_body_type(new ConnectionBody<Signature, group_key_type, slot_function_type>(slot));
-				}
-				boost::shared_ptr<combiner_type> _combiner;
-				boost::shared_ptr<ConnectionList> _connectionBodies;
-				// holds first connection body of each group
-				group_key_less<Group, GroupCompare> _group_key_comparator;
-				mutable boost::mutex _mutex;
-			};
-
 			template<unsigned arity, typename Signature, typename Combiner,
 				typename Group, typename GroupCompare, typename SlotFunction> class SignalN;
 			// partial template specialization
