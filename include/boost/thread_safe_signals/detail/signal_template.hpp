@@ -54,7 +54,6 @@ namespace EPG
 			private:
 				class slot_invoker;
 				typedef group_key<Group>::type group_key_type;
-				typedef slot_group_map<Group, GroupCompare>::map_type group_map_type;
 				typedef boost::shared_ptr<ConnectionBody<Signature, group_key_type, SlotFunction> > connection_body_type;
 				typedef std::list<connection_body_type> ConnectionList;
 			public:
@@ -94,19 +93,12 @@ namespace EPG
 					group_key_type group_key;
 					if(position == at_back)
 					{
-						_connectionBodies->push_back(newConnectionBody);
-						// update map to first connection body in back_ungrouped_slots if needed
 						group_key.first = back_ungrouped_slots;
-						if(_groupMap.find(group_key) == _groupMap.end())
-						{
-							_groupMap.insert(group_map_type::value_type(group_key, newConnectionBody));
-						}
+						_connectionBodies->push_back(newConnectionBody);
 					}else
 					{
-						_connectionBodies->push_front(newConnectionBody);
-						// update map to first connection body in front_ungrouped_slots
 						group_key.first = front_ungrouped_slots;
-						_groupMap.insert(group_map_type::value_type(group_key, newConnectionBody));
+						_connectionBodies->push_front(newConnectionBody);
 					}
 					newConnectionBody->set_group_key(group_key);
 					return EPG::signalslib::connection(newConnectionBody);
@@ -117,39 +109,41 @@ namespace EPG
 					boost::mutex::scoped_lock lock(_mutex);
 					connection_body_type newConnectionBody =
 						create_new_connection(slot);
-					ConnectionList::iterator connection_insert_it;
 					// update map to first connection body in group if needed
 					group_key_type group_key(grouped_slots,
 						boost::shared_ptr<group_type>(new group_type(group)));
 					newConnectionBody->set_group_key(group_key);
-					group_map_type::iterator group_it;
 					if(position == at_back)
 					{
-						group_it = _groupMap.upper_bound(group_key);
-						connection_insert_it = std::find(_connectionBodies.begin(), _connectionBodies.end(), group_it->second);
-						if(group_it == _groupMap.begin())
+						ConnectionList::reverse_iterator rit;
+						for(rit = _connectionBodies->rbegin(); rit != _connectionBodies->rend(); ++rit)
 						{
-							_groupMap.insert(group_map_type::value_type(group_key, newConnectionBody));
-						}else
-						{
-							group_map_type::iterator previous = group_it;
-							--previous;
-							if(weakly_equivalent(_group_key_comparator, group_key, previous->first) == false)
+							if(_group_key_comparator(group_key, (*rit)->group_key()) == false)
 							{
-								_groupMap.insert(group_map_type::value_type(group_key, newConnectionBody));
+								_connectionBodies->insert(rit.base(), newConnectionBody);
+								break;
 							}
+						}
+						if(rit == _connectionBodies->rend())
+						{
+							_connectionBodies->insert(rit.base(), newConnectionBody);
 						}
 					}else	// at_front
 					{
-						group_it = _groupMap.lower_bound(group_key);
-						connection_insert_it = std::find(_connectionBodies.begin(), _connectionBodies.end(), group_it->second);
-						_groupMap.insert(group_map_type::value_type(group_key, newConnectionBody));
-						if(weakly_equivalent(_group_key_comparator, group_key, group_it->first))
+						ConnectionList::iterator it;
+						for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
 						{
-							_groupMap.erase(group_it);
+							if(_group_key_comparator((*it)->group_key(), group_key) == false)
+							{
+								_connectionBodies->insert(it, newConnectionBody);
+								break;
+							}
+						}
+						if(it == _connectionBodies->end())
+						{
+							_connectionBodies->insert(it, newConnectionBody);
 						}
 					}
-					_connectionBodies->insert(connection_insert_it, newConnectionBody);
 					return EPG::signalslib::connection(newConnectionBody);
 				}
 				// disconnect slot(s)
@@ -157,40 +151,29 @@ namespace EPG
 				{
 					boost::mutex::scoped_lock listLock(_mutex);
 					ConnectionList::iterator it;
-					for(it = _connectionBodies.begin(); it != _connectionBodies.end(); ++it)
+					for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
 					{
 						(*it)->disconnect();
 					}
-					_connectionBodies.clear();
-					_groupMap.clear();
+					_connectionBodies->clear();
 				}
 				void disconnect(const group_type &group)
 				{
 					boost::mutex::scoped_lock listLock(_mutex);
 					group_key_type group_key(grouped_slots,
 						boost::shared_ptr<group_type>(new group_type(group)));
-					group_map_type::iterator group_begin_it =
-						_groupMap.lower_bound(group_key);
-					group_map_type::iterator group_end_it =
-						_groupMap.upper_bound(group_key);
-					if(group_begin_it == _groupMap.end())
-						return;
-					ConnectionList::iterator connnection_begin_it = group_begin_it->second;
-					ConnectionList::iterator connnection_end_it;
-					if(group_end_it == _groupMap.end())
-					{
-						connection_end_it = _connectionBodies.end();
-					}else
-					{
-						connection_end_it = group_end_it->second;
-					}
 					ConnectionList::iterator it;
-					for(it = _connection_begin_it; it != _connection_end_it; ++it)
+					for(it = _connectionBodies->begin(); it != _connectionBodies->end();)
 					{
+						if(_group_key_comparator((*it)->group_key(), group_key))
+						{
+							++it;
+							continue;
+						}
+						if(_group_key_comparator(group_key, (*it)->group_key())) break;
 						(*it)->disconnect();
+						it = _connectionBodies->erase(it);
 					}
-					_connectionBodies.erase(_connection_begin_it, _connection_end_it);
-					_groupMap.erase(group_begin_it, group_end_it);
 				}
 				// emit signal
 				result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, Signature))
@@ -297,21 +280,6 @@ namespace EPG
 							(*it)->nolock_grab_tracked_objects();
 						if((*it)->nolock_nograb_connected() == false)
 						{
-							// update group map if needed
-							group_map_type::iterator map_it =
-								_groupMap.lower_bound((*it)->group_key());
-							if(map_it != _groupMap.end())
-							{
-								// add new entry for first slot in group if needed
-								ConnectionList::iterator next_connection_it = it;
-								++next_connection_it;
-								if(next_connection_it != connectionBodies->end() &&
-									weakly_equivalent(_group_key_comparator, (*next_connection_it)->group_key(), (*it)->group_key()))
-								{
-									_groupMap.insert(group_map_type::value_type((*next_connection_it)->group_key(), *next_connection_it));
-								}
-								_groupMap.erase(map_it);
-							}
 							it = connectionBodies->erase(it);
 						}else
 						{
@@ -338,7 +306,6 @@ namespace EPG
 				boost::shared_ptr<combiner_type> _combiner;
 				boost::shared_ptr<ConnectionList> _connectionBodies;
 				// holds first connection body of each group
-				group_map_type _groupMap;
 				group_key_less<Group, GroupCompare> _group_key_comparator;
 				mutable boost::mutex _mutex;
 			};

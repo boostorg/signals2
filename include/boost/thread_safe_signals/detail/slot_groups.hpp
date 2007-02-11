@@ -46,12 +46,6 @@ namespace EPG {
 			private:
 				GroupCompare _group_compare;
 			};
-			template<typename Group, typename GroupCompare>
-			struct slot_group_map
-			{
-				typedef std::map<typename group_key<Group>::type, boost::shared_ptr<ConnectionBodyBase>,
-					group_key_less<Group, GroupCompare> > map_type;
-			};
 			template<typename T, typename Less>
 			bool weakly_equivalent(const Less &less, const T &arg1, const T &arg2)
 			{
