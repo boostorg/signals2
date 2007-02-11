@@ -24,27 +24,28 @@
 
 #define EPG_SIGNALS_NUM_ARGS BOOST_PP_ITERATION()
 
-#define EPG_SIGNAL_CLASS_NAME BOOST_PP_CAT(Signal, EPG_SIGNALS_NUM_ARGS)
+#define EPG_SIGNAL_CLASS_NAME BOOST_PP_CAT(signal, EPG_SIGNALS_NUM_ARGS)
 
-// typename boost::function_traits<Signature>::argn_type
-#define EPG_SIGNAL_SIGNATURE_ARG_TYPE(z, n, Signature) \
-	BOOST_PP_CAT(BOOST_PP_CAT(typename boost::function_traits<Signature>::arg, BOOST_PP_INC(n)), _type)
 // argn
 #define EPG_SIGNAL_SIGNATURE_ARG_NAME(z, n, data) BOOST_PP_CAT(arg, BOOST_PP_INC(n))
-// typename boost::function_traits<Signature>::argn_type argn
-#define EPG_SIGNAL_SIGNATURE_FULL_ARG(z, n, Signature) \
-	EPG_SIGNAL_SIGNATURE_ARG_TYPE(~, n, Signature) EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~)
-// typename boost::function_traits<Signature>::arg1_type arg1, typename boost::function_traits<Signature>::arg2_type arg2, ...
-// typename boost::function_traits<Signature>::argn_type argn
-#define EPG_SIGNAL_SIGNATURE_FULL_ARGS(arity, Signature) \
-	BOOST_PP_ENUM(arity, EPG_SIGNAL_SIGNATURE_FULL_ARG, Signature)
+// Tn argn
+#define EPG_SIGNAL_SIGNATURE_FULL_ARG(z, n, data) \
+	BOOST_PP_CAT(T, BOOST_PP_INC(n)) EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~)
+// T1 arg1, T2 arg2, ...
+// Tn argn
+#define EPG_SIGNAL_SIGNATURE_FULL_ARGS(arity, data) \
+	BOOST_PP_ENUM(arity, EPG_SIGNAL_SIGNATURE_FULL_ARG, data)
 // arg1, arg2, ..., argn
 #define EPG_SIGNAL_SIGNATURE_ARG_NAMES(arity) BOOST_PP_ENUM(arity, EPG_SIGNAL_SIGNATURE_ARG_NAME, ~)
 
 namespace EPG
 {
-	template<typename Signature, typename Combiner, typename Group,
-		typename GroupCompare, typename SlotFunction>
+	template<typename R, BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(EPG_SIGNALS_NUM_ARGS), typename T) BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS)
+		typename Combiner = boost::last_value<R>,
+		typename Group = int,
+		typename GroupCompare = std::less<Group>,
+		typename SlotFunction = BOOST_PP_CAT(boost::function, EPG_SIGNALS_NUM_ARGS)<R BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS)
+			BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(EPG_SIGNALS_NUM_ARGS), T) > >
 	class EPG_SIGNAL_CLASS_NAME
 	{
 	private:
@@ -61,10 +62,10 @@ namespace EPG
 		typedef Group group_type;
 		typedef GroupCompare group_compare_type;
 		typedef signalslib::detail::slot_call_iterator_t<slot_invoker, ConnectionList::iterator > slot_call_iterator;
-// typedef typename boost::function_traits<Signature>::argn_type argn_type
-#define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
-	typedef EPG_SIGNAL_SIGNATURE_ARG_TYPE(~, n, Signature) BOOST_PP_CAT(BOOST_PP_CAT(arg, BOOST_PP_INC(n)), _type);
-		BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, Signature)
+// typedef Tn argn_type;
+#define EPG_SIGNAL_MISC_STATEMENT(z, n, data) \
+	typedef BOOST_PP_CAT(T, BOOST_PP_INC(n)) BOOST_PP_CAT(BOOST_PP_CAT(arg, BOOST_PP_INC(n)), _type);
+		BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, ~)
 #undef EPG_SIGNAL_MISC_STATEMENT
 #if EPG_SIGNALS_NUM_ARGS == 1
 		typedef arg1_type argument_type;
@@ -74,7 +75,8 @@ namespace EPG
 #endif
 		static const int arity = EPG_SIGNALS_NUM_ARGS;
 
-		EPG_SIGNAL_CLASS_NAME(const combiner_type &combiner, const group_compare_type &group_compare):
+		EPG_SIGNAL_CLASS_NAME(const combiner_type &combiner = combiner_type(),
+			const group_compare_type &group_compare = group_compare_type()):
 			_combiner(new combiner_type(combiner)), _connectionBodies(new ConnectionList),
 			_group_key_comparator(group_compare)
 		{};
@@ -172,7 +174,7 @@ namespace EPG
 			}
 		}
 		// emit signal
-		result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, Signature))
+		result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~))
 		{
 			boost::shared_ptr<ConnectionList> localConnectionBodies;
 			boost::shared_ptr<combiner_type> local_combiner;
@@ -189,7 +191,7 @@ namespace EPG
 			}
 			slot_invoker invoker;
 // invoker.argn = argn;
-#define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
+#define EPG_SIGNAL_MISC_STATEMENT(z, n, data) \
 	invoker.EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~) = EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~) ;
 			BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, ~)
 #undef EPG_SIGNAL_MISC_STATEMENT
@@ -245,10 +247,10 @@ namespace EPG
 					EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS) BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS)
 					resolver);
 			}
-// typename boost::function_traits<Signature>::argn_type argn;
+// typename Tn argn;
 #define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
-	EPG_SIGNAL_SIGNATURE_ARG_TYPE(~, n, Signature) EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~);
-			BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, Signature)
+	BOOST_PP_CAT(T, BOOST_PP_INC(n)) EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~);
+			BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, ~)
 #undef EPG_SIGNAL_MISC_STATEMENT
 		private:
 			signalslib::detail::unusable m_invoke(const connection_body_type &connectionBody,
@@ -311,15 +313,21 @@ namespace EPG
 		namespace detail
 		{
 			template<unsigned arity, typename Signature, typename Combiner,
-				typename Group, typename GroupCompare, typename SlotFunction> class SignalN;
+				typename Group, typename GroupCompare, typename SlotFunction> class signalN;
 			// partial template specialization
 			template<typename Signature, typename Combiner, typename Group,
 				typename GroupCompare, typename SlotFunction>
-			class SignalN<EPG_SIGNALS_NUM_ARGS, Signature, Combiner, Group,
+			class signalN<EPG_SIGNALS_NUM_ARGS, Signature, Combiner, Group,
 				GroupCompare, SlotFunction>
 			{
 			public:
-				typedef EPG_SIGNAL_CLASS_NAME<Signature, Combiner, Group,
+				typedef EPG_SIGNAL_CLASS_NAME<typename boost::function_traits<Signature>::result_type,
+// typename boost::function_traits<Signature>::argn_type ,
+#define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
+	BOOST_PP_CAT(BOOST_PP_CAT(typename boost::function_traits<Signature>::arg, BOOST_PP_INC(n)), _type) ,
+					BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, Signature)
+#undef EPG_SIGNAL_MISC_STATEMENT
+					Combiner, Group,
 					GroupCompare, SlotFunction> type;
 			};
 		}
@@ -328,7 +336,6 @@ namespace EPG
 
 #undef EPG_SIGNALS_NUM_ARGS
 #undef EPG_SIGNAL_CLASS_NAME
-#undef EPG_SIGNAL_SIGNATURE_ARG_TYPE
 #undef EPG_SIGNAL_SIGNATURE_ARG_NAME
 #undef EPG_SIGNAL_SIGNATURE_FULL_ARG
 #undef EPG_SIGNAL_SIGNATURE_FULL_ARGS
