@@ -108,8 +108,7 @@ namespace boost
 			connection_body_type newConnectionBody =
 				create_new_connection(slot);
 			// update map to first connection body in group if needed
-			group_key_type group_key(signalslib::detail::grouped_slots,
-				boost::shared_ptr<group_type>(new group_type(group)));
+			group_key_type group_key(signalslib::detail::grouped_slots, group);
 			newConnectionBody->set_group_key(group_key);
 			if(position == signalslib::at_back)
 			{
@@ -158,8 +157,7 @@ namespace boost
 		void disconnect(const group_type &group)
 		{
 			boost::mutex::scoped_lock listLock(_mutex);
-			group_key_type group_key(signalslib::detail::grouped_slots,
-				boost::shared_ptr<group_type>(new group_type(group)));
+			group_key_type group_key(signalslib::detail::grouped_slots, group);
 			ConnectionList::iterator it;
 			for(it = _connectionBodies->begin(); it != _connectionBodies->end();)
 			{

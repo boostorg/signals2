@@ -15,8 +15,7 @@
 #endif
 
 #include <boost/thread_safe_signals/connection.hpp>
-#include <map>
-#include <boost/shared_ptr.hpp>
+#include <boost/optional.hpp>
 #include <utility>
 
 namespace boost {
@@ -26,7 +25,7 @@ namespace boost {
 			template<typename Group>
 			struct group_key
 			{
-				typedef std::pair<enum slot_meta_group, boost::shared_ptr<Group> > type;
+				typedef std::pair<enum slot_meta_group, boost::optional<Group> > type;
 			};
 			template<typename Group, typename GroupCompare>
 			class group_key_less
@@ -39,9 +38,8 @@ namespace boost {
 				bool operator ()(const typename group_key<Group>::type &key1, const typename group_key<Group>::type &key2) const
 				{
 					if(key1.first < key2.first) return true;
-					if(key1.second && key2.second)
-						return _group_compare(*key1.second, *key2.second);
-					return false;
+					if(key1.first != grouped_slots) return false;
+					return _group_compare(key1.second.get(), key2.second.get());
 				}
 			private:
 				GroupCompare _group_compare;
