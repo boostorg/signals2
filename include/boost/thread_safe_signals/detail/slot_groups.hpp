@@ -46,13 +46,6 @@ namespace boost {
 			private:
 				GroupCompare _group_compare;
 			};
-			template<typename T, typename Less>
-			bool weakly_equivalent(const Less &less, const T &arg1, const T &arg2)
-			{
-				if(less(arg1, arg2)) return false;
-				if(less(arg2, arg1)) return false;
-				return true;
-			}
 		} // end namespace detail
 		enum connect_position { at_back, at_front };
 	} // end namespace signalslib
