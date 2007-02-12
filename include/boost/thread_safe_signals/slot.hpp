@@ -58,7 +58,7 @@ namespace boost
 			{
 			public:
 				friend class signalslib::detail::tracked_objects_visitor;
-				template<typename Signature, typename GroupKey, typename SlotFunction>
+				template<typename GroupKey, typename SlotFunction>
 					friend class ConnectionBody;
 			private:
 				typedef std::vector<boost::weak_ptr<void> > tracked_objects_container;

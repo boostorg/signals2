@@ -87,7 +87,7 @@ namespace boost {
           {
             lock.reset(new lock_type((*iter)->mutex));
             trackedPtrs = (*iter)->nolock_grab_tracked_objects();
-            if((*iter)->nolock_nograb_connected()) break;
+            if((*iter)->nolock_nograb_blocked() == false) break;
           }
           if(iter == end) lock.reset();
         }

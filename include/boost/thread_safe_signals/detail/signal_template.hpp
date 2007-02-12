@@ -172,6 +172,22 @@ namespace boost
 				it = _connectionBodies->erase(it);
 			}
 		}
+		template <typename Slot>
+		void disconnect(const Slot &slot)
+		{
+			boost::mutex::scoped_lock listLock(_mutex);
+			typename ConnectionList::iterator it;
+			for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
+			{
+				typename signalslib::detail::ConnectionBodyBase::mutex_type::scoped_lock lock((*it)->mutex);
+				if((*it)->slot == slot)
+				{
+					(*it)->nolock_disconnect();
+					it = _connectionBodies->erase(it);
+					break;
+				}
+			}
+		}
 		// emit signal
 		result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~))
 		{
@@ -206,7 +222,7 @@ namespace boost
 			boost::mutex::scoped_lock listLock(_mutex);
 			typename ConnectionList::iterator it;
 			std::size_t count = 0;
-			for(it = _connectionBodies.begin(); it != _connectionBodies.end(); ++it)
+			for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
 			{
 				if((*it)->connected()) ++count;
 			}
@@ -216,7 +232,7 @@ namespace boost
 		{
 			boost::mutex::scoped_lock listLock(_mutex);
 			typename ConnectionList::iterator it;
-			for(it = _connectionBodies.begin(); it != _connectionBodies.end(); ++it)
+			for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
 			{
 				if((*it)->connected()) return false;
 			}

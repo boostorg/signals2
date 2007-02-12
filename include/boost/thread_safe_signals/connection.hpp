@@ -46,14 +46,18 @@ namespace boost
 				typedef boost::recursive_try_mutex mutex_type;
 				typedef std::vector<boost::weak_ptr<void> > tracked_objects_container;
 
-				ConnectionBodyBase(const tracked_objects_container tracked_objects):
-					_tracked_objects(tracked_objects), _connected(true)
+				ConnectionBodyBase(const tracked_objects_container &tracked_objects):
+					_tracked_objects(tracked_objects), _connected(true), _blocked(false)
 				{
 				}
 				virtual ~ConnectionBodyBase() {}
 				void disconnect()
 				{
 					mutex_type::scoped_lock lock(mutex);
+					nolock_disconnect();
+				}
+				void nolock_disconnect()
+				{
 					if(_connected)
 					{
 						_connected = false;
@@ -64,6 +68,21 @@ namespace boost
 					mutex_type::scoped_lock lock(mutex);
 					nolock_grab_tracked_objects();
 					return nolock_nograb_connected();
+				}
+				void block(bool should_block)
+				{
+					mutex_type::scoped_lock lock(mutex);
+					_blocked = should_block;
+				}
+				bool blocked() const
+				{
+					mutex_type::scoped_lock lock(mutex);
+					nolock_grab_tracked_objects();
+					return nolock_nograb_blocked();
+				}
+				bool nolock_nograb_blocked() const
+				{
+					return _blocked || (nolock_nograb_connected() == false);
 				}
 				bool nolock_nograb_connected() const {return _connected;}
 				// mutex should be locked when calling grabTrackedObjects
@@ -86,6 +105,7 @@ namespace boost
 			private:
 				tracked_objects_container _tracked_objects;
 				mutable bool _connected;
+				bool _blocked;
 			};
 
 			template<typename GroupKey, typename SlotFunction>
@@ -95,7 +115,6 @@ namespace boost
 				ConnectionBody(const slot<SlotFunction> &slot_in):
 					ConnectionBodyBase(slot_in.get_all_tracked()), slot(slot_in.get_slot_function())
 				{
-
 				}
 				virtual ~ConnectionBody() {}
 				const GroupKey& group_key() const {return _group_key;}
@@ -128,6 +147,22 @@ namespace boost
 				boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
 				if(connectionBody == 0) return false;
 				return connectionBody->connected();
+			}
+			void block(bool should_block=true)
+			{
+				boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
+				if(connectionBody == 0) return;
+				connectionBody->block(should_block);
+			}
+			void unblock()
+			{
+				block(false);
+			}
+			bool blocked() const
+			{
+				boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
+				if(connectionBody == 0) return true;
+				return connectionBody->blocked();
 			}
 		private:
 			boost::weak_ptr<detail::ConnectionBodyBase> _weakConnectionBody;
