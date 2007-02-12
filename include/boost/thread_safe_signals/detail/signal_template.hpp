@@ -243,16 +243,15 @@ namespace boost
 			{
 				result_type *resolver = 0;
 				return m_invoke(connectionBody,
-					EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS) BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS)
 					resolver);
 			}
-// Tn & argn;
+// Tn argn;
 #define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
-	BOOST_PP_CAT(T, BOOST_PP_INC(n)) & EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~);
+	BOOST_PP_CAT(T, BOOST_PP_INC(n)) EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~);
 			BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, ~)
 #undef EPG_SIGNAL_MISC_STATEMENT
 		private:
-			signalslib::detail::unusable m_invoke(const connection_body_type &connectionBody,
+			result_type m_invoke(const connection_body_type &connectionBody,
 				const signalslib::detail::unusable *resolver) const
 			{
 				connectionBody->slot(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
