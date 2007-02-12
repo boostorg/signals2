@@ -179,8 +179,18 @@ namespace boost
 			typename ConnectionList::iterator it;
 			for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
 			{
-				typename signalslib::detail::ConnectionBodyBase::mutex_type::scoped_lock lock((*it)->mutex);
-				if((*it)->slot == slot)
+				bool disconnect;
+				{
+					typename signalslib::detail::ConnectionBodyBase::mutex_type::scoped_lock lock((*it)->mutex);
+					if((*it)->slot == slot)
+					{
+						disconnect = true;
+					}else
+					{
+						disconnect = false;
+					}
+				}// scoped_lock destructs here, safe to erase now
+				if(disconnect)
 				{
 					(*it)->nolock_disconnect();
 					it = _connectionBodies->erase(it);
@@ -287,12 +297,16 @@ namespace boost
 			typename ConnectionList::iterator it;
 			for(it = connectionBodies->begin(); it != connectionBodies->end();)
 			{
-				// skip over slots that are busy
-				signalslib::detail::ConnectionBodyBase::mutex_type::scoped_try_lock lock((*it)->mutex);
-				if(lock.locked() == false) continue;
-				if(grab_tracked)
-					(*it)->nolock_grab_tracked_objects();
-				if((*it)->nolock_nograb_connected() == false)
+				bool connected;
+				{
+					// skip over slots that are busy
+					signalslib::detail::ConnectionBodyBase::mutex_type::scoped_try_lock lock((*it)->mutex);
+					if(lock.locked() == false) continue;
+					if(grab_tracked)
+						(*it)->nolock_grab_tracked_objects();
+					connected = (*it)->nolock_nograb_connected();
+				}// scoped lock destructs here, safe to erase now
+				if(connected == false)
 				{
 					it = connectionBodies->erase(it);
 				}else
