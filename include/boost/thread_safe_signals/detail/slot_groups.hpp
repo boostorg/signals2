@@ -30,6 +30,18 @@ namespace boost {
 			{
 				typedef std::pair<enum slot_meta_group, boost::optional<Group> > type;
 			};
+#if 0
+			template <typename T>
+			void print_key(const T &key)
+			{
+				std::cerr << "key: " << key.first << " ";
+				if(key.second)
+					std::cerr << key.second.get();
+				else
+					std::cerr << "uninitialized";
+				std::cerr << std::endl;
+			}
+#endif
 			template<typename Group, typename GroupCompare>
 			class group_key_less
 			{
@@ -103,19 +115,20 @@ namespace boost {
 				}
 				iterator erase(const group_key_type &key, const iterator &it)
 				{
+					assert(it != _list.end());
 					map_iterator map_it = _group_map.lower_bound(key);
 					assert(map_it != _group_map.end());
 					assert(weakly_equivalent(map_it->first, key));
-					iterator next = it;
-					++next;
-					// if next is in same group
-					if(next != _list.end() && next != upper_bound(key))
-					{
-						_group_map.insert(map_type::value_type(key, next));
-					}
 					if(map_it->second == it)
 					{
 						_group_map.erase(map_it);
+						iterator next = it;
+						++next;
+						// if next is in same group
+						if(next != _list.end() && next != upper_bound(key))
+						{
+							_group_map.insert(map_type::value_type(key, next));
+						}
 					}
 					return _list.erase(it);
 				}

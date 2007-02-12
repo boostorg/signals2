@@ -184,12 +184,8 @@ namespace boost
 				thread safe against the combiner getting modified by set_combiner()*/
 				local_combiner = _combiner;
 			}
-			slot_invoker invoker;
-// invoker.argn = argn;
-#define EPG_SIGNAL_MISC_STATEMENT(z, n, data) \
-	invoker.EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~) = EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~) ;
-			BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, ~)
-#undef EPG_SIGNAL_MISC_STATEMENT
+			slot_invoker invoker BOOST_PP_IF(EPG_SIGNALS_NUM_ARGS, \
+				(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS)), );
 			boost::optional<typename signalslib::detail::slot_result_type_wrapper<slot_result_type>::type > cache;
 			slot_call_iterator slot_iter_begin(
 				localConnectionBodies->begin(), localConnectionBodies->end(), invoker, cache);
@@ -235,6 +231,14 @@ namespace boost
 		public:
 			typedef typename signalslib::detail::slot_result_type_wrapper<slot_result_type>::type result_type;
 
+			slot_invoker(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~)) BOOST_PP_IF(EPG_SIGNALS_NUM_ARGS, :, )
+// argn ( argn ) ,
+#define EPG_SIGNAL_MISC_STATEMENT(z, n, data) \
+	BOOST_PP_CAT(arg, n) ( BOOST_PP_CAT(arg, n) )
+// arg1(arg1), arg2(arg2), ..., argn(argn)
+				BOOST_PP_ENUM_SHIFTED(BOOST_PP_INC(EPG_SIGNALS_NUM_ARGS), EPG_SIGNAL_MISC_STATEMENT, ~)
+#undef EPG_SIGNAL_MISC_STATEMENT
+			{}
 			result_type operator ()(const connection_body_type &connectionBody) const
 			{
 				result_type *resolver = 0;
@@ -242,9 +246,9 @@ namespace boost
 					EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS) BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS)
 					resolver);
 			}
-// typename Tn argn;
+// Tn & argn;
 #define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
-	BOOST_PP_CAT(T, BOOST_PP_INC(n)) EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~);
+	BOOST_PP_CAT(T, BOOST_PP_INC(n)) & EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~);
 			BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, ~)
 #undef EPG_SIGNAL_MISC_STATEMENT
 		private:

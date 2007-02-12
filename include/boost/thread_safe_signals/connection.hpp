@@ -164,6 +164,18 @@ namespace boost
 				if(connectionBody == 0) return true;
 				return connectionBody->blocked();
 			}
+			bool operator==(const connection& other) const
+			{
+				boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
+				boost::shared_ptr<detail::ConnectionBodyBase> otherConnectionBody(other._weakConnectionBody.lock());
+				return connectionBody == otherConnectionBody;
+			}
+			bool operator<(const connection& other) const
+			{
+				boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
+				boost::shared_ptr<detail::ConnectionBodyBase> otherConnectionBody(other._weakConnectionBody.lock());
+				return connectionBody < otherConnectionBody;
+			}
 		private:
 			boost::weak_ptr<detail::ConnectionBodyBase> _weakConnectionBody;
 		};
