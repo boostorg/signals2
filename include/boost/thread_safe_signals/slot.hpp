@@ -79,11 +79,10 @@ namespace boost
 	{
 	public:
 		template<typename F>
-		slot(const F& f)
-		: slot_function(f)
+		slot(const F& f): slot_function(f)
 		{
-		signalslib::detail::tracked_objects_visitor visitor(this);
-		boost::visit_each(visitor, f, 0);
+			signalslib::detail::tracked_objects_visitor visitor(this);
+			boost::visit_each(visitor, f, 0);
 		}
 		// We would have to enumerate all of the signalN classes here as friends
 		// to make this private (as it otherwise should be). We can't name all of

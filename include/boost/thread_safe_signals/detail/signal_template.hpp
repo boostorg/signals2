@@ -178,7 +178,31 @@ namespace boost
 				boost::mutex::scoped_lock listLock(_mutex);
 				// only clean up if it is safe to do so
 				if(_connectionBodies.use_count() == 1)
-					nolockCleanupConnections(_connectionBodies, false);
+					nolockCleanupConnections(false);
+				localConnectionBodies = _connectionBodies;
+				/* make a local copy of _combiner while holding mutex, so we are
+				thread safe against the combiner getting modified by set_combiner()*/
+				local_combiner = _combiner;
+			}
+			slot_invoker invoker BOOST_PP_IF(EPG_SIGNALS_NUM_ARGS, \
+				(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS)), );
+			boost::optional<typename signalslib::detail::slot_result_type_wrapper<slot_result_type>::type > cache;
+			slot_call_iterator slot_iter_begin(
+				localConnectionBodies->begin(), localConnectionBodies->end(), invoker, cache);
+			slot_call_iterator slot_iter_end(
+				localConnectionBodies->end(), localConnectionBodies->end(), invoker, cache);
+			return (*local_combiner)(slot_iter_begin, slot_iter_end);
+		}
+		result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~)) const
+		{
+			boost::shared_ptr<connection_list_type> localConnectionBodies;
+			boost::shared_ptr<const combiner_type> local_combiner;
+			typename connection_list_type::iterator it;
+			{
+				boost::mutex::scoped_lock listLock(_mutex);
+				// only clean up if it is safe to do so
+				if(_connectionBodies.use_count() == 1)
+					nolockCleanupConnections(false);
 				localConnectionBodies = _connectionBodies;
 				/* make a local copy of _combiner while holding mutex, so we are
 				thread safe against the combiner getting modified by set_combiner()*/
@@ -264,11 +288,11 @@ namespace boost
 		};
 
 		// clean up disconnected connections
-		void nolockCleanupConnections(boost::shared_ptr<connection_list_type> &connectionBodies, bool grab_tracked)
+		void nolockCleanupConnections(bool grab_tracked) const
 		{
-			assert(connectionBodies.use_count() == 1);
+			assert(_connectionBodies.use_count() == 1);
 			typename connection_list_type::iterator it;
-			for(it = connectionBodies->begin(); it != connectionBodies->end();)
+			for(it = _connectionBodies->begin(); it != _connectionBodies->end();)
 			{
 				bool connected;
 				{
@@ -281,7 +305,7 @@ namespace boost
 				}// scoped lock destructs here, safe to erase now
 				if(connected == false)
 				{
-					it = connectionBodies->erase((*it)->group_key(), it);
+					it = _connectionBodies->erase((*it)->group_key(), it);
 				}else
 				{
 					++it;
@@ -301,7 +325,7 @@ namespace boost
 		connection_body_type create_new_connection(const slot_type &slot)
 		{
 			nolockForceUniqueConnectionList();
-			nolockCleanupConnections(_connectionBodies, true);
+			nolockCleanupConnections(true);
 			return connection_body_type(new signalslib::detail::ConnectionBody<group_key_type, slot_function_type>(slot));
 		}
 

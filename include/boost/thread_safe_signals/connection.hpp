@@ -132,10 +132,12 @@ namespace boost
 		{
 		public:
 			connection() {}
+			connection(const connection &other): _weakConnectionBody(other._weakConnectionBody)
+			{}
 			connection(boost::weak_ptr<detail::ConnectionBodyBase> connectionBody):
 				_weakConnectionBody(connectionBody)
 			{}
-			virtual ~connection() {}
+			~connection() {}
 			void disconnect() const
 			{
 				boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
@@ -180,14 +182,17 @@ namespace boost
 			boost::weak_ptr<detail::ConnectionBodyBase> _weakConnectionBody;
 		};
 
-		class scoped_connection: public boost::signalslib::connection, boost::noncopyable
+		class scoped_connection: public connection
 		{
 		public:
-			virtual ~scoped_connection()
+			scoped_connection() {}
+			scoped_connection(const connection &other): connection(other)
+			{}
+			~scoped_connection()
 			{
 				disconnect();
 			}
-			const scoped_connection& operator=(const boost::signalslib::connection &rhs)
+			const scoped_connection& operator=(const connection &rhs)
 			{
 				boost::signalslib::connection::operator=(rhs);
 				return *this;
