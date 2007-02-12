@@ -52,7 +52,7 @@ namespace boost
 		class slot_invoker;
 		typedef typename signalslib::detail::group_key<Group>::type group_key_type;
 		typedef boost::shared_ptr<signalslib::detail::ConnectionBody<group_key_type, SlotFunction> > connection_body_type;
-		typedef std::list<connection_body_type> ConnectionList;
+		typedef signalslib::detail::grouped_list<Group, GroupCompare, connection_body_type> connection_list_type;
 	public:
 		typedef SlotFunction slot_function_type;
 		typedef slot<slot_function_type> slot_type;
@@ -62,7 +62,7 @@ namespace boost
 		typedef Group group_type;
 		typedef GroupCompare group_compare_type;
 		typedef typename signalslib::detail::slot_call_iterator_t<slot_invoker,
-			typename ConnectionList::iterator > slot_call_iterator;
+			typename connection_list_type::iterator > slot_call_iterator;
 // typedef Tn argn_type;
 #define EPG_SIGNAL_MISC_STATEMENT(z, n, data) \
 	typedef BOOST_PP_CAT(T, BOOST_PP_INC(n)) BOOST_PP_CAT(BOOST_PP_CAT(arg, BOOST_PP_INC(n)), _type);
@@ -78,8 +78,7 @@ namespace boost
 
 		EPG_SIGNAL_CLASS_NAME(const combiner_type &combiner = combiner_type(),
 			const group_compare_type &group_compare = group_compare_type()):
-			_combiner(new combiner_type(combiner)), _connectionBodies(new ConnectionList),
-			_group_key_comparator(group_compare)
+			_combiner(new combiner_type(combiner)), _connectionBodies(new connection_list_type(group_compare))
 		{};
 		virtual ~EPG_SIGNAL_CLASS_NAME()
 		{}
@@ -93,11 +92,11 @@ namespace boost
 			if(position == signalslib::at_back)
 			{
 				group_key.first = signalslib::detail::back_ungrouped_slots;
-				_connectionBodies->push_back(newConnectionBody);
+				_connectionBodies->push_back(group_key, newConnectionBody);
 			}else
 			{
 				group_key.first = signalslib::detail::front_ungrouped_slots;
-				_connectionBodies->push_front(newConnectionBody);
+				_connectionBodies->push_front(group_key, newConnectionBody);
 			}
 			newConnectionBody->set_group_key(group_key);
 			return signalslib::connection(newConnectionBody);
@@ -113,34 +112,10 @@ namespace boost
 			newConnectionBody->set_group_key(group_key);
 			if(position == signalslib::at_back)
 			{
-				typename ConnectionList::reverse_iterator rit;
-				for(rit = _connectionBodies->rbegin(); rit != _connectionBodies->rend(); ++rit)
-				{
-					if(_group_key_comparator(group_key, (*rit)->group_key()) == false)
-					{
-						_connectionBodies->insert(rit.base(), newConnectionBody);
-						break;
-					}
-				}
-				if(rit == _connectionBodies->rend())
-				{
-					_connectionBodies->insert(rit.base(), newConnectionBody);
-				}
+				_connectionBodies.push_back(group_key, newConnectionBody);
 			}else	// at_front
 			{
-				typename ConnectionList::iterator it;
-				for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
-				{
-					if(_group_key_comparator((*it)->group_key(), group_key) == false)
-					{
-						_connectionBodies->insert(it, newConnectionBody);
-						break;
-					}
-				}
-				if(it == _connectionBodies->end())
-				{
-					_connectionBodies->insert(it, newConnectionBody);
-				}
+				_connectionBodies.push_front(group_key, newConnectionBody);
 			}
 			return signalslib::connection(newConnectionBody);
 		}
@@ -148,7 +123,7 @@ namespace boost
 		void disconnect_all_slots()
 		{
 			boost::mutex::scoped_lock listLock(_mutex);
-			typename ConnectionList::iterator it;
+			typename connection_list_type::iterator it;
 			for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
 			{
 				(*it)->disconnect();
@@ -159,24 +134,19 @@ namespace boost
 		{
 			boost::mutex::scoped_lock listLock(_mutex);
 			group_key_type group_key(signalslib::detail::grouped_slots, group);
-			typename ConnectionList::iterator it;
-			for(it = _connectionBodies->begin(); it != _connectionBodies->end();)
+			typename connection_list_type::iterator it;
+			typename connection_list_type::iterator end_it = _connectionBodies->upper_bound(group);
+			for(it = _connectionBodies->lower_bound(group); it != end_it; ++it)
 			{
-				if(_group_key_comparator((*it)->group_key(), group_key))
-				{
-					++it;
-					continue;
-				}
-				if(_group_key_comparator(group_key, (*it)->group_key())) break;
 				(*it)->disconnect();
-				it = _connectionBodies->erase(it);
 			}
+			_connectionBodies->erase(group);
 		}
 		template <typename Slot>
 		void disconnect(const Slot &slot)
 		{
 			boost::mutex::scoped_lock listLock(_mutex);
-			typename ConnectionList::iterator it;
+			typename connection_list_type::iterator it;
 			for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
 			{
 				bool disconnect;
@@ -193,7 +163,7 @@ namespace boost
 				if(disconnect)
 				{
 					(*it)->nolock_disconnect();
-					it = _connectionBodies->erase(it);
+					it = _connectionBodies->erase((*it)->group_key(), it);
 					break;
 				}
 			}
@@ -201,9 +171,9 @@ namespace boost
 		// emit signal
 		result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~))
 		{
-			boost::shared_ptr<ConnectionList> localConnectionBodies;
+			boost::shared_ptr<connection_list_type> localConnectionBodies;
 			boost::shared_ptr<combiner_type> local_combiner;
-			typename ConnectionList::iterator it;
+			typename connection_list_type::iterator it;
 			{
 				boost::mutex::scoped_lock listLock(_mutex);
 				// only clean up if it is safe to do so
@@ -230,7 +200,7 @@ namespace boost
 		std::size_t num_slots() const
 		{
 			boost::mutex::scoped_lock listLock(_mutex);
-			typename ConnectionList::iterator it;
+			typename connection_list_type::iterator it;
 			std::size_t count = 0;
 			for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
 			{
@@ -241,7 +211,7 @@ namespace boost
 		bool empty() const
 		{
 			boost::mutex::scoped_lock listLock(_mutex);
-			typename ConnectionList::iterator it;
+			typename connection_list_type::iterator it;
 			for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
 			{
 				if((*it)->connected()) return false;
@@ -291,10 +261,10 @@ namespace boost
 		};
 
 		// clean up disconnected connections
-		void nolockCleanupConnections(boost::shared_ptr<ConnectionList> &connectionBodies, bool grab_tracked)
+		void nolockCleanupConnections(boost::shared_ptr<connection_list_type> &connectionBodies, bool grab_tracked)
 		{
 			assert(connectionBodies.use_count() == 1);
-			typename ConnectionList::iterator it;
+			typename connection_list_type::iterator it;
 			for(it = connectionBodies->begin(); it != connectionBodies->end();)
 			{
 				bool connected;
@@ -308,7 +278,7 @@ namespace boost
 				}// scoped lock destructs here, safe to erase now
 				if(connected == false)
 				{
-					it = connectionBodies->erase(it);
+					it = connectionBodies->erase((*it)->group_key(), it);
 				}else
 				{
 					++it;
@@ -321,7 +291,7 @@ namespace boost
 		{
 			if(_connectionBodies.use_count() > 1)
 			{
-				boost::shared_ptr<ConnectionList> newList(new ConnectionList(*_connectionBodies));
+				boost::shared_ptr<connection_list_type> newList(new connection_list_type(*_connectionBodies));
 				_connectionBodies = newList;
 			}
 		}
@@ -331,10 +301,9 @@ namespace boost
 			nolockCleanupConnections(_connectionBodies, true);
 			return connection_body_type(new signalslib::detail::ConnectionBody<group_key_type, slot_function_type>(slot));
 		}
+
 		boost::shared_ptr<combiner_type> _combiner;
-		boost::shared_ptr<ConnectionList> _connectionBodies;
-		// holds first connection body of each group
-		signalslib::detail::group_key_less<Group, GroupCompare> _group_key_comparator;
+		boost::shared_ptr<connection_list_type> _connectionBodies;
 		mutable boost::mutex _mutex;
 	};
 	namespace signalslib

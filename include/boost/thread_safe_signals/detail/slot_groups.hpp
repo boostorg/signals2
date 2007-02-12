@@ -16,6 +16,9 @@
 
 #include <boost/thread_safe_signals/connection.hpp>
 #include <boost/optional.hpp>
+#include <cassert>
+#include <list>
+#include <map>
 #include <utility>
 
 namespace boost {
@@ -43,6 +46,123 @@ namespace boost {
 				}
 			private:
 				GroupCompare _group_compare;
+			};
+			template<typename Group, typename GroupCompare, typename ValueType>
+			class grouped_list
+			{
+			private:
+				typedef std::list<ValueType> list_type;
+				typedef std::map<typename group_key<Group>::type, typename list_type::iterator> map_type;
+				typedef typename map_type::iterator map_iterator;
+			public:
+				typedef typename list_type::iterator iterator;
+				typedef typename group_key<Group>::type group_key_type;
+				typedef group_key_less<Group, GroupCompare> group_key_compare_type;
+
+				grouped_list(const group_key_compare_type &group_key_compare):
+					_group_key_compare(group_key_compare)
+				{}
+				iterator begin()
+				{
+					return _list.begin();
+				}
+				iterator end()
+				{
+					return _list.end();
+				}
+				iterator lower_bound(const group_key_type &key)
+				{
+					map_iterator map_it = _group_map.lower_bound(key);
+					return get_list_iterator(map_it);
+				}
+				iterator upper_bound(const group_key_type &key)
+				{
+					map_iterator map_it = _group_map.upper_bound(key);
+					return get_list_iterator(map_it);
+				}
+				void push_front(const group_key_type &key, const ValueType &value)
+				{
+					map_iterator map_it = _group_map.lower_bound(key);
+					m_insert(map_it, key, value);
+				}
+				void push_back(const group_key_type &key, const ValueType &value)
+				{
+					map_iterator map_it = _group_map.upper_bound(key);
+					m_insert(map_it, key, value);
+				}
+				void erase(const group_key_type &key)
+				{
+					map_iterator map_it = _group_map.lower_bound(key);
+					iterator begin_list_it = get_list_iterator(map_it);
+					iterator end_list_it = upper_bound(key);
+					if(begin_list_it != end_list_it)
+					{
+						_list.erase(begin_list_it, end_list_it);
+						map_it.erase(map_it);
+					}
+				}
+				iterator erase(const group_key_type &key, const iterator &it)
+				{
+					map_iterator map_it = _group_map.lower_bound(key);
+					assert(map_it != _group_map.end());
+					assert(weakly_equivalent(map_it->first, key));
+					iterator next = it;
+					++next;
+					// if next is in same group
+					if(next != _list.end() && next != upper_bound(key))
+					{
+						_group_map.insert(map_type::value_type(key, next));
+					}
+					if(map_it->second == it)
+					{
+						_group_map.erase(map_it);
+					}
+					return _list.erase(it);
+				}
+				void clear()
+				{
+					_list.clear();
+					_group_map.clear();
+				}
+			private:
+				bool weakly_equivalent(const group_key_type &arg1, const group_key_type &arg2)
+				{
+					if(_group_key_compare(arg1, arg2)) return false;
+					if(_group_key_compare(arg2, arg1)) return false;
+					return true;
+				}
+				void m_insert(map_iterator map_it, const group_key_type &key, const ValueType &value)
+				{
+					iterator list_it = get_list_iterator(map_it);
+					_list.insert(list_it, value);
+					if(map_it != _group_map.end() && weakly_equivalent(key, map_it->first))
+					{
+						_group_map.erase(map_it);
+					}
+					map_iterator lower_bound_it = _group_map.lower_bound(key);
+					if(lower_bound_it == _group_map.end() ||
+						weakly_equivalent(lower_bound_it->first, key) == false)
+					{
+						_group_map.insert(map_type::value_type(key, list_it));
+					}
+				}
+				iterator get_list_iterator(const map_iterator &map_it)
+				{
+					iterator list_it;
+					if(map_it == _group_map.end())
+					{
+						list_it = _list.end();
+					}else
+					{
+						list_it = map_it->second;
+					}
+					return list_it;
+				}
+
+				list_type _list;
+				// holds iterators to first list item in each group
+				map_type _group_map;
+				group_key_compare_type _group_key_compare;
 			};
 		} // end namespace detail
 		enum connect_position { at_back, at_front };
