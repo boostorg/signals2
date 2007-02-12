@@ -112,10 +112,10 @@ namespace boost
 			newConnectionBody->set_group_key(group_key);
 			if(position == signalslib::at_back)
 			{
-				_connectionBodies.push_back(group_key, newConnectionBody);
+				_connectionBodies->push_back(group_key, newConnectionBody);
 			}else	// at_front
 			{
-				_connectionBodies.push_front(group_key, newConnectionBody);
+				_connectionBodies->push_front(group_key, newConnectionBody);
 			}
 			return signalslib::connection(newConnectionBody);
 		}

@@ -40,7 +40,7 @@ namespace boost {
 				{}
 				bool operator ()(const typename group_key<Group>::type &key1, const typename group_key<Group>::type &key2) const
 				{
-					if(key1.first < key2.first) return true;
+					if(key1.first != key2.first) return key1.first < key2.first;
 					if(key1.first != grouped_slots) return false;
 					return _group_compare(key1.second.get(), key2.second.get());
 				}
@@ -134,7 +134,7 @@ namespace boost {
 				void m_insert(map_iterator map_it, const group_key_type &key, const ValueType &value)
 				{
 					iterator list_it = get_list_iterator(map_it);
-					_list.insert(list_it, value);
+					iterator new_it = _list.insert(list_it, value);
 					if(map_it != _group_map.end() && weakly_equivalent(key, map_it->first))
 					{
 						_group_map.erase(map_it);
@@ -143,7 +143,7 @@ namespace boost {
 					if(lower_bound_it == _group_map.end() ||
 						weakly_equivalent(lower_bound_it->first, key) == false)
 					{
-						_group_map.insert(map_type::value_type(key, list_it));
+						_group_map.insert(map_type::value_type(key, new_it));
 					}
 				}
 				iterator get_list_iterator(const map_iterator &map_it)
