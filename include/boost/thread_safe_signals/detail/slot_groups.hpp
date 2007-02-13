@@ -110,7 +110,7 @@ namespace boost {
 					if(begin_list_it != end_list_it)
 					{
 						_list.erase(begin_list_it, end_list_it);
-						map_it.erase(map_it);
+						_group_map.erase(map_it);
 					}
 				}
 				iterator erase(const group_key_type &key, const iterator &it)

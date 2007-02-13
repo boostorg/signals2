@@ -39,17 +39,21 @@ namespace boost
 				tracked_objects_visitor(slot_base *slot) : slot_(slot)
 				{}
 				template<typename T>
-				void operator()(const T& t) const {
+				void operator()(const T& t) const
+				{
 					maybe_add_tracked(t, boost::mpl::bool_<boost::is_convertible<T*, boost::signalslib::detail::tracked_base*>::value>());
-					{}
+					maybe_add_tracked(t, boost::mpl::bool_<boost::is_convertible<T*, signal_base*>::value>());
 				}
 				template<typename T>
-				void operator()(boost::reference_wrapper<T> const & r) const {
+				void operator()(boost::reference_wrapper<T> const & r) const
+				{
 					maybe_add_tracked(r.get(), boost::mpl::bool_<boost::is_convertible<T*, boost::signalslib::detail::tracked_base*>::value>());
-					{}
 				}
 			private:
-				inline void maybe_add_tracked(const boost::signalslib::detail::tracked_base& t, boost::mpl::bool_<true>) const;
+				template<typename T>
+				void maybe_add_tracked(const tracked<T> &t, boost::mpl::bool_<true>) const;
+				template<typename T>
+				inline void maybe_add_tracked(const T &signal, boost::mpl::bool_<true>) const;
 				template<typename T>
 				void maybe_add_tracked(const T&, boost::mpl::bool_<false>) const {}
 
@@ -65,9 +69,9 @@ namespace boost
 			private:
 				typedef std::vector<boost::weak_ptr<void> > tracked_objects_container;
 
-				void add_tracked(const boost::signalslib::detail::tracked_base &tracked)
+				void add_tracked(const shared_ptr<void> &tracked)
 				{
-					_trackedObjects.push_back(tracked.get_shared_ptr());
+					_trackedObjects.push_back(tracked);
 				}
 				const tracked_objects_container& get_all_tracked() const {return _trackedObjects;}
 
@@ -76,9 +80,9 @@ namespace boost
 
 			// Get the slot so that it can be copied
 			template<typename F>
-			reference_wrapper<const F>
-			get_invocable_slot(const F& f, signalslib::detail::signal_tag)
-			{ return reference_wrapper<const F>(f); }
+			typename F::weak_signal_type
+			get_invocable_slot(const F &signal, signalslib::detail::signal_tag)
+			{ return typename F::weak_signal_type(signal); }
 
 			template<typename F>
 			const F&
@@ -129,10 +133,16 @@ namespace boost
 	};
 } // end namespace boost
 
-void boost::signalslib::detail::tracked_objects_visitor::maybe_add_tracked(const boost::signalslib::detail::tracked_base& t, boost::mpl::bool_<true>) const
+template<typename T>
+void boost::signalslib::detail::tracked_objects_visitor::maybe_add_tracked(const tracked<T> &t, boost::mpl::bool_<true>) const
 {
-	slot_->add_tracked(t);
+	slot_->add_tracked(t.get_shared_ptr());
 }
+template<typename T>
+void boost::signalslib::detail::tracked_objects_visitor::maybe_add_tracked(const T &signal, boost::mpl::bool_<true>) const
+{
+	slot_->add_tracked(signal.lock_pimpl());
+};
 
 #ifdef BOOST_HAS_ABI_HEADERS
 #  include BOOST_ABI_SUFFIX
