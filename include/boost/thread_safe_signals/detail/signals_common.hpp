@@ -11,6 +11,12 @@
 #ifndef BOOST_TSS_SIGNALS_COMMON_HEADER
 #define BOOST_TSS_SIGNALS_COMMON_HEADER
 
+#include <boost/mpl/bool.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/ref.hpp>
+#include <boost/thread_safe_signals/detail/signal_base.hpp>
+#include <boost/type_traits.hpp>
+
 #ifdef BOOST_HAS_ABI_HEADERS
 #  include BOOST_ABI_PREFIX
 #endif
@@ -35,6 +41,30 @@ namespace boost {
       template<>
       struct slot_result_type_wrapper<void> {
         typedef unusable type;
+      };
+
+      // Determine if the given type T is a signal
+      class signal_base;
+      template<typename T>
+      class is_signal: public mpl::bool_<is_convertible<T*, signal_base*>::value>
+      {};
+
+      // A slot can be a signal, a reference to a function object, or a
+      // function object.
+      struct signal_tag {};
+      struct reference_tag {};
+      struct value_tag {};
+
+      // Classify the given slot as a signal, a reference-to-slot, or a
+      // standard slot
+      template<typename S>
+      class get_slot_tag {
+        typedef typename mpl::if_<is_signal<S>,
+          signal_tag, value_tag>::type signal_or_value;
+      public:
+        typedef typename mpl::if_<is_reference_wrapper<S>,
+                            reference_tag,
+                            signal_or_value>::type type;
       };
     } // end namespace detail
   } // end namespace BOOST_SIGNALS_NAMESPACE

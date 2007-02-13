@@ -12,6 +12,8 @@
 #ifndef BOOST_TSS_SIGNALS_SLOT_HEADER
 #define BOOST_TSS_SIGNALS_SLOT_HEADER
 
+#include <boost/ref.hpp>
+#include <boost/thread_safe_signals/detail/signals_common.hpp>
 #include <boost/thread_safe_signals/track.hpp>
 #include <boost/weak_ptr.hpp>
 #include <vector>
@@ -71,6 +73,34 @@ namespace boost
 
 				tracked_objects_container _trackedObjects;
 			};
+
+			// Get the slot so that it can be copied
+			template<typename F>
+			reference_wrapper<const F>
+			get_invocable_slot(const F& f, signalslib::detail::signal_tag)
+			{ return reference_wrapper<const F>(f); }
+
+			template<typename F>
+			const F&
+			get_invocable_slot(const F& f, signalslib::detail::reference_tag)
+			{ return f; }
+
+			template<typename F>
+			const F&
+			get_invocable_slot(const F& f, signalslib::detail::value_tag)
+			{ return f; }
+
+			// Determines the type of the slot - is it a signal, a reference to a
+			// slot or just a normal slot.
+			template<typename F>
+			typename signalslib::detail::get_slot_tag<F>::type
+			tag_type(const F&)
+			{
+				typedef typename signalslib::detail::get_slot_tag<F>::type
+				the_tag_type;
+				the_tag_type tag = the_tag_type();
+				return tag;
+			}
 		}
 	}
 	// slot class template.
@@ -79,7 +109,7 @@ namespace boost
 	{
 	public:
 		template<typename F>
-		slot(const F& f): slot_function(f)
+		slot(const F& f): slot_function(signalslib::detail::get_invocable_slot(f, signalslib::detail::tag_type(f)))
 		{
 			signalslib::detail::tracked_objects_visitor visitor(this);
 			boost::visit_each(visitor, f, 0);

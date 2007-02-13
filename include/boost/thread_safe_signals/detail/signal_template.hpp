@@ -46,7 +46,7 @@ namespace boost
 		typename GroupCompare = std::less<Group>,
 		typename SlotFunction = BOOST_PP_CAT(boost::function, EPG_SIGNALS_NUM_ARGS)<R BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS)
 			BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(EPG_SIGNALS_NUM_ARGS), T) > >
-	class EPG_SIGNAL_CLASS_NAME
+	class EPG_SIGNAL_CLASS_NAME: public signalslib::detail::signal_base
 	{
 	private:
 		class slot_invoker;
