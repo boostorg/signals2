@@ -128,25 +128,25 @@ namespace boost
 				// disconnect slot(s)
 				void disconnect_all_slots()
 				{
-					boost::mutex::scoped_lock listLock(_mutex);
+					shared_ptr<connection_list_type> connectionBodies =
+						get_readable_connection_list();
 					typename connection_list_type::iterator it;
-					for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
+					for(it = connectionBodies->begin(); it != connectionBodies->end(); ++it)
 					{
 						(*it)->disconnect();
 					}
-					_connectionBodies->clear();
 				}
 				void disconnect(const group_type &group)
 				{
-					boost::mutex::scoped_lock listLock(_mutex);
+					shared_ptr<connection_list_type> connectionBodies =
+						get_readable_connection_list();
 					group_key_type group_key(signalslib::detail::grouped_slots, group);
 					typename connection_list_type::iterator it;
-					typename connection_list_type::iterator end_it = _connectionBodies->upper_bound(group_key);
-					for(it = _connectionBodies->lower_bound(group_key); it != end_it; ++it)
+					typename connection_list_type::iterator end_it = connectionBodies->upper_bound(group_key);
+					for(it = connectionBodies->lower_bound(group_key); it != end_it; ++it)
 					{
 						(*it)->disconnect();
 					}
-					_connectionBodies->erase(group_key);
 				}
 				template <typename T>
 				void disconnect(const T &slot)
@@ -205,10 +205,11 @@ namespace boost
 				}
 				std::size_t num_slots() const
 				{
-					boost::mutex::scoped_lock listLock(_mutex);
+					shared_ptr<connection_list_type> connectionBodies =
+						get_readable_connection_list();
 					typename connection_list_type::iterator it;
 					std::size_t count = 0;
-					for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
+					for(it = connectionBodies->begin(); it != connectionBodies->end(); ++it)
 					{
 						if((*it)->connected()) ++count;
 					}
@@ -216,9 +217,10 @@ namespace boost
 				}
 				bool empty() const
 				{
-					boost::mutex::scoped_lock listLock(_mutex);
+					shared_ptr<connection_list_type> connectionBodies =
+						get_readable_connection_list();
 					typename connection_list_type::iterator it;
-					for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
+					for(it = connectionBodies->begin(); it != connectionBodies->end(); ++it)
 					{
 						if((*it)->connected()) return false;
 					}
@@ -298,9 +300,9 @@ namespace boost
 						}
 					}
 				}
-				/* Make a new copy of the slot list if it is currently being iterated through
-				by signal invocation. */
-				void nolockForceUniqueConnectionList()
+				/* Make a new copy of the slot list if it is currently being read somewhere else
+				*/
+				void nolock_force_unique_connection_list()
 				{
 					if(_connectionBodies.use_count() > 1)
 					{
@@ -308,9 +310,14 @@ namespace boost
 						_connectionBodies = newList;
 					}
 				}
+				shared_ptr<connection_list_type> get_readable_connection_list() const
+				{
+					boost::mutex::scoped_lock listLock(_mutex);
+					return _connectionBodies;
+				}
 				connection_body_type create_new_connection(const slot_type &slot)
 				{
-					nolockForceUniqueConnectionList();
+					nolock_force_unique_connection_list();
 					nolockCleanupConnections(true);
 					return connection_body_type(new signalslib::detail::ConnectionBody<group_key_type, slot_function_type>(slot));
 				}
@@ -321,9 +328,10 @@ namespace boost
 				template<typename T>
 				void do_disconnect(const T &slot, mpl::bool_<false> is_group)
 				{
-					boost::mutex::scoped_lock listLock(_mutex);
+					shared_ptr<connection_list_type> connectionBodies =
+						get_readable_connection_list();
 					typename connection_list_type::iterator it;
-					for(it = _connectionBodies->begin(); it != _connectionBodies->end(); ++it)
+					for(it = connectionBodies->begin(); it != connectionBodies->end(); ++it)
 					{
 						bool disconnect;
 						{
@@ -339,14 +347,14 @@ namespace boost
 						if(disconnect)
 						{
 							(*it)->nolock_disconnect();
-							it = _connectionBodies->erase((*it)->group_key(), it);
-							break;
 						}
 					}
 				}
 
 				boost::shared_ptr<combiner_type> _combiner;
 				boost::shared_ptr<connection_list_type> _connectionBodies;
+				// connection list mutex must never be locked when attempting a blocking lock on a slot,
+				// or you could deadlock.
 				mutable boost::mutex _mutex;
 			};
 
@@ -389,6 +397,10 @@ namespace boost
 			const group_compare_type &group_compare = group_compare_type()):
 			_pimpl(new signalslib::detail::EPG_SIGNAL_IMPL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION>(combiner, group_compare))
 		{};
+		~EPG_SIGNAL_CLASS_NAME()
+		{
+			disconnect_all_slots();
+		}
 		signalslib::connection connect(const slot_type &slot, signalslib::connect_position position = signalslib::at_back)
 		{
 			return (*_pimpl).connect(slot, position);

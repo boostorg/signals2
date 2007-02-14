@@ -57,7 +57,7 @@ namespace boost {
         typename inherited::reference
         dereference() const
         {
-          if (!cache->is_initialized()) {
+          if (!(*cache)) {
             cache->reset(f(*iter));
           }
 
