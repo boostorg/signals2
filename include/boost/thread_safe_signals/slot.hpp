@@ -32,7 +32,7 @@ namespace boost
 			template<typename GroupKey, typename SlotFunction>
 			class ConnectionBody;
 
-			// Visitor to collect tracked_base-derived objects from a bound function.
+			// Visitor to collect tracked objects from a bound function.
 			class tracked_objects_visitor
 			{
 			public:
@@ -41,13 +41,18 @@ namespace boost
 				template<typename T>
 				void operator()(const T& t) const
 				{
-					maybe_add_tracked(t, boost::mpl::bool_<boost::is_convertible<T*, boost::signalslib::detail::tracked_base*>::value>());
 					maybe_add_tracked(t, boost::mpl::bool_<boost::is_convertible<T*, signal_base*>::value>());
+				}
+				template<typename T>
+				void operator()(const tracked<T> &t) const
+				{
+					slot_->add_tracked(t);
 				}
 				template<typename T>
 				void operator()(boost::reference_wrapper<T> const & r) const
 				{
-					maybe_add_tracked(r.get(), boost::mpl::bool_<boost::is_convertible<T*, boost::signalslib::detail::tracked_base*>::value>());
+					maybe_add_tracked(r.get(), boost::mpl::bool_<boost::is_convertible<T*, boost::signalslib::tracked<T>*>::value>());
+					maybe_add_tracked(r.get(), boost::mpl::bool_<boost::is_convertible<T*, signal_base*>::value>());
 				}
 			private:
 				template<typename T>
