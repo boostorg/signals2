@@ -12,9 +12,12 @@
 #ifndef BOOST_TSS_SIGNALS_SLOT_HEADER
 #define BOOST_TSS_SIGNALS_SLOT_HEADER
 
+#include <boost/mpl/bool.hpp>
 #include <boost/ref.hpp>
 #include <boost/thread_safe_signals/detail/signals_common.hpp>
 #include <boost/thread_safe_signals/track.hpp>
+#include <boost/type_traits.hpp>
+#include <boost/utility/addressof.hpp>
 #include <boost/weak_ptr.hpp>
 #include <vector>
 
@@ -41,26 +44,43 @@ namespace boost
 				template<typename T>
 				void operator()(const T& t) const
 				{
-					maybe_add_tracked(t, boost::mpl::bool_<boost::is_convertible<T*, signal_base*>::value>());
-				}
-				template<typename T>
-				void operator()(const tracked<T> &t) const
-				{
-					slot_->add_tracked(t);
-				}
-				template<typename T>
-				void operator()(boost::reference_wrapper<T> const & r) const
-				{
-					maybe_add_tracked(r.get(), boost::mpl::bool_<boost::is_convertible<T*, boost::signalslib::tracked<T>*>::value>());
-					maybe_add_tracked(r.get(), boost::mpl::bool_<boost::is_convertible<T*, signal_base*>::value>());
+					m_visit_reference_wrapper(t, mpl::bool_<is_reference_wrapper<T>::value>());
 				}
 			private:
 				template<typename T>
-				void maybe_add_tracked(const tracked<T> &t, boost::mpl::bool_<true>) const;
+				void m_visit_reference_wrapper(const reference_wrapper<T> &t, const mpl::bool_<true> &) const
+				{
+					m_visit_pointer(t.get_pointer(), mpl::bool_<true>());
+				}
 				template<typename T>
-				inline void maybe_add_tracked(const T &signal, boost::mpl::bool_<true>) const;
+				void m_visit_reference_wrapper(const T &t, const mpl::bool_<false> &) const
+				{
+					m_visit_pointer(t, mpl::bool_<is_pointer<T>::value>());
+				}
 				template<typename T>
-				void maybe_add_tracked(const T&, boost::mpl::bool_<false>) const {}
+				void m_visit_pointer(const T &t, const mpl::bool_<true> &) const
+				{
+					m_visit_tracked_pointer(t,
+						mpl::bool_<is_convertible<T, const tracked_base*>::value>());
+				}
+				template<typename T>
+				void m_visit_pointer(const T &t, const mpl::bool_<false> &) const
+				{
+					m_visit_pointer(addressof(t), mpl::bool_<true>());
+				}
+				template<typename T>
+				void m_visit_tracked_pointer(const tracked<T> *t, const mpl::bool_<true> &) const;
+				template<typename T>
+				void m_visit_tracked_pointer(const T &t, const mpl::bool_<false> &) const
+				{
+					m_visit_signal_pointer(t, mpl::bool_<is_convertible<T, const signal_base*>::value>());
+				}
+				template<typename T>
+				void m_visit_signal_pointer(const T *signal, const mpl::bool_<true> &)  const;
+				template<typename T>
+				void m_visit_signal_pointer(const T &t, const mpl::bool_<false> &) const
+				{
+				}
 
 				mutable slot_base * slot_;
 			};
@@ -121,7 +141,7 @@ namespace boost
 		slot(const F& f): slot_function(signalslib::detail::get_invocable_slot(f, signalslib::detail::tag_type(f)))
 		{
 			signalslib::detail::tracked_objects_visitor visitor(this);
-			boost::visit_each(visitor, f, 0);
+			boost::visit_each(visitor, f);
 		}
 		// We would have to enumerate all of the signalN classes here as friends
 		// to make this private (as it otherwise should be). We can't name all of
@@ -139,14 +159,16 @@ namespace boost
 } // end namespace boost
 
 template<typename T>
-void boost::signalslib::detail::tracked_objects_visitor::maybe_add_tracked(const tracked<T> &t, boost::mpl::bool_<true>) const
+void boost::signalslib::detail::tracked_objects_visitor::m_visit_tracked_pointer(const tracked<T> *t, const mpl::bool_<true> &) const
 {
-	slot_->add_tracked(t.get_shared_ptr());
+	if(t)
+		slot_->add_tracked(*t);
 }
 template<typename T>
-void boost::signalslib::detail::tracked_objects_visitor::maybe_add_tracked(const T &signal, boost::mpl::bool_<true>) const
+void boost::signalslib::detail::tracked_objects_visitor::m_visit_signal_pointer(const T *signal, const mpl::bool_<true> &) const
 {
-	slot_->add_tracked(signal.lock_pimpl());
+	if(signal)
+		slot_->add_tracked(signal->lock_pimpl());
 };
 
 #ifdef BOOST_HAS_ABI_HEADERS

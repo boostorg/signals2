@@ -333,18 +333,8 @@ namespace boost
 					typename connection_list_type::iterator it;
 					for(it = connectionBodies->begin(); it != connectionBodies->end(); ++it)
 					{
-						bool disconnect;
-						{
-							typename signalslib::detail::ConnectionBodyBase::mutex_type::scoped_lock lock((*it)->mutex);
-							if((*it)->slot == slot)
-							{
-								disconnect = true;
-							}else
-							{
-								disconnect = false;
-							}
-						}// scoped_lock destructs here, safe to erase now
-						if(disconnect)
+						typename signalslib::detail::ConnectionBodyBase::mutex_type::scoped_lock lock((*it)->mutex);
+						if((*it)->slot == slot)
 						{
 							(*it)->nolock_disconnect();
 						}
