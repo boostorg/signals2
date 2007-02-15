@@ -49,15 +49,15 @@ namespace boost {
       public:
         slot_call_iterator_t(Iterator iter_in, Iterator end_in, Function f,
                            boost::optional<result_type> &c)
-          : iter(iter_in), end(end_in), f(f), cache(&c)
+          : iter(iter_in), end(end_in), f(f), cache(&c), lock_iter(end_in)
         {
-          lockNextCallable();
         }
 
         typename inherited::reference
         dereference() const
         {
           if (!(*cache)) {
+            lockNextCallable();
             cache->reset(f(*iter));
           }
 
@@ -66,6 +66,7 @@ namespace boost {
 
         void increment()
         {
+          lockNextCallable();
           ++iter;
           lockNextCallable();
           cache->reset();
@@ -83,13 +84,22 @@ namespace boost {
 
         void lockNextCallable() const
         {
+          if(iter == lock_iter)
+          {
+            return;
+          }
           for(;iter != end; ++iter)
           {
             lock.reset(new lock_type((*iter)->mutex));
+            lock_iter = iter;
             trackedPtrs = (*iter)->nolock_grab_tracked_objects();
             if((*iter)->nolock_nograb_blocked() == false) break;
           }
-          if(iter == end) lock.reset();
+          if(iter == end)
+          {
+            lock.reset();
+            lock_iter = end;
+          }
         }
 
         mutable Iterator iter;
@@ -97,6 +107,7 @@ namespace boost {
         Function f;
         boost::optional<result_type>* cache;
         mutable boost::shared_ptr<lock_type> lock;
+        mutable Iterator lock_iter;
         mutable ConnectionBodyBase::shared_ptrs_type trackedPtrs;
       };
     } // end namespace detail
