@@ -16,6 +16,7 @@
 #include <boost/ref.hpp>
 #include <boost/thread_safe_signals/detail/signals_common.hpp>
 #include <boost/thread_safe_signals/track.hpp>
+#include <boost/thread_safe_signals/trackable.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/utility/addressof.hpp>
 #include <boost/weak_ptr.hpp>
@@ -60,8 +61,7 @@ namespace boost
 				template<typename T>
 				void m_visit_pointer(const T &t, const mpl::bool_<true> &) const
 				{
-					m_visit_tracked_pointer(t,
-						mpl::bool_<is_convertible<T, const tracked_base*>::value>());
+					m_visit_not_function_pointer(t, mpl::bool_<is_convertible<T, const void*>::value>());
 				}
 				template<typename T>
 				void m_visit_pointer(const T &t, const mpl::bool_<false> &) const
@@ -69,18 +69,24 @@ namespace boost
 					m_visit_pointer(addressof(t), mpl::bool_<true>());
 				}
 				template<typename T>
-				void m_visit_tracked_pointer(const tracked<T> *t, const mpl::bool_<true> &) const;
-				template<typename T>
-				void m_visit_tracked_pointer(const T &t, const mpl::bool_<false> &) const
+				void m_visit_not_function_pointer(const T *t, const mpl::bool_<true> &) const
 				{
-					m_visit_signal_pointer(t, mpl::bool_<is_convertible<T, const signal_base*>::value>());
+					m_visit_signal(t, mpl::bool_<is_signal<T>::value>());
 				}
 				template<typename T>
-				void m_visit_signal_pointer(const T *signal, const mpl::bool_<true> &)  const;
+				void m_visit_not_function_pointer(const T &t, const mpl::bool_<false> &) const
+				{}
 				template<typename T>
-				void m_visit_signal_pointer(const T &t, const mpl::bool_<false> &) const
+				void m_visit_signal(const T *t, const mpl::bool_<true> &) const;
+				template<typename T>
+				void m_visit_signal(const T &t, const mpl::bool_<false> &) const
 				{
+					add_if_trackable(t);
 				}
+				template<typename T>
+				void add_if_trackable(const tracked<T> *t) const;
+				void add_if_trackable(const trackable *trackable) const;
+				void add_if_trackable(const void *trackable) const {}
 
 				mutable slot_base * slot_;
 			};
@@ -159,16 +165,22 @@ namespace boost
 } // end namespace boost
 
 template<typename T>
-void boost::signalslib::detail::tracked_objects_visitor::m_visit_tracked_pointer(const tracked<T> *t, const mpl::bool_<true> &) const
+void boost::signalslib::detail::tracked_objects_visitor::m_visit_signal(
+	const T *signal, const mpl::bool_<true> &) const
+{
+	if(signal)
+		slot_->add_tracked(signal->lock_pimpl());
+};
+template<typename T>
+void boost::signalslib::detail::tracked_objects_visitor::add_if_trackable(const tracked<T> *t) const
 {
 	if(t)
 		slot_->add_tracked(*t);
 }
-template<typename T>
-void boost::signalslib::detail::tracked_objects_visitor::m_visit_signal_pointer(const T *signal, const mpl::bool_<true> &) const
+void boost::signalslib::detail::tracked_objects_visitor::add_if_trackable(const trackable *trackable) const
 {
-	if(signal)
-		slot_->add_tracked(signal->lock_pimpl());
+	if(trackable)
+		slot_->add_tracked(trackable->get_shared_ptr());
 };
 
 #ifdef BOOST_HAS_ABI_HEADERS

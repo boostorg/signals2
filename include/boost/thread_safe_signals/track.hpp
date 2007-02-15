@@ -23,17 +23,10 @@
 
 namespace boost {
   namespace signalslib {
-    namespace detail
-    {
-      class tracked_base
-      {
-      public:
-      };
-    }
     // The actual wrapper for tracked shared_ptr-referenced objects.
     // (This probably needs a full smart pointer interface)
     template<class T>
-    class tracked : public detail::tracked_base, public weak_ptr<T>
+    class tracked : public weak_ptr<T>
     {
     public:
       tracked(const weak_ptr<T>& ptr): weak_ptr<T>(ptr)

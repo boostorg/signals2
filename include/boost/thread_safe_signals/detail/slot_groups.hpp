@@ -121,13 +121,16 @@ namespace boost {
 					assert(weakly_equivalent(map_it->first, key));
 					if(map_it->second == it)
 					{
-						_group_map.erase(map_it);
 						iterator next = it;
 						++next;
 						// if next is in same group
 						if(next != _list.end() && next != upper_bound(key))
 						{
-							_group_map.insert(map_type::value_type(key, next));
+							// also erases old entry
+							_group_map.insert(map_it, map_type::value_type(key, next));
+						}else
+						{
+							_group_map.erase(map_it);
 						}
 					}
 					return _list.erase(it);
