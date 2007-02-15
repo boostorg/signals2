@@ -286,10 +286,15 @@ namespace boost
 						{
 							// skip over slots that are busy
 							signalslib::detail::ConnectionBodyBase::mutex_type::scoped_try_lock lock((*it)->mutex);
-							if(lock.locked() == false) continue;
-							if(grab_tracked)
-								(*it)->nolock_grab_tracked_objects();
-							connected = (*it)->nolock_nograb_connected();
+							if(lock.locked() == false)
+							{
+								connected = true;
+							}else
+							{
+								if(grab_tracked)
+									(*it)->nolock_grab_tracked_objects();
+								connected = (*it)->nolock_nograb_connected();
+							}
 						}// scoped lock destructs here, safe to erase now
 						if(connected == false)
 						{
