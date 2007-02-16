@@ -86,8 +86,9 @@ namespace boost
 
 				EPG_SIGNAL_IMPL_CLASS_NAME(const combiner_type &combiner,
 					const group_compare_type &group_compare):
-					_combiner(new combiner_type(combiner)), _connectionBodies(new connection_list_type(group_compare))
-				{};
+					_combiner(new combiner_type(combiner)), _connectionBodies(new connection_list_type(group_compare)),
+					_garbage_collector_it(_connectionBodies->end())
+				{}
 				// connect slot
 				signalslib::connection connect(const slot_type &slot, signalslib::connect_position position = signalslib::at_back)
 				{
@@ -164,7 +165,7 @@ namespace boost
 						boost::mutex::scoped_lock listLock(_mutex);
 						// only clean up if it is safe to do so
 						if(_connectionBodies.use_count() == 1)
-							nolockCleanupConnections(false);
+							nolock_cleanup_connections(false);
 						localConnectionBodies = _connectionBodies;
 						/* make a local copy of _combiner while holding mutex, so we are
 						thread safe against the combiner getting modified by set_combiner()*/
@@ -186,7 +187,7 @@ namespace boost
 						boost::mutex::scoped_lock listLock(_mutex);
 						// only clean up if it is safe to do so
 						if(_connectionBodies.use_count() == 1)
-							nolockCleanupConnections(false);
+							nolock_cleanup_connections(false);
 						localConnectionBodies = _connectionBodies;
 						/* make a local copy of _combiner while holding mutex, so we are
 						thread safe against the combiner getting modified by set_combiner()*/
@@ -272,16 +273,17 @@ namespace boost
 				};
 
 				// clean up disconnected connections
-				void nolockCleanupConnections(bool grab_tracked) const
+				void nolock_cleanup_connections(bool grab_tracked,
+					const connection_list_type::iterator &begin, const connection_list_type::iterator &end) const
 				{
 					assert(_connectionBodies.use_count() == 1);
 					typename connection_list_type::iterator it;
-					for(it = _connectionBodies->begin(); it != _connectionBodies->end();)
+					for(it = begin; it != end;)
 					{
 						bool connected;
 						{
 							// skip over slots that are busy
-							signalslib::detail::ConnectionBodyBase::mutex_type::scoped_try_lock lock((*it)->mutex);
+							ConnectionBodyBase::mutex_type::scoped_try_lock lock((*it)->mutex);
 							if(lock.locked() == false)
 							{
 								connected = true;
@@ -300,6 +302,23 @@ namespace boost
 							++it;
 						}
 					}
+					_garbage_collector_it = end;
+				}
+				// clean up a few connections in constant time
+				void nolock_cleanup_connections(bool grab_tracked) const
+				{
+					connection_list_type::iterator begin;
+					if(_garbage_collector_it == _connectionBodies->end())
+					{
+						begin = _connectionBodies->begin();
+					}else
+					{
+						begin = _garbage_collector_it;
+					}
+					connection_list_type::iterator end = begin;
+					++end;
+					if(end != _connectionBodies->end()) ++end;
+					nolock_cleanup_connections(grab_tracked, begin, end);
 				}
 				/* Make a new copy of the slot list if it is currently being read somewhere else
 				*/
@@ -309,6 +328,10 @@ namespace boost
 					{
 						quick_ptr<connection_list_type> newList(new connection_list_type(*_connectionBodies));
 						_connectionBodies = newList;
+						nolock_cleanup_connections(true, _connectionBodies->begin(), _connectionBodies->end());
+					}else
+					{
+						nolock_cleanup_connections(true);
 					}
 				}
 				quick_ptr<connection_list_type> get_readable_connection_list() const
@@ -319,8 +342,7 @@ namespace boost
 				connection_body_type create_new_connection(const slot_type &slot)
 				{
 					nolock_force_unique_connection_list();
-					nolockCleanupConnections(true);
-					return connection_body_type(new signalslib::detail::ConnectionBody<group_key_type, slot_function_type>(slot));
+					return connection_body_type(new ConnectionBody<group_key_type, slot_function_type>(slot));
 				}
 				void do_disconnect(const group_type &group, mpl::bool_<true> is_group)
 				{
@@ -334,7 +356,7 @@ namespace boost
 					typename connection_list_type::iterator it;
 					for(it = connectionBodies->begin(); it != connectionBodies->end(); ++it)
 					{
-						typename signalslib::detail::ConnectionBodyBase::mutex_type::scoped_lock lock((*it)->mutex);
+						typename ConnectionBodyBase::mutex_type::scoped_lock lock((*it)->mutex);
 						if((*it)->slot == slot)
 						{
 							(*it)->nolock_disconnect();
@@ -344,6 +366,7 @@ namespace boost
 
 				quick_ptr<combiner_type> _combiner;
 				quick_ptr<connection_list_type> _connectionBodies;
+				mutable connection_list_type::iterator _garbage_collector_it;
 				// connection list mutex must never be locked when attempting a blocking lock on a slot,
 				// or you could deadlock.
 				mutable boost::mutex _mutex;
