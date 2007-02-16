@@ -94,12 +94,26 @@ namespace boost {
 				}
 				void push_front(const group_key_type &key, const ValueType &value)
 				{
-					map_iterator map_it = _group_map.lower_bound(key);
+					map_iterator map_it;
+					if(key.first == front_ungrouped_slots)
+					{// optimization
+						map_it = _group_map.begin();
+					}else
+					{
+						map_it = _group_map.lower_bound(key);
+					}
 					m_insert(map_it, key, value);
 				}
 				void push_back(const group_key_type &key, const ValueType &value)
 				{
-					map_iterator map_it = _group_map.upper_bound(key);
+					map_iterator map_it;
+					if(key.first == back_ungrouped_slots)
+					{
+						map_it = _group_map.end();
+					}else
+					{
+						map_it = _group_map.upper_bound(key);
+					}
 					m_insert(map_it, key, value);
 				}
 				void erase(const group_key_type &key)
