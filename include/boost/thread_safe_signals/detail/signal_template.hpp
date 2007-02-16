@@ -129,7 +129,7 @@ namespace boost
 				// disconnect slot(s)
 				void disconnect_all_slots()
 				{
-					quick_ptr<connection_list_type> connectionBodies =
+					shared_ptr<connection_list_type> connectionBodies =
 						get_readable_connection_list();
 					typename connection_list_type::iterator it;
 					for(it = connectionBodies->begin(); it != connectionBodies->end(); ++it)
@@ -139,7 +139,7 @@ namespace boost
 				}
 				void disconnect(const group_type &group)
 				{
-					quick_ptr<connection_list_type> connectionBodies =
+					shared_ptr<connection_list_type> connectionBodies =
 						get_readable_connection_list();
 					group_key_type group_key(signalslib::detail::grouped_slots, group);
 					typename connection_list_type::iterator it;
@@ -158,8 +158,8 @@ namespace boost
 				// emit signal
 				result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~))
 				{
-					quick_ptr<connection_list_type> localConnectionBodies;
-					quick_ptr<combiner_type> local_combiner;
+					shared_ptr<connection_list_type> localConnectionBodies;
+					shared_ptr<combiner_type> local_combiner;
 					typename connection_list_type::iterator it;
 					{
 						boost::mutex::scoped_lock listLock(_mutex);
@@ -180,8 +180,8 @@ namespace boost
 				}
 				result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~)) const
 				{
-					quick_ptr<connection_list_type> localConnectionBodies;
-					quick_ptr<const combiner_type> local_combiner;
+					shared_ptr<connection_list_type> localConnectionBodies;
+					shared_ptr<const combiner_type> local_combiner;
 					typename connection_list_type::iterator it;
 					{
 						boost::mutex::scoped_lock listLock(_mutex);
@@ -202,7 +202,7 @@ namespace boost
 				}
 				std::size_t num_slots() const
 				{
-					quick_ptr<connection_list_type> connectionBodies =
+					shared_ptr<connection_list_type> connectionBodies =
 						get_readable_connection_list();
 					typename connection_list_type::iterator it;
 					std::size_t count = 0;
@@ -214,7 +214,7 @@ namespace boost
 				}
 				bool empty() const
 				{
-					quick_ptr<connection_list_type> connectionBodies =
+					shared_ptr<connection_list_type> connectionBodies =
 						get_readable_connection_list();
 					typename connection_list_type::iterator it;
 					for(it = connectionBodies->begin(); it != connectionBodies->end(); ++it)
@@ -326,7 +326,7 @@ namespace boost
 				{
 					if(_connectionBodies.use_count() > 1)
 					{
-						quick_ptr<connection_list_type> newList(new connection_list_type(*_connectionBodies));
+						shared_ptr<connection_list_type> newList(new connection_list_type(*_connectionBodies));
 						_connectionBodies = newList;
 						nolock_cleanup_connections(true, _connectionBodies->begin(), _connectionBodies->end());
 					}else
@@ -334,7 +334,7 @@ namespace boost
 						nolock_cleanup_connections(true);
 					}
 				}
-				quick_ptr<connection_list_type> get_readable_connection_list() const
+				shared_ptr<connection_list_type> get_readable_connection_list() const
 				{
 					boost::mutex::scoped_lock listLock(_mutex);
 					return _connectionBodies;
@@ -351,7 +351,7 @@ namespace boost
 				template<typename T>
 				void do_disconnect(const T &slot, mpl::bool_<false> is_group)
 				{
-					quick_ptr<connection_list_type> connectionBodies =
+					shared_ptr<connection_list_type> connectionBodies =
 						get_readable_connection_list();
 					typename connection_list_type::iterator it;
 					for(it = connectionBodies->begin(); it != connectionBodies->end(); ++it)
@@ -364,8 +364,8 @@ namespace boost
 					}
 				}
 
-				quick_ptr<combiner_type> _combiner;
-				quick_ptr<connection_list_type> _connectionBodies;
+				shared_ptr<combiner_type> _combiner;
+				shared_ptr<connection_list_type> _connectionBodies;
 				mutable connection_list_type::iterator _garbage_collector_it;
 				// connection list mutex must never be locked when attempting a blocking lock on a slot,
 				// or you could deadlock.
