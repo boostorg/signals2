@@ -14,7 +14,7 @@
 
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/optional.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/thread_safe_signals/connection.hpp>
 
 #ifdef BOOST_HAS_ABI_HEADERS
@@ -51,6 +51,26 @@ namespace boost {
                            boost::optional<result_type> &c)
           : iter(iter_in), end(end_in), f(f), cache(&c), lock_iter(end_in)
         {
+        }
+        slot_call_iterator_t(const slot_call_iterator_t &other)
+        {
+            iter = other.iter;
+            end = other.end;
+            f = other.f;
+            cache = other.cache;
+            lock.reset();
+            lock_iter = end;
+        }
+        const slot_call_iterator_t& operator =(const slot_call_iterator_t &other)
+        {
+            if(this == &other) return;
+            iter = other.iter;
+            end = other.end;
+            f = other.f;
+            cache = other.cache;
+            lock.reset();
+            lock_iter = end;
+            return *this;
         }
 
         typename inherited::reference
@@ -106,7 +126,7 @@ namespace boost {
         Iterator end;
         Function f;
         boost::optional<result_type>* cache;
-        mutable boost::shared_ptr<lock_type> lock;
+        mutable boost::scoped_ptr<lock_type> lock;
         mutable Iterator lock_iter;
         mutable ConnectionBodyBase::shared_ptrs_type trackedPtrs;
       };
