@@ -71,7 +71,7 @@ namespace boost
 			private:
 				class slot_invoker;
 				typedef typename signalslib::detail::group_key<Group>::type group_key_type;
-				typedef boost::shared_ptr<signalslib::detail::ConnectionBody<group_key_type, SlotFunction> > connection_body_type;
+				typedef shared_ptr<signalslib::detail::ConnectionBody<group_key_type, SlotFunction> > connection_body_type;
 				typedef signalslib::detail::grouped_list<Group, GroupCompare, connection_body_type> connection_list_type;
 			public:
 				typedef SlotFunction slot_function_type;
@@ -128,7 +128,7 @@ namespace boost
 				// disconnect slot(s)
 				void disconnect_all_slots()
 				{
-					shared_ptr<connection_list_type> connectionBodies =
+					quick_ptr<connection_list_type> connectionBodies =
 						get_readable_connection_list();
 					typename connection_list_type::iterator it;
 					for(it = connectionBodies->begin(); it != connectionBodies->end(); ++it)
@@ -138,7 +138,7 @@ namespace boost
 				}
 				void disconnect(const group_type &group)
 				{
-					shared_ptr<connection_list_type> connectionBodies =
+					quick_ptr<connection_list_type> connectionBodies =
 						get_readable_connection_list();
 					group_key_type group_key(signalslib::detail::grouped_slots, group);
 					typename connection_list_type::iterator it;
@@ -157,8 +157,8 @@ namespace boost
 				// emit signal
 				result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~))
 				{
-					boost::shared_ptr<connection_list_type> localConnectionBodies;
-					boost::shared_ptr<combiner_type> local_combiner;
+					quick_ptr<connection_list_type> localConnectionBodies;
+					quick_ptr<combiner_type> local_combiner;
 					typename connection_list_type::iterator it;
 					{
 						boost::mutex::scoped_lock listLock(_mutex);
@@ -173,16 +173,14 @@ namespace boost
 					slot_invoker invoker BOOST_PP_IF(EPG_SIGNALS_NUM_ARGS, \
 						(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS)), );
 					boost::optional<typename signalslib::detail::slot_result_type_wrapper<slot_result_type>::type > cache;
-					slot_call_iterator slot_iter_begin(
-						localConnectionBodies->begin(), localConnectionBodies->end(), invoker, cache);
-					slot_call_iterator slot_iter_end(
-						localConnectionBodies->end(), localConnectionBodies->end(), invoker, cache);
-					return (*local_combiner)(slot_iter_begin, slot_iter_end);
+					return (*local_combiner)(
+						slot_call_iterator(localConnectionBodies->begin(), localConnectionBodies->end(), invoker, cache),
+						slot_call_iterator(localConnectionBodies->end(), localConnectionBodies->end(), invoker, cache));
 				}
 				result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~)) const
 				{
-					boost::shared_ptr<connection_list_type> localConnectionBodies;
-					boost::shared_ptr<const combiner_type> local_combiner;
+					quick_ptr<connection_list_type> localConnectionBodies;
+					quick_ptr<const combiner_type> local_combiner;
 					typename connection_list_type::iterator it;
 					{
 						boost::mutex::scoped_lock listLock(_mutex);
@@ -197,15 +195,13 @@ namespace boost
 					slot_invoker invoker BOOST_PP_IF(EPG_SIGNALS_NUM_ARGS, \
 						(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS)), );
 					boost::optional<typename signalslib::detail::slot_result_type_wrapper<slot_result_type>::type > cache;
-					slot_call_iterator slot_iter_begin(
-						localConnectionBodies->begin(), localConnectionBodies->end(), invoker, cache);
-					slot_call_iterator slot_iter_end(
-						localConnectionBodies->end(), localConnectionBodies->end(), invoker, cache);
-					return (*local_combiner)(slot_iter_begin, slot_iter_end);
+					return (*local_combiner)(
+						slot_call_iterator(localConnectionBodies->begin(), localConnectionBodies->end(), invoker, cache),
+						slot_call_iterator(localConnectionBodies->end(), localConnectionBodies->end(), invoker, cache));
 				}
 				std::size_t num_slots() const
 				{
-					shared_ptr<connection_list_type> connectionBodies =
+					quick_ptr<connection_list_type> connectionBodies =
 						get_readable_connection_list();
 					typename connection_list_type::iterator it;
 					std::size_t count = 0;
@@ -217,7 +213,7 @@ namespace boost
 				}
 				bool empty() const
 				{
-					shared_ptr<connection_list_type> connectionBodies =
+					quick_ptr<connection_list_type> connectionBodies =
 						get_readable_connection_list();
 					typename connection_list_type::iterator it;
 					for(it = connectionBodies->begin(); it != connectionBodies->end(); ++it)
@@ -311,11 +307,11 @@ namespace boost
 				{
 					if(_connectionBodies.use_count() > 1)
 					{
-						boost::shared_ptr<connection_list_type> newList(new connection_list_type(*_connectionBodies));
+						quick_ptr<connection_list_type> newList(new connection_list_type(*_connectionBodies));
 						_connectionBodies = newList;
 					}
 				}
-				shared_ptr<connection_list_type> get_readable_connection_list() const
+				quick_ptr<connection_list_type> get_readable_connection_list() const
 				{
 					boost::mutex::scoped_lock listLock(_mutex);
 					return _connectionBodies;
@@ -333,7 +329,7 @@ namespace boost
 				template<typename T>
 				void do_disconnect(const T &slot, mpl::bool_<false> is_group)
 				{
-					shared_ptr<connection_list_type> connectionBodies =
+					quick_ptr<connection_list_type> connectionBodies =
 						get_readable_connection_list();
 					typename connection_list_type::iterator it;
 					for(it = connectionBodies->begin(); it != connectionBodies->end(); ++it)
@@ -346,8 +342,8 @@ namespace boost
 					}
 				}
 
-				boost::shared_ptr<combiner_type> _combiner;
-				boost::shared_ptr<connection_list_type> _connectionBodies;
+				quick_ptr<combiner_type> _combiner;
+				quick_ptr<connection_list_type> _connectionBodies;
 				// connection list mutex must never be locked when attempting a blocking lock on a slot,
 				// or you could deadlock.
 				mutable boost::mutex _mutex;
@@ -448,7 +444,7 @@ namespace boost
 			return _pimpl;
 		}
 
-		boost::shared_ptr<signalslib::detail::EPG_SIGNAL_IMPL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION> >
+		shared_ptr<signalslib::detail::EPG_SIGNAL_IMPL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION> >
 			_pimpl;
 	};
 
@@ -472,13 +468,13 @@ namespace boost
 				{}
 				result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~))
 				{
-					boost::shared_ptr<signalslib::detail::EPG_SIGNAL_IMPL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION> >
+					shared_ptr<signalslib::detail::EPG_SIGNAL_IMPL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION> >
 						shared_pimpl(_weak_pimpl);
 					return (*shared_pimpl)(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
 				}
 				result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~)) const
 				{
-					boost::shared_ptr<signalslib::detail::EPG_SIGNAL_IMPL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION> >
+					shared_ptr<signalslib::detail::EPG_SIGNAL_IMPL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION> >
 						shared_pimpl(_weak_pimpl);
 					return (*shared_pimpl)(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
 				}

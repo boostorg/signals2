@@ -52,14 +52,12 @@ namespace boost {
           : iter(iter_in), end(end_in), f(f), cache(&c), lock_iter(end_in)
         {
         }
-        slot_call_iterator_t(const slot_call_iterator_t &other)
+        slot_call_iterator_t(const slot_call_iterator_t &other): iter(other.iter),
+          end(other.end), f(other.f), cache(other.cache), lock_iter(other.lock_iter),
+          tracked_ptrs(other.tracked_ptrs)
         {
-            iter = other.iter;
-            end = other.end;
-            f = other.f;
-            cache = other.cache;
-            lock.reset();
-            lock_iter = end;
+          if(other.lock)
+            lock.reset(new lock_type((*iter)->mutex));
         }
         const slot_call_iterator_t& operator =(const slot_call_iterator_t &other)
         {
@@ -68,8 +66,12 @@ namespace boost {
             end = other.end;
             f = other.f;
             cache = other.cache;
-            lock.reset();
-            lock_iter = end;
+            if(other.lock)
+              lock.reset(new lock_type((*iter)->mutex));
+            else
+              lock.reset();
+            lock_iter = other.lock_iter;
+            tracked_ptrs = other.tracked_ptrs;
             return *this;
         }
 
@@ -80,7 +82,6 @@ namespace boost {
             lockNextCallable();
             cache->reset(f(*iter));
           }
-
           return cache->get();
         }
 
@@ -112,7 +113,7 @@ namespace boost {
           {
             lock.reset(new lock_type((*iter)->mutex));
             lock_iter = iter;
-            trackedPtrs = (*iter)->nolock_grab_tracked_objects();
+            tracked_ptrs = (*iter)->nolock_grab_tracked_objects();
             if((*iter)->nolock_nograb_blocked() == false) break;
           }
           if(iter == end)
@@ -126,9 +127,9 @@ namespace boost {
         Iterator end;
         Function f;
         boost::optional<result_type>* cache;
-        mutable boost::scoped_ptr<lock_type> lock;
+        mutable scoped_ptr<lock_type> lock;
         mutable Iterator lock_iter;
-        mutable ConnectionBodyBase::shared_ptrs_type trackedPtrs;
+        mutable ConnectionBodyBase::shared_ptrs_type tracked_ptrs;
       };
     } // end namespace detail
   } // end namespace BOOST_SIGNALS_NAMESPACE
