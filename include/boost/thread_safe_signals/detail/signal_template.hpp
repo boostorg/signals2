@@ -175,7 +175,7 @@ namespace boost
 					}
 					slot_invoker invoker BOOST_PP_IF(EPG_SIGNALS_NUM_ARGS, \
 						(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS)), );
-					boost::optional<typename signalslib::detail::slot_result_type_wrapper<slot_result_type>::type > cache;
+					optional<typename signalslib::detail::slot_result_type_wrapper<slot_result_type>::type > cache;
 					return (*local_combiner)(
 						slot_call_iterator(localConnectionBodies->begin(), localConnectionBodies->end(), invoker, cache),
 						slot_call_iterator(localConnectionBodies->end(), localConnectionBodies->end(), invoker, cache));
@@ -197,7 +197,7 @@ namespace boost
 					}
 					slot_invoker invoker BOOST_PP_IF(EPG_SIGNALS_NUM_ARGS, \
 						(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS)), );
-					boost::optional<typename signalslib::detail::slot_result_type_wrapper<slot_result_type>::type > cache;
+					optional<typename signalslib::detail::slot_result_type_wrapper<slot_result_type>::type > cache;
 					return (*local_combiner)(
 						slot_call_iterator(localConnectionBodies->begin(), localConnectionBodies->end(), invoker, cache),
 						slot_call_iterator(localConnectionBodies->end(), localConnectionBodies->end(), invoker, cache));
