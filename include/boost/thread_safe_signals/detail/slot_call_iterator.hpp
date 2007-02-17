@@ -54,6 +54,7 @@ namespace boost {
 				iter(iter_in), end(end_in), f(f),
 				cache(&c), lock_iter(end_in)
 			{
+				lockNextCallable();
 			}
 			slot_call_iterator_t(const slot_call_iterator_t &other): iter(other.iter),
 			end(other.end), f(other.f), cache(other.cache), lock_iter(other.lock_iter),
@@ -82,7 +83,6 @@ namespace boost {
 			dereference() const
 			{
 				if (!(*cache)) {
-					lockNextCallable();
 					cache->reset(f(*iter));
 				}
 				return cache->get();
@@ -90,7 +90,6 @@ namespace boost {
 	
 			void increment()
 			{
-				lockNextCallable();
 				++iter;
 				lockNextCallable();
 				cache->reset();
@@ -111,28 +110,39 @@ namespace boost {
 			class lock_memory_pool
 			{
 			public:
-				lock_memory_pool():
-					_use_first(false), _alloc_count(0)
+				lock_memory_pool()
 				{
+					unsigned i;
+					for(i = 0; i < _max_objects; ++i)
+						_allocated[i] = false;
 				}
 				void * malloc()
 				{
-					BOOST_ASSERT(_alloc_count < _max_objects);
-					_use_first = !_use_first;
-					++_alloc_count;
-					return &_chunks[_use_first];
+					unsigned i;
+					for(i = 0; i < _max_objects; ++i)
+					{
+						if(_allocated[i] == false)
+						{
+							_allocated[i] = true;
+							return &_chunks[i];
+						}
+					}
+					BOOST_ASSERT(false);
+					return 0;
 				}
-				void free(void *)
+				void free(void *ptr)
 				{
-					--_alloc_count;
+					aligned_storage_type *typed_ptr =
+						static_cast<aligned_storage_type*>(ptr);
+					_allocated[typed_ptr - _chunks] = false;
 				}
 			private:
+				typedef aligned_storage<sizeof(lock_type), alignment_of<lock_type>::value> aligned_storage_type;
+				
 				static const unsigned _max_objects = 2;
 				
-				aligned_storage<sizeof(lock_type), alignment_of<lock_type>::value>
-					_chunks[_max_objects];
-				bool _use_first;
-				unsigned _alloc_count;
+				aligned_storage_type _chunks[_max_objects];
+				bool _allocated[_max_objects];
 			};
 			class lock_type: public ConnectionBody::mutex_type::scoped_lock
 			{
