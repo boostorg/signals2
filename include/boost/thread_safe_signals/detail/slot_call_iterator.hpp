@@ -54,7 +54,6 @@ namespace boost {
 				iter(iter_in), end(end_in), f(f),
 				cache(&c), lock_iter(end_in)
 			{
-				lockNextCallable();
 			}
 			slot_call_iterator_t(const slot_call_iterator_t &other): iter(other.iter),
 			end(other.end), f(other.f), cache(other.cache), lock_iter(other.lock_iter),
