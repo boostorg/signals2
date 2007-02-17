@@ -180,9 +180,9 @@ namespace boost {
 			Iterator end;
 			Function f;
 			optional<result_type>* cache;
+			mutable lock_memory_pool lock_pool;
 			mutable scoped_ptr<lock_type> lock;
 			mutable Iterator lock_iter;
-			mutable lock_memory_pool lock_pool;
 			mutable typename ConnectionBody::shared_ptrs_type tracked_ptrs;
 		};
 		} // end namespace detail
