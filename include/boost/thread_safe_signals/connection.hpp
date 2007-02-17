@@ -181,6 +181,10 @@ namespace boost
 				boost::shared_ptr<detail::ConnectionBodyBase> otherConnectionBody(other._weakConnectionBody.lock());
 				return connectionBody < otherConnectionBody;
 			}
+			void swap(connection &other)
+			{
+				std::swap(_weakConnectionBody, other._weakConnectionBody);
+			}
 		private:
 			boost::weak_ptr<detail::ConnectionBodyBase> _weakConnectionBody;
 		};
@@ -199,6 +203,10 @@ namespace boost
 			{
 				boost::signalslib::connection::operator=(rhs);
 				return *this;
+			}
+			void swap(scoped_connection &other)
+			{
+				connection::swap(other);
 			}
 		};
 	}
