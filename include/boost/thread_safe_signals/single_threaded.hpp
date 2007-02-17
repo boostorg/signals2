@@ -1,0 +1,51 @@
+// Boost.Signals library
+
+// Copyright Frank Mori Hess 2007.
+// distribution is subject to the Boost Software License, Version
+// 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+// For more information, see http://www.boost.org
+
+#ifndef BOOST_SIGNALS_SINGLE_THREADED_MODEL_HEADER
+#define BOOST_SIGNALS_SINGLE_THREADED_MODEL_HEADER
+
+#ifdef BOOST_HAS_ABI_HEADERS
+#  include BOOST_ABI_PREFIX
+#endif
+
+namespace boost {
+	namespace signalslib {
+		namespace detail
+		{
+			class null_mutex;
+			
+			class null_scoped_lock
+			{
+			public:
+				null_scoped_lock(const null_mutex &mutex)
+				{}
+				bool locked() const {return true;}
+			};
+			class null_mutex
+			{
+			public:
+				typedef null_scoped_lock scoped_lock;
+				typedef null_scoped_lock scoped_try_lock;
+			};
+		}
+		
+		class single_threaded
+		{
+		public:
+			typedef detail::null_mutex mutex_type;
+			typedef detail::null_mutex recursive_try_mutex_type;
+		};
+	} // end namespace signalslib
+} // end namespace boost
+
+#ifdef BOOST_HAS_ABI_HEADERS
+#  include BOOST_ABI_SUFFIX
+#endif
+
+#endif // BOOST_SIGNALS_SINGLE_THREADED_MODEL_HEADER

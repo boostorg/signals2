@@ -33,7 +33,7 @@ namespace boost
 		namespace detail
 		{
 			class slot_base;
-			template<typename GroupKey, typename SlotFunction>
+			template<typename GroupKey, typename SlotFunction, typename ThreadingModel>
 			class ConnectionBody;
 
 			// Visitor to collect tracked objects from a bound function.

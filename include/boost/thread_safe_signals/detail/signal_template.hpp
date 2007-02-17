@@ -46,18 +46,20 @@
 	typename Group = int, \
 	typename GroupCompare = std::less<Group>, \
 	typename SlotFunction = BOOST_PP_CAT(boost::function, EPG_SIGNALS_NUM_ARGS)<R BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS) \
-		BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(EPG_SIGNALS_NUM_ARGS), T) >
+		BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(EPG_SIGNALS_NUM_ARGS), T) >, \
+	typename ThreadingModel = signalslib::single_threaded
 // typename R, typename T1, typename T2, ..., typename TN, typename Combiner, ...
 #define EPG_SIGNAL_TEMPLATE_DECL \
 	typename R, BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(EPG_SIGNALS_NUM_ARGS), typename T) BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS) \
 	typename Combiner, \
 	typename Group, \
 	typename GroupCompare, \
-	typename SlotFunction
-// R, T1, T2, ..., TN, Combiner, Group, GroupCompare, SlotFunction
+	typename SlotFunction, \
+	typename ThreadingModel
+// R, T1, T2, ..., TN, Combiner, Group, GroupCompare, SlotFunction, ThreadingModel
 #define EPG_SIGNAL_TEMPLATE_INSTANTIATION \
 	R, BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(EPG_SIGNALS_NUM_ARGS), T) BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS) \
-	Combiner, Group, GroupCompare, SlotFunction
+	Combiner, Group, GroupCompare, SlotFunction, ThreadingModel
 
 namespace boost
 {
@@ -71,8 +73,8 @@ namespace boost
 			private:
 				class slot_invoker;
 				typedef typename signalslib::detail::group_key<Group>::type group_key_type;
-				typedef shared_ptr<signalslib::detail::ConnectionBody<group_key_type, SlotFunction> > connection_body_type;
-				typedef signalslib::detail::grouped_list<Group, GroupCompare, connection_body_type> connection_list_type;
+				typedef shared_ptr<ConnectionBody<group_key_type, SlotFunction, ThreadingModel> > connection_body_type;
+				typedef grouped_list<Group, GroupCompare, connection_body_type> connection_list_type;
 			public:
 				typedef SlotFunction slot_function_type;
 				typedef slot<slot_function_type> slot_type;
@@ -82,7 +84,7 @@ namespace boost
 				typedef Group group_type;
 				typedef GroupCompare group_compare_type;
 				typedef typename signalslib::detail::slot_call_iterator_t<slot_invoker,
-					typename connection_list_type::iterator > slot_call_iterator;
+					typename connection_list_type::iterator, ConnectionBody<group_key_type, SlotFunction, ThreadingModel> > slot_call_iterator;
 
 				EPG_SIGNAL_IMPL_CLASS_NAME(const combiner_type &combiner,
 					const group_compare_type &group_compare):
@@ -92,7 +94,7 @@ namespace boost
 				// connect slot
 				signalslib::connection connect(const slot_type &slot, signalslib::connect_position position = signalslib::at_back)
 				{
-					boost::mutex::scoped_lock lock(_mutex);
+					typename mutex_type::scoped_lock lock(_mutex);
 					connection_body_type newConnectionBody =
 						create_new_connection(slot);
 					group_key_type group_key;
@@ -111,7 +113,7 @@ namespace boost
 				signalslib::connection connect(const group_type &group,
 					const slot_type &slot, signalslib::connect_position position = signalslib::at_back)
 				{
-					boost::mutex::scoped_lock lock(_mutex);
+					typename mutex_type::scoped_lock lock(_mutex);
 					connection_body_type newConnectionBody =
 						create_new_connection(slot);
 					// update map to first connection body in group if needed
@@ -162,7 +164,7 @@ namespace boost
 					shared_ptr<combiner_type> local_combiner;
 					typename connection_list_type::iterator it;
 					{
-						boost::mutex::scoped_lock listLock(_mutex);
+						typename mutex_type::scoped_lock listLock(_mutex);
 						// only clean up if it is safe to do so
 						if(_connectionBodies.use_count() == 1)
 							nolock_cleanup_connections(false);
@@ -184,7 +186,7 @@ namespace boost
 					shared_ptr<const combiner_type> local_combiner;
 					typename connection_list_type::iterator it;
 					{
-						boost::mutex::scoped_lock listLock(_mutex);
+						typename mutex_type::scoped_lock listLock(_mutex);
 						// only clean up if it is safe to do so
 						if(_connectionBodies.use_count() == 1)
 							nolock_cleanup_connections(false);
@@ -225,15 +227,17 @@ namespace boost
 				}
 				combiner_type combiner() const
 				{
-					boost::mutex::scoped_lock lock(_mutex);
+					typename mutex_type::scoped_lock lock(_mutex);
 					return *_combiner;
 				}
 				void set_combiner(const combiner_type &combiner)
 				{
-					boost::mutex::scoped_lock lock(_mutex);
+					typename mutex_type::scoped_lock lock(_mutex);
 					_combiner.reset(new combiner_type(combiner));
 				}
 			private:
+				typedef typename ThreadingModel::mutex_type mutex_type;
+				
 				// slot_invoker is passed to slot_call_iterator_t to run slots
 				class slot_invoker
 				{
@@ -283,7 +287,7 @@ namespace boost
 						bool connected;
 						{
 							// skip over slots that are busy
-							ConnectionBodyBase::mutex_type::scoped_try_lock lock((*it)->mutex);
+							typename ConnectionBody<group_key_type, SlotFunction, ThreadingModel>::mutex_type::scoped_try_lock lock((*it)->mutex);
 							if(lock.locked() == false)
 							{
 								connected = true;
@@ -336,13 +340,13 @@ namespace boost
 				}
 				shared_ptr<connection_list_type> get_readable_connection_list() const
 				{
-					boost::mutex::scoped_lock listLock(_mutex);
+					typename mutex_type::scoped_lock listLock(_mutex);
 					return _connectionBodies;
 				}
 				connection_body_type create_new_connection(const slot_type &slot)
 				{
 					nolock_force_unique_connection_list();
-					return connection_body_type(new ConnectionBody<group_key_type, slot_function_type>(slot));
+					return connection_body_type(new ConnectionBody<group_key_type, slot_function_type, ThreadingModel>(slot));
 				}
 				void do_disconnect(const group_type &group, mpl::bool_<true> is_group)
 				{
@@ -356,7 +360,7 @@ namespace boost
 					typename connection_list_type::iterator it;
 					for(it = connectionBodies->begin(); it != connectionBodies->end(); ++it)
 					{
-						typename ConnectionBodyBase::mutex_type::scoped_lock lock((*it)->mutex);
+						typename ConnectionBody<group_key_type, slot_function_type, ThreadingModel>::mutex_type::scoped_lock lock((*it)->mutex);
 						if((*it)->slot == slot)
 						{
 							(*it)->nolock_disconnect();
@@ -369,7 +373,7 @@ namespace boost
 				mutable connection_list_type::iterator _garbage_collector_it;
 				// connection list mutex must never be locked when attempting a blocking lock on a slot,
 				// or you could deadlock.
-				mutable boost::mutex _mutex;
+				mutable mutex_type _mutex;
 			};
 
 			template<EPG_SIGNAL_TEMPLATE_DECL>
@@ -507,22 +511,23 @@ namespace boost
 			};
 
 			template<unsigned arity, typename Signature, typename Combiner,
-				typename Group, typename GroupCompare, typename SlotFunction> class signalN;
+				typename Group, typename GroupCompare, typename SlotFunction, typename ThreadingModel>
+			class signalN;
 			// partial template specialization
 			template<typename Signature, typename Combiner, typename Group,
-				typename GroupCompare, typename SlotFunction>
+				typename GroupCompare, typename SlotFunction, typename ThreadingModel>
 			class signalN<EPG_SIGNALS_NUM_ARGS, Signature, Combiner, Group,
-				GroupCompare, SlotFunction>
+				GroupCompare, SlotFunction, ThreadingModel>
 			{
 			public:
 				typedef EPG_SIGNAL_CLASS_NAME<typename boost::function_traits<Signature>::result_type,
 // typename boost::function_traits<Signature>::argn_type ,
 #define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
 	BOOST_PP_CAT(BOOST_PP_CAT(typename boost::function_traits<Signature>::arg, BOOST_PP_INC(n)), _type) ,
-					BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, Signature)
+				BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, Signature)
 #undef EPG_SIGNAL_MISC_STATEMENT
-					Combiner, Group,
-					GroupCompare, SlotFunction> type;
+				Combiner, Group,
+				GroupCompare, SlotFunction, ThreadingModel> type;
 			};
 		}
 	}

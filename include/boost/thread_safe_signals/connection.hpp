@@ -25,7 +25,6 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread_safe_signals/slot.hpp>
 #include <boost/thread_safe_signals/track.hpp>
 #include <boost/type_traits.hpp>
@@ -43,7 +42,6 @@ namespace boost
 			{
 			public:
 				typedef std::vector<boost::shared_ptr<void> > shared_ptrs_type;
-				typedef boost::recursive_try_mutex mutex_type;
 				typedef std::vector<boost::weak_ptr<void> > tracked_objects_container;
 
 				ConnectionBodyBase(const tracked_objects_container &tracked_objects):
@@ -51,11 +49,7 @@ namespace boost
 				{
 				}
 				virtual ~ConnectionBodyBase() {}
-				void disconnect()
-				{
-					mutex_type::scoped_lock lock(mutex);
-					nolock_disconnect();
-				}
+				virtual void disconnect() = 0;
 				void nolock_disconnect()
 				{
 					if(_connected)
@@ -63,23 +57,9 @@ namespace boost
 						_connected = false;
 					}
 				}
-				bool connected() const
-				{
-					mutex_type::scoped_lock lock(mutex);
-					nolock_grab_tracked_objects();
-					return nolock_nograb_connected();
-				}
-				void block(bool should_block)
-				{
-					mutex_type::scoped_lock lock(mutex);
-					_blocked = should_block;
-				}
-				bool blocked() const
-				{
-					mutex_type::scoped_lock lock(mutex);
-					nolock_grab_tracked_objects();
-					return nolock_nograb_blocked();
-				}
+				virtual bool connected() const = 0;
+				virtual void block(bool should_block) = 0;
+				virtual bool blocked() const = 0;
 				bool nolock_nograb_blocked() const
 				{
 					return _blocked || (nolock_nograb_connected() == false);
@@ -101,28 +81,51 @@ namespace boost
 					}
 					return sharedPtrs;
 				}
-				mutable mutex_type mutex;
-			private:
+			protected:
 				tracked_objects_container _tracked_objects;
 				mutable bool _connected;
 				bool _blocked;
 			};
 
-			template<typename GroupKey, typename SlotFunction>
+			template<typename GroupKey, typename SlotFunction, typename ThreadingModel>
 			class ConnectionBody: public ConnectionBodyBase
 			{
 			public:
+				typedef typename ThreadingModel::recursive_try_mutex_type mutex_type;
 				ConnectionBody(const slot<SlotFunction> &slot_in):
 					ConnectionBodyBase(slot_in.get_all_tracked()), slot(slot_in.get_slot_function())
 				{
 				}
 				virtual ~ConnectionBody() {}
+				virtual void disconnect()
+				{
+					typename mutex_type::scoped_lock lock(mutex);
+					nolock_disconnect();
+				}
+				virtual bool connected() const
+				{
+					typename mutex_type::scoped_lock lock(mutex);
+					nolock_grab_tracked_objects();
+					return nolock_nograb_connected();
+				}
+				virtual void block(bool should_block)
+				{
+					typename mutex_type::scoped_lock lock(mutex);
+					_blocked = should_block;
+				}
+				virtual bool blocked() const
+				{
+					typename mutex_type::scoped_lock lock(mutex);
+					nolock_grab_tracked_objects();
+					return nolock_nograb_blocked();
+				}
 				const GroupKey& group_key() const {return _group_key;}
 				void set_group_key(const GroupKey &key) {_group_key = key;}
 				/* base class mutex should be locked and nolock_nograb_blocked() checked
 				before slot is called, to prevent races
 				with connect() and disconnect() */
 				const SlotFunction slot;
+				mutable mutex_type mutex;
 			private:
 				GroupKey _group_key;
 			};
