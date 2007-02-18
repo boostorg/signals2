@@ -88,7 +88,7 @@ namespace boost
 
 				EPG_SIGNAL_IMPL_CLASS_NAME(const combiner_type &combiner,
 					const group_compare_type &group_compare):
-					_shared_state(new invocation_state(connection_list_type(group_compare), combiner_type(combiner))),
+					_shared_state(new invocation_state(connection_list_type(group_compare), combiner)),
 					_garbage_collector_it(_shared_state->connection_bodies.end())
 				{}
 				// connect slot
@@ -236,7 +236,10 @@ namespace boost
 				void set_combiner(const combiner_type &combiner)
 				{
 					typename mutex_type::scoped_lock lock(_mutex);
-					_shared_state.reset(_shared_state->connection_bodies, new combiner_type(combiner));
+					if(_shared_state.unique())
+						_shared_state->combiner = combiner;
+					else
+						_shared_state.reset(new invocation_state(_shared_state->connection_bodies, combiner));
 				}
 			private:
 				typedef typename ThreadingModel::mutex_type mutex_type;
