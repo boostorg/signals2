@@ -82,6 +82,7 @@ namespace boost {
 			dereference() const
 			{
 				if (!(*cache)) {
+					lock.reset();
 					cache->reset(f(*iter));
 				}
 				return cache->get();
