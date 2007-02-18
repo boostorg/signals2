@@ -52,38 +52,14 @@ namespace boost {
 			slot_call_iterator_t(Iterator iter_in, Iterator end_in, Function f,
 				boost::optional<result_type> &c):
 				iter(iter_in), end(end_in), f(f),
-				cache(&c), lock_iter(end_in)
+				cache(&c), callable_iter(end_in)
 			{
-			}
-			slot_call_iterator_t(const slot_call_iterator_t &other): iter(other.iter),
-			end(other.end), f(other.f), cache(other.cache), lock_iter(other.lock_iter),
-			tracked_ptrs(other.tracked_ptrs)
-			{
-				if(other.lock)
-					lock.reset(new(lock_pool) lock_type(lock_pool, (*iter)->mutex));
-			}
-			const slot_call_iterator_t& operator =(const slot_call_iterator_t &other)
-			{
-				if(this == &other) return;
-				iter = other.iter;
-				end = other.end;
-				f = other.f;
-				cache = other.cache;
-				if(other.lock)
-					lock.reset(new(lock_pool) lock_type(lock_pool, (*iter)->mutex));
-				else
-					lock.reset();
-				lock_iter = other.lock_iter;
-				tracked_ptrs = other.tracked_ptrs;
-				return *this;
 			}
 	
 			typename inherited::reference
 			dereference() const
 			{
 				if (!(*cache)) {
-					lock_iter = end;
-					lock.reset();
 					cache->reset(f(*iter));
 				}
 				return cache->get();
@@ -104,86 +80,25 @@ namespace boost {
 			}
 	
 		private:
-			class lock_type;
-			// lock_memory_pool and the lock_type class exist to optimize our dynamic allocation of scoped_locks.
-			// It makes a noticeable difference in benchmarks when invoking a signal in an inner loop with
-			// an empty slot connected.  I tried using boost::object_pool<lock_type> but it was slower.
-			class lock_memory_pool
-			{
-			public:
-				lock_memory_pool()
-				{
-					unsigned i;
-					for(i = 0; i < _max_objects; ++i)
-						_allocated[i] = false;
-				}
-				void * malloc()
-				{
-					unsigned i;
-					for(i = 0; i < _max_objects; ++i)
-					{
-						if(_allocated[i] == false)
-						{
-							_allocated[i] = true;
-							return &_chunks[i];
-						}
-					}
-					BOOST_ASSERT(false);
-					return 0;
-				}
-				void free(void *ptr)
-				{
-					aligned_storage_type *typed_ptr =
-						static_cast<aligned_storage_type*>(ptr);
-					_allocated[typed_ptr - _chunks] = false;
-				}
-			private:
-				typedef aligned_storage<sizeof(lock_type), alignment_of<lock_type>::value> aligned_storage_type;
-				
-				static const unsigned _max_objects = 2;
-				
-				aligned_storage_type _chunks[_max_objects];
-				bool _allocated[_max_objects];
-			};
-			class lock_type: public ConnectionBody::mutex_type::scoped_lock
-			{
-			public:
-				lock_type(lock_memory_pool &pool, typename ConnectionBody::mutex_type &mutex):
-					ConnectionBody::mutex_type::scoped_lock(mutex), _pool(pool)
-				{}
-				static void* operator new(unsigned num_bytes, lock_memory_pool &pool)
-				{
-					return pool.malloc();
-				}
-				static void operator delete(void *ptr)
-				{
-					if(ptr == 0) return;
-					lock_type *typed_ptr = static_cast<lock_type*>(ptr);
-					lock_memory_pool &pool = typed_ptr->_pool;
-					pool.free(typed_ptr);
-				}
-			private:
-				lock_memory_pool &_pool;
-			};
-			
+			typedef typename ConnectionBody::mutex_type::scoped_lock lock_type;
 			
 			void lockNextCallable() const
 			{
-				if(iter == lock_iter)
+				if(iter == callable_iter)
 				{
 					return;
 				}
 				for(;iter != end; ++iter)
 				{
-					lock.reset(new(lock_pool) lock_type(lock_pool, (*iter)->mutex));
-					lock_iter = iter;
-					tracked_ptrs = (*iter)->nolock_grab_tracked_objects();
-					if((*iter)->nolock_nograb_blocked() == false) break;
+					if((*iter)->blocked() == false)
+					{
+						callable_iter = iter;
+						break;
+					}
 				}
 				if(iter == end)
 				{
-					lock.reset();
-					lock_iter = end;
+					callable_iter = end;
 				}
 			}
 	
@@ -191,9 +106,7 @@ namespace boost {
 			Iterator end;
 			Function f;
 			optional<result_type>* cache;
-			mutable lock_memory_pool lock_pool;
-			mutable scoped_ptr<lock_type> lock;
-			mutable Iterator lock_iter;
+			mutable Iterator callable_iter;
 			mutable typename ConnectionBody::shared_ptrs_type tracked_ptrs;
 		};
 		} // end namespace detail

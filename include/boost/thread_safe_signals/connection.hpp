@@ -91,7 +91,7 @@ namespace boost
 			class ConnectionBody: public ConnectionBodyBase
 			{
 			public:
-				typedef typename ThreadingModel::recursive_try_mutex_type mutex_type;
+				typedef typename ThreadingModel::try_mutex_type mutex_type;
 				ConnectionBody(const slot<SlotFunction> &slot_in):
 					ConnectionBodyBase(slot_in.get_all_tracked()), slot(slot_in.get_slot_function())
 				{

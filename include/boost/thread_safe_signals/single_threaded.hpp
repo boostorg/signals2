@@ -39,6 +39,7 @@ namespace boost {
 		{
 		public:
 			typedef detail::null_mutex mutex_type;
+			typedef detail::null_mutex try_mutex_type;
 			typedef detail::null_mutex recursive_try_mutex_type;
 		};
 	} // end namespace signalslib

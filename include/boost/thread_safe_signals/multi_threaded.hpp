@@ -23,7 +23,7 @@ namespace boost {
 		{
 		public:
 			typedef mutex mutex_type;
-			typedef recursive_try_mutex recursive_try_mutex_type;
+			typedef try_mutex try_mutex_type;
 		};
 	} // end namespace signalslib
 } // end namespace boost
