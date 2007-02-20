@@ -54,6 +54,7 @@ namespace boost {
 				iter(iter_in), end(end_in), f(f),
 				cache(&c), callable_iter(end_in)
 			{
+				lockNextCallable();
 			}
 	
 			typename inherited::reference
@@ -74,8 +75,6 @@ namespace boost {
 	
 			bool equal(const slot_call_iterator_t& other) const
 			{
-				lockNextCallable();
-				other.lockNextCallable();
 				return iter == other.iter;
 			}
 	
