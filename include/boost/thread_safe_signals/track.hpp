@@ -24,7 +24,6 @@
 namespace boost {
   namespace signalslib {
     // The actual wrapper for tracked shared_ptr-referenced objects.
-    // (This probably needs a full smart pointer interface)
     template<class T>
     class tracked : public weak_ptr<T>
     {
@@ -46,6 +45,14 @@ namespace boost {
       operator shared_ptr<const T> () const
       {
         return shared_ptr<const T>(*this);
+      }
+      operator T& ()
+      {
+        return *shared_ptr<T>(*this).get();
+      }
+      operator const T& ()
+      {
+        return *shared_ptr<const T>(*this).get();
       }
       operator shared_ptr<void> () const
       {
