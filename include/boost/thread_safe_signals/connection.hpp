@@ -121,9 +121,7 @@ namespace boost
 				}
 				const GroupKey& group_key() const {return _group_key;}
 				void set_group_key(const GroupKey &key) {_group_key = key;}
-				/* base class mutex should be locked and nolock_nograb_blocked() checked
-				before slot is called, to prevent races
-				with connect() and disconnect() */
+
 				const SlotFunction slot;
 				mutable mutex_type mutex;
 			private:

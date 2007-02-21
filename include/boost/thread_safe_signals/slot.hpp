@@ -97,13 +97,14 @@ namespace boost
 				friend class signalslib::detail::tracked_objects_visitor;
 				template<typename GroupKey, typename SlotFunction>
 					friend class ConnectionBody;
-			private:
-				typedef std::vector<boost::weak_ptr<void> > tracked_objects_container;
 
 				void add_tracked(const shared_ptr<void> &tracked)
 				{
 					_trackedObjects.push_back(tracked);
 				}
+			private:
+				typedef std::vector<boost::weak_ptr<void> > tracked_objects_container;
+
 				const tracked_objects_container& get_all_tracked() const {return _trackedObjects;}
 
 				tracked_objects_container _trackedObjects;
