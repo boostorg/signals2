@@ -65,16 +65,8 @@ namespace boost {
       return tracked<T>(ptr);
     }
     template<class T>
-    tracked<T> track(const boost::reference_wrapper<shared_ptr<T> > &ref) {
-      return tracked<T>(ref.get());
-    }
-    template<class T>
     tracked<T> track(const boost::weak_ptr<T>& ptr) {
       return tracked<T>(ptr);
-    }
-    template<class T>
-    tracked<T> track(const boost::reference_wrapper<weak_ptr<T> > &ref) {
-      return tracked<T>(ref.get());
     }
     // get_pointer lets mem_fn bind a tracked
     template<typename T>
