@@ -48,14 +48,28 @@ namespace boost {
       T _value;
       weak_ptr<void> _tracked_ptr;
     };
-    // Convenience functions for binders.
+
     template<typename T>
-    tracked<weak_ptr<T> > track(const shared_ptr<T>& ptr) {
-      return tracked<weak_ptr<T> >(weak_ptr<T>(ptr), ptr);
+    class tracked_shared_ptr: public tracked<weak_ptr<T> >
+    {
+    public:
+      tracked_shared_ptr(const weak_ptr<T>& ptr):
+        tracked<weak_ptr<T> >(ptr, ptr.lock())
+      {}
+      operator shared_ptr<T> () const
+      {
+        return shared_ptr<T>(static_cast<const weak_ptr<T> &>(*this));
+      }
+    };
+
+   // Convenience functions for binders.
+    template<typename T>
+    tracked_shared_ptr<T> track(const shared_ptr<T>& ptr) {
+      return tracked_shared_ptr<T>(ptr);
     }
     template<typename T>
-    tracked<weak_ptr<T> > track(const weak_ptr<T>& ptr) {
-      return tracked<weak_ptr<T> >(ptr, ptr.lock());
+    tracked_shared_ptr<T> track(const weak_ptr<T>& ptr) {
+      return tracked_shared_ptr<T>(ptr);
     }
     template<typename T>
     tracked<T> track(const T &value, const shared_ptr<void> &tracked_ptr) {
