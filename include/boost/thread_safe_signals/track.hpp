@@ -12,6 +12,7 @@
 #ifndef BOOST_SIGNALS_TRACK_HEADER
 #define BOOST_SIGNALS_TRACK_HEADER
 
+#include <boost/ref.hpp>
 #include <boost/smart_ptr.hpp>
 
 #ifdef BOOST_HAS_ABI_HEADERS
@@ -25,17 +26,17 @@ namespace boost {
     class tracked
     {
     public:
-      typedef T value_type;
+      typedef typename unwrap_reference<T>::type value_type;
 
       tracked(const shared_ptr<void>& tracked_ptr, const T &value):
         _value(value), _tracked_ptr(tracked_ptr)
       {}
       // implicit conversions so tracked objects can be bound with bind
-      operator T& ()
+      operator value_type & ()
       {
         return _value;
       }
-      operator const T& () const
+      operator const value_type & () const
       {
         return _value;
       }
