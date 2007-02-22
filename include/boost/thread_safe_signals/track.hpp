@@ -27,7 +27,7 @@ namespace boost {
     public:
       typedef T value_type;
 
-      tracked(const T &value, const shared_ptr<void>& tracked_ptr):
+      tracked(const shared_ptr<void>& tracked_ptr, const T &value):
         _value(value), _tracked_ptr(tracked_ptr)
       {}
       // implicit conversions so tracked objects can be bound with bind
@@ -54,7 +54,7 @@ namespace boost {
     {
     public:
       tracked_shared_ptr(const weak_ptr<T>& ptr):
-        tracked<weak_ptr<T> >(ptr, ptr.lock())
+        tracked<weak_ptr<T> >(ptr.lock(), ptr)
       {}
       operator shared_ptr<T> () const
       {
@@ -72,8 +72,8 @@ namespace boost {
       return tracked_shared_ptr<T>(ptr);
     }
     template<typename T>
-    tracked<T> track(const T &value, const shared_ptr<void> &tracked_ptr) {
-      return tracked<T>(value, tracked_ptr);
+    tracked<T> track(const shared_ptr<void> &tracked_ptr, const T &value) {
+      return tracked<T>(tracked_ptr, value);
     }
     // get_pointer lets mem_fn bind a tracked
     template<typename T>
