@@ -12,10 +12,7 @@
 #ifndef BOOST_SIGNALS_TRACK_HEADER
 #define BOOST_SIGNALS_TRACK_HEADER
 
-#include <boost/ref.hpp>
-#include <boost/signals/detail/config.hpp>
 #include <boost/smart_ptr.hpp>
-#include <boost/noncopyable.hpp>
 
 #ifdef BOOST_HAS_ABI_HEADERS
 #  include BOOST_ABI_PREFIX
@@ -23,12 +20,15 @@
 
 namespace boost {
   namespace signalslib {
-    // The actual wrapper for tracked shared_ptr-referenced objects.
-    template<class T>
-    class tracked : public weak_ptr<T>
+    /* a weak_ptr that supports various implicit conversions, so it
+    binds to more types of parameters with boost::bind */
+    template<typename T>
+    class convertible_weak_ptr: public weak_ptr<T>
     {
     public:
-      tracked(const weak_ptr<T>& ptr): weak_ptr<T>(ptr)
+      convertible_weak_ptr(const weak_ptr<T> &ptr): weak_ptr<T>(ptr)
+      {}
+      convertible_weak_ptr(const shared_ptr<T> &ptr): weak_ptr<T>(ptr)
       {}
       operator T* ()
       {
@@ -54,23 +54,53 @@ namespace boost {
       {
         return *shared_ptr<const T>(*this).get();
       }
-      operator shared_ptr<void> () const
+    };
+    // The actual wrapper for tracked shared_ptr-managed objects.
+    template<typename T>
+    class tracked
+    {
+    public:
+      tracked(const T &value, const shared_ptr<void>& tracked_ptr):
+        _value(value), _tracked_ptr(tracked_ptr)
+      {}
+      // implicit conversions so tracked objects can be bound with bind
+      operator T& ()
       {
-        return shared_ptr<void>(*this);
+        return _value;
       }
+      operator const T& () const
+      {
+        return _value;
+      }
+
+      const weak_ptr<void>& get_tracked_ptr() const
+      {
+        return _tracked_ptr;
+      }
+    private:
+      T _value;
+      weak_ptr<void> _tracked_ptr;
     };
     // Convenience functions for binders.
-    template<class T>
-    tracked<T> track(const boost::shared_ptr<T>& ptr) {
-      return tracked<T>(ptr);
+    template<typename T>
+    tracked<convertible_weak_ptr<T> > track(const shared_ptr<T>& ptr) {
+      return tracked<convertible_weak_ptr<T> >(weak_ptr<T>(ptr), ptr);
     }
-    template<class T>
-    tracked<T> track(const boost::weak_ptr<T>& ptr) {
-      return tracked<T>(ptr);
+    template<typename T>
+    tracked<convertible_weak_ptr<T> > track(const weak_ptr<T>& ptr) {
+      return tracked<convertible_weak_ptr<T> >(ptr, ptr.lock());
+    }
+    template<typename T>
+    tracked<T> track(const T &value, const shared_ptr<void> &tracked_ptr) {
+      return tracked<T>(value, tracked_ptr);
     }
     // get_pointer lets mem_fn bind a tracked
     template<typename T>
-    T* get_pointer(const signalslib::tracked<T> &tracked) {return shared_ptr<T>(tracked).get();}
+    T* get_pointer(const signalslib::tracked<T*> &tracked) {return tracked;}
+    template<typename T>
+    T* get_pointer(const signalslib::tracked<weak_ptr<T> > &tracked) {return shared_ptr<T>(static_cast<weak_ptr<T> >(tracked)).get();}
+    template<typename T>
+    T* get_pointer(const signalslib::tracked<convertible_weak_ptr<T> > &tracked) {return shared_ptr<T>(static_cast<weak_ptr<T> >(tracked)).get();}
   } // end namespace BOOST_SIGNALS_NAMESPACE
 } // end namespace boost
 

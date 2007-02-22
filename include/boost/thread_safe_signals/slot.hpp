@@ -98,13 +98,13 @@ namespace boost
 				template<typename GroupKey, typename SlotFunction>
 					friend class ConnectionBody;
 
-				void add_tracked(const shared_ptr<void> &tracked)
-				{
-					_trackedObjects.push_back(tracked);
-				}
 			private:
 				typedef std::vector<boost::weak_ptr<void> > tracked_objects_container;
 
+				void add_tracked(const weak_ptr<void> &tracked)
+				{
+					_trackedObjects.push_back(tracked);
+				}
 				const tracked_objects_container& get_all_tracked() const {return _trackedObjects;}
 
 				tracked_objects_container _trackedObjects;
@@ -176,7 +176,7 @@ template<typename T>
 void boost::signalslib::detail::tracked_objects_visitor::add_if_trackable(const tracked<T> *t) const
 {
 	if(t)
-		slot_->add_tracked(*t);
+		slot_->add_tracked(t->get_tracked_ptr());
 }
 void boost::signalslib::detail::tracked_objects_visitor::add_if_trackable(const trackable *trackable) const
 {
