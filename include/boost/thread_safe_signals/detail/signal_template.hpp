@@ -22,43 +22,31 @@
 
 // This file is included iteratively, and should not be protected from multiple inclusion
 
-#define EPG_SIGNALS_NUM_ARGS BOOST_PP_ITERATION()
+#define BOOST_SIGNALS_NUM_ARGS BOOST_PP_ITERATION()
 
-#define EPG_SIGNAL_CLASS_NAME BOOST_PP_CAT(signal, EPG_SIGNALS_NUM_ARGS)
-#define EPG_WEAK_SIGNAL_CLASS_NAME BOOST_PP_CAT(weak_, EPG_SIGNAL_CLASS_NAME)
-#define EPG_SIGNAL_IMPL_CLASS_NAME BOOST_PP_CAT(EPG_SIGNAL_CLASS_NAME, _impl)
+#define BOOST_SIGNAL_CLASS_NAME BOOST_PP_CAT(signal, BOOST_SIGNALS_NUM_ARGS)
+#define BOOST_WEAK_SIGNAL_CLASS_NAME BOOST_PP_CAT(weak_, BOOST_SIGNAL_CLASS_NAME)
+#define BOOST_SIGNAL_IMPL_CLASS_NAME BOOST_PP_CAT(BOOST_SIGNAL_CLASS_NAME, _impl)
 
-// argn
-#define EPG_SIGNAL_SIGNATURE_ARG_NAME(z, n, data) BOOST_PP_CAT(arg, BOOST_PP_INC(n))
-// Tn argn
-#define EPG_SIGNAL_SIGNATURE_FULL_ARG(z, n, data) \
-	BOOST_PP_CAT(T, BOOST_PP_INC(n)) EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~)
-// T1 arg1, T2 arg2, ...
-// Tn argn
-#define EPG_SIGNAL_SIGNATURE_FULL_ARGS(arity, data) \
-	BOOST_PP_ENUM(arity, EPG_SIGNAL_SIGNATURE_FULL_ARG, data)
-// arg1, arg2, ..., argn
-#define EPG_SIGNAL_SIGNATURE_ARG_NAMES(arity) BOOST_PP_ENUM(arity, EPG_SIGNAL_SIGNATURE_ARG_NAME, ~)
 // typename R, typename T1, typename T2, ..., typename TN, typename Combiner = boost::last_value<R>, ...
-#define EPG_SIGNAL_TEMPLATE_DEFAULTED_DECL \
-	typename R, BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(EPG_SIGNALS_NUM_ARGS), typename T) BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS) \
+#define BOOST_SIGNAL_TEMPLATE_DEFAULTED_DECL \
+	BOOST_SIGNAL_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS_NUM_ARGS), \
 	typename Combiner = boost::last_value<R>, \
 	typename Group = int, \
 	typename GroupCompare = std::less<Group>, \
-	typename SlotFunction = BOOST_PP_CAT(boost::function, EPG_SIGNALS_NUM_ARGS)<R BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS) \
-		BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(EPG_SIGNALS_NUM_ARGS), T) >, \
+	typename SlotFunction = BOOST_FUNCTION_N_DECL(BOOST_SIGNALS_NUM_ARGS), \
 	typename ThreadingModel = signalslib::single_threaded
 // typename R, typename T1, typename T2, ..., typename TN, typename Combiner, ...
-#define EPG_SIGNAL_TEMPLATE_DECL \
-	typename R, BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(EPG_SIGNALS_NUM_ARGS), typename T) BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS) \
+#define BOOST_SIGNAL_TEMPLATE_DECL \
+	BOOST_SIGNAL_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS_NUM_ARGS), \
 	typename Combiner, \
 	typename Group, \
 	typename GroupCompare, \
 	typename SlotFunction, \
 	typename ThreadingModel
 // R, T1, T2, ..., TN, Combiner, Group, GroupCompare, SlotFunction, ThreadingModel
-#define EPG_SIGNAL_TEMPLATE_INSTANTIATION \
-	R, BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(EPG_SIGNALS_NUM_ARGS), T) BOOST_PP_COMMA_IF(EPG_SIGNALS_NUM_ARGS) \
+#define BOOST_SIGNAL_TEMPLATE_INSTANTIATION \
+	BOOST_SIGNAL_SIGNATURE_TEMPLATE_INSTANTIATION(BOOST_SIGNALS_NUM_ARGS), \
 	Combiner, Group, GroupCompare, SlotFunction, ThreadingModel
 
 namespace boost
@@ -67,17 +55,20 @@ namespace boost
 	{
 		namespace detail
 		{
-			template<EPG_SIGNAL_TEMPLATE_DECL>
-			class EPG_SIGNAL_IMPL_CLASS_NAME
+			template<BOOST_SIGNAL_TEMPLATE_DECL>
+			class BOOST_SIGNAL_IMPL_CLASS_NAME
 			{
+			public:
+				typedef BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)<BOOST_SIGNAL_SIGNATURE_TEMPLATE_INSTANTIATION(BOOST_SIGNALS_NUM_ARGS),
+					SlotFunction> slot_type;
 			private:
 				class slot_invoker;
 				typedef typename signalslib::detail::group_key<Group>::type group_key_type;
-				typedef shared_ptr<ConnectionBody<group_key_type, SlotFunction, ThreadingModel> > connection_body_type;
+				typedef shared_ptr<ConnectionBody<group_key_type, slot_type, ThreadingModel> > connection_body_type;
 				typedef grouped_list<Group, GroupCompare, connection_body_type> connection_list_type;
 			public:
 				typedef SlotFunction slot_function_type;
-				typedef slot<slot_function_type> slot_type;
+				// typedef slotN<Signature, SlotFunction> slot_type;
 				typedef typename slot_function_type::result_type slot_result_type;
 				typedef Combiner combiner_type;
 				typedef typename combiner_type::result_type result_type;
@@ -86,7 +77,7 @@ namespace boost
 				typedef typename signalslib::detail::slot_call_iterator_t<slot_invoker,
 					typename connection_list_type::iterator, ConnectionBody<group_key_type, SlotFunction, ThreadingModel> > slot_call_iterator;
 
-				EPG_SIGNAL_IMPL_CLASS_NAME(const combiner_type &combiner,
+				BOOST_SIGNAL_IMPL_CLASS_NAME(const combiner_type &combiner,
 					const group_compare_type &group_compare):
 					_shared_state(new invocation_state(connection_list_type(group_compare), combiner)),
 					_garbage_collector_it(_shared_state->connection_bodies.end())
@@ -161,7 +152,7 @@ namespace boost
 					do_disconnect(slot, is_group());
 				}
 				// emit signal
-				result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~))
+				result_type operator ()(BOOST_SIGNAL_SIGNATURE_FULL_ARGS(BOOST_SIGNALS_NUM_ARGS))
 				{
 					shared_ptr<invocation_state> local_state;
 					typename connection_list_type::iterator it;
@@ -175,14 +166,14 @@ namespace boost
 						during invocation. */
 						local_state = _shared_state;
 					}
-					slot_invoker invoker BOOST_PP_IF(EPG_SIGNALS_NUM_ARGS, \
-						(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS)), );
+					slot_invoker invoker BOOST_PP_IF(BOOST_SIGNALS_NUM_ARGS, \
+						(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS)), );
 					optional<typename signalslib::detail::slot_result_type_wrapper<slot_result_type>::type > cache;
 					return local_state->combiner(
 						slot_call_iterator(local_state->connection_bodies.begin(), local_state->connection_bodies.end(), invoker, cache),
 						slot_call_iterator(local_state->connection_bodies.end(), local_state->connection_bodies.end(), invoker, cache));
 				}
-				result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~)) const
+				result_type operator ()(BOOST_SIGNAL_SIGNATURE_FULL_ARGS(BOOST_SIGNALS_NUM_ARGS)) const
 				{
 					shared_ptr<invocation_state> local_state;
 					typename connection_list_type::iterator it;
@@ -196,8 +187,8 @@ namespace boost
 						during invocation. */
 						local_state = _shared_state;
 					}
-					slot_invoker invoker BOOST_PP_IF(EPG_SIGNALS_NUM_ARGS, \
-						(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS)), );
+					slot_invoker invoker BOOST_PP_IF(BOOST_SIGNALS_NUM_ARGS, \
+						(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS)), );
 					optional<typename signalslib::detail::slot_result_type_wrapper<slot_result_type>::type > cache;
 					return const_cast<const combiner_type&>(local_state->combiner)(
 						slot_call_iterator(local_state->connection_bodies.begin(), local_state->connection_bodies.end(), invoker, cache),
@@ -243,20 +234,20 @@ namespace boost
 				}
 			private:
 				typedef typename ThreadingModel::mutex_type mutex_type;
-				
+
 				// slot_invoker is passed to slot_call_iterator_t to run slots
 				class slot_invoker
 				{
 				public:
 					typedef typename signalslib::detail::slot_result_type_wrapper<slot_result_type>::type result_type;
 
-					slot_invoker(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~)) BOOST_PP_IF(EPG_SIGNALS_NUM_ARGS, :, )
+					slot_invoker(BOOST_SIGNAL_SIGNATURE_FULL_ARGS(BOOST_SIGNALS_NUM_ARGS)) BOOST_PP_IF(BOOST_SIGNALS_NUM_ARGS, :, )
 // argn ( argn ) ,
-#define EPG_SIGNAL_MISC_STATEMENT(z, n, data) \
+#define BOOST_SIGNAL_MISC_STATEMENT(z, n, data) \
 	BOOST_PP_CAT(arg, n) ( BOOST_PP_CAT(arg, n) )
 // arg1(arg1), arg2(arg2), ..., argn(argn)
-						BOOST_PP_ENUM_SHIFTED(BOOST_PP_INC(EPG_SIGNALS_NUM_ARGS), EPG_SIGNAL_MISC_STATEMENT, ~)
-#undef EPG_SIGNAL_MISC_STATEMENT
+						BOOST_PP_ENUM_SHIFTED(BOOST_PP_INC(BOOST_SIGNALS_NUM_ARGS), BOOST_SIGNAL_MISC_STATEMENT, ~)
+#undef BOOST_SIGNAL_MISC_STATEMENT
 					{}
 					result_type operator ()(const connection_body_type &connectionBody) const
 					{
@@ -265,20 +256,20 @@ namespace boost
 							resolver);
 					}
 // Tn argn;
-#define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
-	BOOST_PP_CAT(T, BOOST_PP_INC(n)) EPG_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~);
-					BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, ~)
-#undef EPG_SIGNAL_MISC_STATEMENT
+#define BOOST_SIGNAL_MISC_STATEMENT(z, n, Signature) \
+	BOOST_PP_CAT(T, BOOST_PP_INC(n)) BOOST_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~);
+					BOOST_PP_REPEAT(BOOST_SIGNALS_NUM_ARGS, BOOST_SIGNAL_MISC_STATEMENT, ~)
+#undef BOOST_SIGNAL_MISC_STATEMENT
 				private:
 					result_type m_invoke(const connection_body_type &connectionBody,
 						const signalslib::detail::unusable *resolver) const
 					{
-						connectionBody->slot(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
+						connectionBody->slot(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
 						return signalslib::detail::unusable();
 					}
 					result_type m_invoke(const connection_body_type &connectionBody, ...) const
 					{
-						return connectionBody->slot(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
+						return connectionBody->slot(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
 					}
 				};
 				// a struct used to optimize (minimize) the number of shared_ptrs that need to be created
@@ -296,7 +287,7 @@ namespace boost
 					connection_list_type connection_bodies;
 					combiner_type combiner;
 				};
-				
+
 				// clean up disconnected connections
 				void nolock_cleanup_connections(bool grab_tracked,
 					const connection_list_type::iterator &begin, const connection_list_type::iterator &end) const
@@ -315,7 +306,7 @@ namespace boost
 							}else
 							{
 								if(grab_tracked)
-									(*it)->nolock_grab_tracked_objects();
+									(*it)->nolock_slot_expired();
 								connected = (*it)->nolock_nograb_connected();
 							}
 						}// scoped lock destructs here, safe to erase now
@@ -367,7 +358,7 @@ namespace boost
 				connection_body_type create_new_connection(const slot_type &slot)
 				{
 					nolock_force_unique_connection_list();
-					return connection_body_type(new ConnectionBody<group_key_type, slot_function_type, ThreadingModel>(slot));
+					return connection_body_type(new ConnectionBody<group_key_type, slot_type, ThreadingModel>(slot));
 				}
 				void do_disconnect(const group_type &group, mpl::bool_<true> is_group)
 				{
@@ -397,46 +388,47 @@ namespace boost
 				mutable mutex_type _mutex;
 			};
 
-			template<EPG_SIGNAL_TEMPLATE_DECL>
-			class EPG_WEAK_SIGNAL_CLASS_NAME;
+			template<BOOST_SIGNAL_TEMPLATE_DECL>
+			class BOOST_WEAK_SIGNAL_CLASS_NAME;
 		}
 	}
 
-	template<EPG_SIGNAL_TEMPLATE_DEFAULTED_DECL>
-	class EPG_SIGNAL_CLASS_NAME: public signalslib::detail::signal_base
+	template<BOOST_SIGNAL_TEMPLATE_DEFAULTED_DECL>
+	class BOOST_SIGNAL_CLASS_NAME: public signalslib::detail::signal_base
 	{
 	public:
-		typedef signalslib::detail::EPG_WEAK_SIGNAL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION> weak_signal_type;
+		typedef signalslib::detail::BOOST_WEAK_SIGNAL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION> weak_signal_type;
 		friend class weak_signal_type;
-		friend class signalslib::detail::tracked_objects_visitor;
 
 		typedef SlotFunction slot_function_type;
-		typedef slot<slot_function_type> slot_type;
+		// typedef slotN<Signature, SlotFunction> slot_type;
+		typedef BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)<BOOST_SIGNAL_SIGNATURE_TEMPLATE_INSTANTIATION(BOOST_SIGNALS_NUM_ARGS),
+			slot_function_type> slot_type;
 		typedef typename slot_function_type::result_type slot_result_type;
 		typedef Combiner combiner_type;
 		typedef typename combiner_type::result_type result_type;
 		typedef Group group_type;
 		typedef GroupCompare group_compare_type;
-		typedef signalslib::detail::EPG_SIGNAL_IMPL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION>::slot_call_iterator
+		typedef signalslib::detail::BOOST_SIGNAL_IMPL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION>::slot_call_iterator
 			slot_call_iterator;
 // typedef Tn argn_type;
-#define EPG_SIGNAL_MISC_STATEMENT(z, n, data) \
+#define BOOST_SIGNAL_MISC_STATEMENT(z, n, data) \
 	typedef BOOST_PP_CAT(T, BOOST_PP_INC(n)) BOOST_PP_CAT(BOOST_PP_CAT(arg, BOOST_PP_INC(n)), _type);
-				BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, ~)
-#undef EPG_SIGNAL_MISC_STATEMENT
-#if EPG_SIGNALS_NUM_ARGS == 1
+				BOOST_PP_REPEAT(BOOST_SIGNALS_NUM_ARGS, BOOST_SIGNAL_MISC_STATEMENT, ~)
+#undef BOOST_SIGNAL_MISC_STATEMENT
+#if BOOST_SIGNALS_NUM_ARGS == 1
 		typedef arg1_type argument_type;
-#elif EPG_SIGNALS_NUM_ARGS == 2
+#elif BOOST_SIGNALS_NUM_ARGS == 2
 		typedef arg1_type first_argument_type;
 		typedef arg2_type second_argument_type;
 #endif
-		static const int arity = EPG_SIGNALS_NUM_ARGS;
+		static const int arity = BOOST_SIGNALS_NUM_ARGS;
 
-		EPG_SIGNAL_CLASS_NAME(const combiner_type &combiner = combiner_type(),
+		BOOST_SIGNAL_CLASS_NAME(const combiner_type &combiner = combiner_type(),
 			const group_compare_type &group_compare = group_compare_type()):
-			_pimpl(new signalslib::detail::EPG_SIGNAL_IMPL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION>(combiner, group_compare))
+			_pimpl(new signalslib::detail::BOOST_SIGNAL_IMPL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION>(combiner, group_compare))
 		{};
-		~EPG_SIGNAL_CLASS_NAME()
+		virtual ~BOOST_SIGNAL_CLASS_NAME()
 		{
 			disconnect_all_slots();
 		}
@@ -462,13 +454,13 @@ namespace boost
 		{
 			(*_pimpl).disconnect(slot);
 		}
-		result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~))
+		result_type operator ()(BOOST_SIGNAL_SIGNATURE_FULL_ARGS(BOOST_SIGNALS_NUM_ARGS))
 		{
-			return (*_pimpl)(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
+			return (*_pimpl)(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
 		}
-		result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~)) const
+		result_type operator ()(BOOST_SIGNAL_SIGNATURE_FULL_ARGS(BOOST_SIGNALS_NUM_ARGS)) const
 		{
-			return (*_pimpl)(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
+			return (*_pimpl)(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
 		}
 		std::size_t num_slots() const
 		{
@@ -486,13 +478,13 @@ namespace boost
 		{
 			return (*_pimpl).set_combiner(combiner);
 		}
-	private:
-		shared_ptr<void> lock_pimpl() const
+	protected:
+		virtual shared_ptr<void> lock_pimpl() const
 		{
 			return _pimpl;
 		}
-
-		shared_ptr<signalslib::detail::EPG_SIGNAL_IMPL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION> >
+	private:
+		shared_ptr<signalslib::detail::BOOST_SIGNAL_IMPL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION> >
 			_pimpl;
 	};
 
@@ -501,33 +493,33 @@ namespace boost
 		namespace detail
 		{
 			// wrapper class for storing other signals as slots with automatic lifetime tracking
-			template<EPG_SIGNAL_TEMPLATE_DECL>
-			class EPG_WEAK_SIGNAL_CLASS_NAME
+			template<BOOST_SIGNAL_TEMPLATE_DECL>
+			class BOOST_WEAK_SIGNAL_CLASS_NAME
 			{
 			public:
 				typedef SlotFunction slot_function_type;
 				typedef typename slot_function_type::result_type slot_result_type;
-				typedef EPG_SIGNAL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION>::result_type
+				typedef BOOST_SIGNAL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION>::result_type
 					result_type;
 
-				EPG_WEAK_SIGNAL_CLASS_NAME(const EPG_SIGNAL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION>
+				BOOST_WEAK_SIGNAL_CLASS_NAME(const BOOST_SIGNAL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION>
 					&signal):
 					_weak_pimpl(signal._pimpl)
 				{}
-				result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~))
+				result_type operator ()(BOOST_SIGNAL_SIGNATURE_FULL_ARGS(BOOST_SIGNALS_NUM_ARGS))
 				{
-					shared_ptr<signalslib::detail::EPG_SIGNAL_IMPL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION> >
+					shared_ptr<signalslib::detail::BOOST_SIGNAL_IMPL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION> >
 						shared_pimpl(_weak_pimpl);
-					return (*shared_pimpl)(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
+					return (*shared_pimpl)(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
 				}
-				result_type operator ()(EPG_SIGNAL_SIGNATURE_FULL_ARGS(EPG_SIGNALS_NUM_ARGS, ~)) const
+				result_type operator ()(BOOST_SIGNAL_SIGNATURE_FULL_ARGS(BOOST_SIGNALS_NUM_ARGS)) const
 				{
-					shared_ptr<signalslib::detail::EPG_SIGNAL_IMPL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION> >
+					shared_ptr<signalslib::detail::BOOST_SIGNAL_IMPL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION> >
 						shared_pimpl(_weak_pimpl);
-					return (*shared_pimpl)(EPG_SIGNAL_SIGNATURE_ARG_NAMES(EPG_SIGNALS_NUM_ARGS));
+					return (*shared_pimpl)(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
 				}
 			private:
-				boost::weak_ptr<signalslib::detail::EPG_SIGNAL_IMPL_CLASS_NAME<EPG_SIGNAL_TEMPLATE_INSTANTIATION> >
+				boost::weak_ptr<signalslib::detail::BOOST_SIGNAL_IMPL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION> >
 					_weak_pimpl;
 			};
 
@@ -537,30 +529,23 @@ namespace boost
 			// partial template specialization
 			template<typename Signature, typename Combiner, typename Group,
 				typename GroupCompare, typename SlotFunction, typename ThreadingModel>
-			class signalN<EPG_SIGNALS_NUM_ARGS, Signature, Combiner, Group,
+			class signalN<BOOST_SIGNALS_NUM_ARGS, Signature, Combiner, Group,
 				GroupCompare, SlotFunction, ThreadingModel>
 			{
 			public:
-				typedef EPG_SIGNAL_CLASS_NAME<typename boost::function_traits<Signature>::result_type,
-// typename boost::function_traits<Signature>::argn_type ,
-#define EPG_SIGNAL_MISC_STATEMENT(z, n, Signature) \
-	BOOST_PP_CAT(BOOST_PP_CAT(typename boost::function_traits<Signature>::arg, BOOST_PP_INC(n)), _type) ,
-				BOOST_PP_REPEAT(EPG_SIGNALS_NUM_ARGS, EPG_SIGNAL_MISC_STATEMENT, Signature)
-#undef EPG_SIGNAL_MISC_STATEMENT
-				Combiner, Group,
-				GroupCompare, SlotFunction, ThreadingModel> type;
+				typedef BOOST_SIGNAL_CLASS_NAME<
+					BOOST_SIGNAL_PORTABLE_SIGNATURE(BOOST_SIGNALS_NUM_ARGS, Signature),
+					Combiner, Group,
+					GroupCompare, SlotFunction, ThreadingModel> type;
 			};
 		}
 	}
 }
 
-#undef EPG_SIGNALS_NUM_ARGS
-#undef EPG_SIGNAL_CLASS_NAME
-#undef EPG_SIGNAL_IMPL_CLASS_NAME
-#undef EPG_SIGNAL_SIGNATURE_ARG_NAME
-#undef EPG_SIGNAL_SIGNATURE_FULL_ARG
-#undef EPG_SIGNAL_SIGNATURE_FULL_ARGS
-#undef EPG_SIGNAL_SIGNATURE_ARG_NAMES
-#undef EPG_SIGNAL_TEMPLATE_DEFAULTED_DECL
-#undef EPG_SIGNAL_TEMPLATE_DECL
-#undef EPG_SIGNAL_TEMPLATE_INSTANTIATION
+#undef BOOST_SIGNALS_NUM_ARGS
+#undef BOOST_SIGNAL_CLASS_NAME
+#undef BOOST_WEAK_SIGNAL_CLASS_NAME
+#undef BOOST_SIGNAL_IMPL_CLASS_NAME
+#undef BOOST_SIGNAL_TEMPLATE_DEFAULTED_DECL
+#undef BOOST_SIGNAL_TEMPLATE_DECL
+#undef BOOST_SIGNAL_TEMPLATE_INSTANTIATION

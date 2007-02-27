@@ -41,11 +41,8 @@ namespace boost
 			class ConnectionBodyBase
 			{
 			public:
-				typedef std::vector<boost::shared_ptr<void> > shared_ptrs_type;
-				typedef std::vector<boost::weak_ptr<void> > tracked_objects_container;
-
-				ConnectionBodyBase(const tracked_objects_container &tracked_objects):
-					_tracked_objects(tracked_objects), _connected(true), _blocked(false)
+				ConnectionBodyBase():
+					_connected(true), _blocked(false)
 				{
 				}
 				virtual ~ConnectionBodyBase() {}
@@ -65,35 +62,18 @@ namespace boost
 					return _blocked || (nolock_nograb_connected() == false);
 				}
 				bool nolock_nograb_connected() const {return _connected;}
-				// mutex should be locked when calling grabTrackedObjects
-				shared_ptrs_type nolock_grab_tracked_objects() const
-				{
-					shared_ptrs_type sharedPtrs;
-					tracked_objects_container::const_iterator it;
-					for(it = _tracked_objects.begin(); it != _tracked_objects.end(); ++it)
-					{
-						sharedPtrs.push_back(it->lock());
-						if(sharedPtrs.back() == 0)
-						{
-							_connected = false;
-							return shared_ptrs_type();
-						}
-					}
-					return sharedPtrs;
-				}
 			protected:
-				tracked_objects_container _tracked_objects;
 				mutable bool _connected;
 				bool _blocked;
 			};
 
-			template<typename GroupKey, typename SlotFunction, typename ThreadingModel>
+			template<typename GroupKey, typename SlotType, typename ThreadingModel>
 			class ConnectionBody: public ConnectionBodyBase
 			{
 			public:
 				typedef typename ThreadingModel::try_mutex_type mutex_type;
-				ConnectionBody(const slot<SlotFunction> &slot_in):
-					ConnectionBodyBase(slot_in.get_all_tracked()), slot(slot_in.get_slot_function())
+				ConnectionBody(const SlotType &slot_in):
+					slot(slot_in)
 				{
 				}
 				virtual ~ConnectionBody() {}
@@ -121,8 +101,30 @@ namespace boost
 				}
 				const GroupKey& group_key() const {return _group_key;}
 				void set_group_key(const GroupKey &key) {_group_key = key;}
-
-				const SlotFunction slot;
+				bool nolock_slot_expired() const
+				{
+					bool expired = slot.expired();
+					if(expired == true)
+					{
+						_connected = false;
+					}
+					return expired;
+				}
+				typename slot_base::locked_container_type nolock_grab_tracked_objects() const
+				{
+					slot_base::locked_container_type locked_objects;
+					try
+					{
+						locked_objects = slot.lock();
+					}
+					catch(const bad_weak_ptr &err)
+					{
+						_connected = false;
+						return locked_objects;
+					}
+					return locked_objects;
+				}
+				SlotType slot;
 				mutable mutex_type mutex;
 			private:
 				GroupKey _group_key;

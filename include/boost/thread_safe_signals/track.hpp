@@ -26,17 +26,18 @@ namespace boost {
     class tracked
     {
     public:
-      typedef typename unwrap_reference<T>::type value_type;
+      typedef T value_type;
+      typedef typename unwrap_reference<T>::type unwrapped_value_type;
 
       tracked(const shared_ptr<void>& tracked_ptr, const T &value):
         _value(value), _tracked_ptr(tracked_ptr)
       {}
       // implicit conversions so tracked objects can be bound with bind
-      operator value_type & ()
+      operator unwrapped_value_type & ()
       {
         return _value;
       }
-      operator const value_type & () const
+      operator const unwrapped_value_type & () const
       {
         return _value;
       }
@@ -83,7 +84,7 @@ namespace boost {
     T* get_pointer(const signalslib::tracked<weak_ptr<T> > &tracked) {return shared_ptr<T>(static_cast<weak_ptr<T> >(tracked)).get();}
     // handles T=shared_ptr or similar case
     template<typename T>
-    typename T::pointer get_pointer(const signalslib::tracked<T> &tracked) {return static_cast<const T&>(tracked).get();}
+    typename T::element_type* get_pointer(const signalslib::tracked<T> &tracked) {return get_pointer(static_cast<const T&>(tracked));}
   } // end namespace BOOST_SIGNALS_NAMESPACE
 } // end namespace boost
 

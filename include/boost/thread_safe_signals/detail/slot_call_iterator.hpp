@@ -18,6 +18,7 @@
 #include <boost/optional.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread_safe_signals/connection.hpp>
+#include <boost/thread_safe_signals/slot_base.hpp>
 #include <boost/type_traits.hpp>
 
 #ifdef BOOST_HAS_ABI_HEADERS
@@ -43,11 +44,11 @@ namespace boost {
 				boost::single_pass_traversal_tag,
 				typename Function::result_type const&>
 			inherited;
-	
+
 			typedef typename Function::result_type result_type;
-	
+
 			friend class boost::iterator_core_access;
-	
+
 		public:
 			slot_call_iterator_t(Iterator iter_in, Iterator end_in, Function f,
 				boost::optional<result_type> &c):
@@ -56,7 +57,7 @@ namespace boost {
 			{
 				lockNextCallable();
 			}
-	
+
 			typename inherited::reference
 			dereference() const
 			{
@@ -65,22 +66,22 @@ namespace boost {
 				}
 				return cache->get();
 			}
-	
+
 			void increment()
 			{
 				++iter;
 				lockNextCallable();
 				cache->reset();
 			}
-	
+
 			bool equal(const slot_call_iterator_t& other) const
 			{
 				return iter == other.iter;
 			}
-	
+
 		private:
 			typedef typename ConnectionBody::mutex_type::scoped_lock lock_type;
-			
+
 			void lockNextCallable() const
 			{
 				if(iter == callable_iter)
@@ -102,13 +103,13 @@ namespace boost {
 					callable_iter = end;
 				}
 			}
-	
+
 			mutable Iterator iter;
 			Iterator end;
 			Function f;
 			optional<result_type>* cache;
 			mutable Iterator callable_iter;
-			mutable typename ConnectionBody::shared_ptrs_type tracked_ptrs;
+			mutable typename slot_base::locked_container_type tracked_ptrs;
 		};
 		} // end namespace detail
 	} // end namespace BOOST_SIGNALS_NAMESPACE

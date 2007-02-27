@@ -12,9 +12,12 @@
 #ifndef BOOST_TSS_SIGNALS_SLOT_HEADER
 #define BOOST_TSS_SIGNALS_SLOT_HEADER
 
+#include <boost/bind.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/ref.hpp>
 #include <boost/thread_safe_signals/detail/signals_common.hpp>
+#include <boost/thread_safe_signals/detail/signals_common_macros.hpp>
+#include <boost/thread_safe_signals/slot_base.hpp>
 #include <boost/thread_safe_signals/track.hpp>
 #include <boost/thread_safe_signals/trackable.hpp>
 #include <boost/type_traits.hpp>
@@ -32,84 +35,6 @@ namespace boost
 	{
 		namespace detail
 		{
-			class slot_base;
-			template<typename GroupKey, typename SlotFunction, typename ThreadingModel>
-			class ConnectionBody;
-
-			// Visitor to collect tracked objects from a bound function.
-			class tracked_objects_visitor
-			{
-			public:
-				tracked_objects_visitor(slot_base *slot) : slot_(slot)
-				{}
-				template<typename T>
-				void operator()(const T& t) const
-				{
-					m_visit_reference_wrapper(t, mpl::bool_<is_reference_wrapper<T>::value>());
-				}
-			private:
-				template<typename T>
-				void m_visit_reference_wrapper(const reference_wrapper<T> &t, const mpl::bool_<true> &) const
-				{
-					m_visit_pointer(t.get_pointer(), mpl::bool_<true>());
-				}
-				template<typename T>
-				void m_visit_reference_wrapper(const T &t, const mpl::bool_<false> &) const
-				{
-					m_visit_pointer(t, mpl::bool_<is_pointer<T>::value>());
-				}
-				template<typename T>
-				void m_visit_pointer(const T &t, const mpl::bool_<true> &) const
-				{
-					m_visit_not_function_pointer(t, mpl::bool_<is_convertible<T, const void*>::value>());
-				}
-				template<typename T>
-				void m_visit_pointer(const T &t, const mpl::bool_<false> &) const
-				{
-					m_visit_pointer(addressof(t), mpl::bool_<true>());
-				}
-				template<typename T>
-				void m_visit_not_function_pointer(const T *t, const mpl::bool_<true> &) const
-				{
-					m_visit_signal(t, mpl::bool_<is_signal<T>::value>());
-				}
-				template<typename T>
-				void m_visit_not_function_pointer(const T &t, const mpl::bool_<false> &) const
-				{}
-				template<typename T>
-				void m_visit_signal(const T *t, const mpl::bool_<true> &) const;
-				template<typename T>
-				void m_visit_signal(const T &t, const mpl::bool_<false> &) const
-				{
-					add_if_trackable(t);
-				}
-				template<typename T>
-				void add_if_trackable(const tracked<T> *t) const;
-				void add_if_trackable(const trackable *trackable) const;
-				void add_if_trackable(const void *trackable) const {}
-
-				mutable slot_base * slot_;
-			};
-
-			class slot_base
-			{
-			public:
-				friend class signalslib::detail::tracked_objects_visitor;
-				template<typename GroupKey, typename SlotFunction>
-					friend class ConnectionBody;
-
-			private:
-				typedef std::vector<boost::weak_ptr<void> > tracked_objects_container;
-
-				void add_tracked(const weak_ptr<void> &tracked)
-				{
-					_trackedObjects.push_back(tracked);
-				}
-				const tracked_objects_container& get_all_tracked() const {return _trackedObjects;}
-
-				tracked_objects_container _trackedObjects;
-			};
-
 			// Get the slot so that it can be copied
 			template<typename F>
 			typename F::weak_signal_type
@@ -139,50 +64,43 @@ namespace boost
 			}
 		}
 	}
-	// slot class template.
-	template<typename SlotFunction>
-	class slot: public signalslib::detail::slot_base
-	{
-	public:
-		template<typename F>
-		slot(const F& f): slot_function(signalslib::detail::get_invocable_slot(f, signalslib::detail::tag_type(f)))
-		{
-			signalslib::detail::tracked_objects_visitor visitor(this);
-			boost::visit_each(visitor, f);
-		}
-		// We would have to enumerate all of the signalN classes here as friends
-		// to make this private (as it otherwise should be). We can't name all of
-		// them because we don't know how many there are.
-	public:
-		// Get the slot function to call the actual slot
-		const SlotFunction& get_slot_function() const { return slot_function; }
-	private:
-
-		slot(); // no default constructor
-		slot& operator=(const slot&); // no assignment operator
-
-		SlotFunction slot_function;
-	};
 } // end namespace boost
 
-template<typename T>
-void boost::signalslib::detail::tracked_objects_visitor::m_visit_signal(
-	const T *signal, const mpl::bool_<true> &) const
+#define BOOST_PP_ITERATION_LIMITS (0, BOOST_SIGNALS_MAX_ARGS)
+#define BOOST_PP_FILENAME_1 <boost/thread_safe_signals/detail/slot_template.hpp>
+#include BOOST_PP_ITERATE()
+
+namespace boost
 {
-	if(signal)
-		slot_->add_tracked(signal->lock_pimpl());
-};
-template<typename T>
-void boost::signalslib::detail::tracked_objects_visitor::add_if_trackable(const tracked<T> *t) const
-{
-	if(t)
-		slot_->add_tracked(t->get_tracked_ptr());
+	template<typename Signature,
+		typename SlotFunction = boost::function<Signature> >
+	class slot: public signalslib::detail::slotN<function_traits<Signature>::arity,
+		Signature, SlotFunction>::type
+	{
+	private:
+		typedef typename signalslib::detail::slotN<boost::function_traits<Signature>::arity,
+			Signature, SlotFunction>::type base_type;
+	public:
+		template<typename F>
+		slot(const F& f): base_type(f)
+		{}
+		// bind syntactic sugar
+// AN aN
+#define BOOST_SLOT_BINDING_ARG_DECL(z, n, data) \
+	BOOST_PP_CAT(A, n) BOOST_PP_CAT(a, n)
+// template<typename F, typename A0, typename A1, ..., typename An-1> slotN(...
+#define BOOST_SLOT_BINDING_CONSTRUCTOR(z, n, data) \
+		template<typename F, BOOST_PP_ENUM_PARAMS(n, typename A)> \
+		slot(F f, BOOST_PP_ENUM(n, BOOST_SLOT_BINDING_ARG_DECL, ~)): \
+			base_type(f, BOOST_PP_ENUM_PARAMS(n, a)) \
+		{}
+#define BOOST_SLOT_MAX_BINDING_ARGS 10
+		BOOST_PP_REPEAT_FROM_TO(1, BOOST_SLOT_MAX_BINDING_ARGS, BOOST_SLOT_BINDING_CONSTRUCTOR, ~)
+#undef BOOST_SLOT_MAX_BINDING_ARGS
+#undef BOOST_SLOT_BINDING_ARG_DECL
+#undef BOOST_SLOT_BINDING_CONSTRUCTOR
+	};
 }
-void boost::signalslib::detail::tracked_objects_visitor::add_if_trackable(const trackable *trackable) const
-{
-	if(trackable)
-		slot_->add_tracked(trackable->get_shared_ptr());
-};
 
 #ifdef BOOST_HAS_ABI_HEADERS
 #  include BOOST_ABI_SUFFIX
