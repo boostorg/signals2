@@ -8,6 +8,7 @@
 
 // For more information, see http://www.boost.org
 
+#include <boost/ref.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/test/minimal.hpp>
 #include <boost/thread_safe_signal.hpp>
@@ -74,7 +75,7 @@ int test_main(int, char*[])
   // Test binding of a slot to another slot
   {
     boost::shared_ptr<int> shorty(new int(2));
-    boost::slot<int (double)> other_slot(&myfunc, *shorty.get(), _1);
+    boost::slot<int (double)> other_slot(&myfunc, boost::cref(*shorty.get()), _1);
     other_slot.track(shorty);
     s1.connect(sig_type::slot_type(other_slot, 0.5).track(other_slot));
     BOOST_CHECK(s1(3) == 2);
