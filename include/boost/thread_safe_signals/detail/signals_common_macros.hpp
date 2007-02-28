@@ -33,12 +33,18 @@
 	BOOST_PP_ENUM(arity, BOOST_SIGNAL_SIGNATURE_FULL_ARG, ~)
 // arg1, arg2, ..., argn
 #define BOOST_SIGNAL_SIGNATURE_ARG_NAMES(arity) BOOST_PP_ENUM(arity, BOOST_SIGNAL_SIGNATURE_ARG_NAME, ~)
+// typename prefixR, typename prefixT1, typename prefixT2, ..., typename prefixTN
+#define BOOST_SIGNAL_PREFIXED_SIGNATURE_TEMPLATE_DECL(arity, prefix) \
+	typename BOOST_PP_CAT(prefix, R) BOOST_PP_COMMA_IF(arity) \
+	BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(arity), typename BOOST_PP_CAT(prefix, T))
 // typename R, typename T1, typename T2, ..., typename TN
-#define BOOST_SIGNAL_SIGNATURE_TEMPLATE_DECL(arity) \
-	typename R BOOST_PP_COMMA_IF(arity) BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(arity), typename T)
+#define BOOST_SIGNAL_SIGNATURE_TEMPLATE_DECL(arity) BOOST_SIGNAL_PREFIXED_SIGNATURE_TEMPLATE_DECL(arity,)
+// prefixR, prefixT1, prefixT2, ..., prefixTN
+#define BOOST_SIGNAL_PREFIXED_SIGNATURE_TEMPLATE_INSTANTIATION(arity, prefix) \
+	BOOST_PP_CAT(prefix, R) BOOST_PP_COMMA_IF(arity) BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(arity), BOOST_PP_CAT(prefix, T))
 // R, T1, T2, ..., TN
 #define BOOST_SIGNAL_SIGNATURE_TEMPLATE_INSTANTIATION(arity) \
-	R BOOST_PP_COMMA_IF(arity) BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(arity), T)
+	BOOST_SIGNAL_PREFIXED_SIGNATURE_TEMPLATE_INSTANTIATION(arity,)
 // functionN<R, T1, T2, ..., TN>
 #define BOOST_FUNCTION_N_DECL(arity) BOOST_PP_CAT(function, arity)<\
 	BOOST_SIGNAL_SIGNATURE_TEMPLATE_INSTANTIATION(arity) >

@@ -59,16 +59,16 @@ namespace boost
 			class BOOST_SIGNAL_IMPL_CLASS_NAME
 			{
 			public:
+				typedef SlotFunction slot_function_type;
+				// typedef slotN<Signature, SlotFunction> slot_type;
 				typedef BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)<BOOST_SIGNAL_SIGNATURE_TEMPLATE_INSTANTIATION(BOOST_SIGNALS_NUM_ARGS),
-					SlotFunction> slot_type;
+					slot_function_type> slot_type;
 			private:
 				class slot_invoker;
 				typedef typename signalslib::detail::group_key<Group>::type group_key_type;
 				typedef shared_ptr<ConnectionBody<group_key_type, slot_type, ThreadingModel> > connection_body_type;
 				typedef grouped_list<Group, GroupCompare, connection_body_type> connection_list_type;
 			public:
-				typedef SlotFunction slot_function_type;
-				// typedef slotN<Signature, SlotFunction> slot_type;
 				typedef typename slot_function_type::result_type slot_result_type;
 				typedef Combiner combiner_type;
 				typedef typename combiner_type::result_type result_type;

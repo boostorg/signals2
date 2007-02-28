@@ -18,16 +18,33 @@
 
 namespace boost
 {
+	template<typename Signature, typename SlotFunction> class slot;
+
 	// slot class template.
 	template<BOOST_SIGNAL_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS_NUM_ARGS),
 		typename SlotFunction = BOOST_FUNCTION_N_DECL(BOOST_SIGNALS_NUM_ARGS)>
 	class BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS): public signalslib::detail::slot_base
 	{
 	public:
+		template<BOOST_SIGNAL_PREFIXED_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS_NUM_ARGS, Other), typename OtherSlotFunction>
+		friend class BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS);
+
 		typedef R result_type;
 
 		template<typename F>
 		BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)(const F& f): _slot_function(signalslib::detail::get_invocable_slot(f, signalslib::detail::tag_type(f)))
+		{
+		}
+		// copy constructors
+		template<BOOST_SIGNAL_PREFIXED_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS_NUM_ARGS, Other), typename OtherSlotFunction>
+		BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)(const BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)
+			<BOOST_SIGNAL_PREFIXED_SIGNATURE_TEMPLATE_INSTANTIATION(BOOST_SIGNALS_NUM_ARGS, Other), OtherSlotFunction> &other_slot):
+			signalslib::detail::slot_base(other_slot), _slot_function(other_slot._slot_function)
+		{
+		}
+		template<typename Signature, typename OtherSlotFunction>
+		BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)(const slot<Signature, OtherSlotFunction> &other_slot):
+			signalslib::detail::slot_base(other_slot), _slot_function(other_slot._slot_function)
 		{
 		}
 		// bind syntactic sugar

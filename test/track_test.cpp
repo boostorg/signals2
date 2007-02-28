@@ -39,7 +39,7 @@ struct max_or_default {
 
 static int myfunc(int i, double z)
 {
-  std::cout << __FUNCTION__ << ": z is " << z << std::endl;
+  std::cout << __FUNCTION__ << ": i is " << i << " and z is " << z << std::endl;
   return i;
 }
 
@@ -59,13 +59,17 @@ int test_main(int, char*[])
 
   // Test auto-disconnection of slot before signal connection
   {
-    boost::shared_ptr<int> shorty(new int());
-    //works
-    sig_type::slot_type slot(boost::bind(swallow(), shorty.get(), _1));
-    // also works
-//    sig_type::slot_type slot = sig_type::slot_type(swallow(), shorty.get(), _1);
-    // doesn't work? gcc says: error: type specifier omitted for parameter `shorty'
+    boost::shared_ptr<int> shorty(new int(1));
+// doesn't work? gcc says: error: type specifier omitted for parameter `shorty'
 //    sig_type::slot_type slot(swallow(), shorty.get(), _1);
+//works
+//    sig_type::slot_type slot(boost::bind(swallow(), shorty.get(), _1));
+// also works
+//    sig_type::slot_type slot = sig_type::slot_type(swallow(), shorty.get(), _1);
+// also works
+    swallow myswallow;
+    sig_type::slot_type slot(myswallow, shorty.get(), _1);
+
     slot.track(shorty);
     shorty.reset();
     s1.connect(slot);
