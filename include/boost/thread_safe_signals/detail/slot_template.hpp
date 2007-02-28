@@ -82,7 +82,8 @@ namespace boost
 		}
 		BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)& track(const signalslib::detail::signal_base &signal)
 		{
-			track(signal.lock_pimpl());
+			// call base class function, since it is a friend of signal_base and can call lock_pimpl()
+			track_signal(signal);
 			return *this;
 		}
 	private:

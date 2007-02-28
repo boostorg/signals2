@@ -57,6 +57,11 @@ namespace boost
 					return false;
 				}
 			protected:
+				void track_signal(const signalslib::detail::signal_base &signal)
+				{
+					_trackedObjects.push_back(signal.lock_pimpl());
+				}
+
 				tracked_container_type _trackedObjects;
 			};
 		}

@@ -83,8 +83,16 @@ int test_main(int, char*[])
     other_slot.track(shorty);
     s1.connect(sig_type::slot_type(other_slot, 0.5).track(other_slot));
     BOOST_CHECK(s1(3) == 2);
-    shorty.reset();
-    BOOST_CHECK(s1(3) == 0);
   }
+  BOOST_CHECK(s1(3) == 0);
+
+  // Test binding of a signal as a slot
+  {
+    sig_type s2;
+    s1.connect(sig_type::slot_type(s2).track(s2));
+    s2.connect(sig_type::slot_type(&myfunc, _1, 0.7));
+    BOOST_CHECK(s1(4) == 4);
+  }
+  BOOST_CHECK(s1(4) == 0);
   return 0;
 }
