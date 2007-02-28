@@ -290,7 +290,7 @@ namespace boost
 
 				// clean up disconnected connections
 				void nolock_cleanup_connections(bool grab_tracked,
-					const connection_list_type::iterator &begin, const connection_list_type::iterator &end) const
+					const typename connection_list_type::iterator &begin, const typename connection_list_type::iterator &end) const
 				{
 					assert(_shared_state.unique());
 					typename connection_list_type::iterator it;
@@ -323,7 +323,7 @@ namespace boost
 				// clean up a few connections in constant time
 				void nolock_cleanup_connections(bool grab_tracked) const
 				{
-					connection_list_type::iterator begin;
+					typename connection_list_type::iterator begin;
 					if(_garbage_collector_it == _shared_state->connection_bodies.end())
 					{
 						begin = _shared_state->connection_bodies.begin();
@@ -331,7 +331,7 @@ namespace boost
 					{
 						begin = _garbage_collector_it;
 					}
-					connection_list_type::iterator end = begin;
+					typename connection_list_type::iterator end = begin;
 					++end;
 					if(end != _shared_state->connection_bodies.end()) ++end;
 					nolock_cleanup_connections(grab_tracked, begin, end);
@@ -382,7 +382,7 @@ namespace boost
 				}
 
 				shared_ptr<invocation_state> _shared_state;
-				mutable connection_list_type::iterator _garbage_collector_it;
+				mutable typename connection_list_type::iterator _garbage_collector_it;
 				// connection list mutex must never be locked when attempting a blocking lock on a slot,
 				// or you could deadlock.
 				mutable mutex_type _mutex;
@@ -398,7 +398,7 @@ namespace boost
 	{
 	public:
 		typedef signalslib::detail::BOOST_WEAK_SIGNAL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION> weak_signal_type;
-		friend class weak_signal_type;
+		friend class signalslib::detail::BOOST_WEAK_SIGNAL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION>;
 
 		typedef SlotFunction slot_function_type;
 		// typedef slotN<Signature, SlotFunction> slot_type;
@@ -409,7 +409,7 @@ namespace boost
 		typedef typename combiner_type::result_type result_type;
 		typedef Group group_type;
 		typedef GroupCompare group_compare_type;
-		typedef signalslib::detail::BOOST_SIGNAL_IMPL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION>::slot_call_iterator
+		typedef typename signalslib::detail::BOOST_SIGNAL_IMPL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION>::slot_call_iterator
 			slot_call_iterator;
 // typedef Tn argn_type;
 #define BOOST_SIGNAL_MISC_STATEMENT(z, n, data) \
@@ -499,7 +499,7 @@ namespace boost
 			public:
 				typedef SlotFunction slot_function_type;
 				typedef typename slot_function_type::result_type slot_result_type;
-				typedef BOOST_SIGNAL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION>::result_type
+				typedef typename BOOST_SIGNAL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION>::result_type
 					result_type;
 
 				BOOST_WEAK_SIGNAL_CLASS_NAME(const BOOST_SIGNAL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION>

@@ -141,7 +141,7 @@ namespace boost {
 						if(next != _list.end() && next != upper_bound(key))
 						{
 							// also erases old entry
-							_group_map.insert(map_it, map_type::value_type(key, next));
+							_group_map.insert(map_it, typename map_type::value_type(key, next));
 						}else
 						{
 							_group_map.erase(map_it);
@@ -173,7 +173,7 @@ namespace boost {
 					if(lower_bound_it == _group_map.end() ||
 						weakly_equivalent(lower_bound_it->first, key) == false)
 					{
-						_group_map.insert(map_type::value_type(key, new_it));
+						_group_map.insert(typename map_type::value_type(key, new_it));
 					}
 				}
 				iterator get_list_iterator(const map_iterator &map_it)
