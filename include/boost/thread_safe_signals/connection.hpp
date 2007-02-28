@@ -25,6 +25,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread_safe_signals/detail/signal_base.hpp>
 #include <boost/thread_safe_signals/slot.hpp>
 #include <boost/thread_safe_signals/track.hpp>
 #include <boost/type_traits.hpp>
@@ -41,7 +42,8 @@ namespace boost
 			class ConnectionBodyBase
 			{
 			public:
-				ConnectionBodyBase():
+				typedef signal_impl_base::mutex_type mutex_type;
+				ConnectionBodyBase(const shared_ptr<mutex_type> &mutex): _mutex(mutex),
 					_connected(true), _blocked(false)
 				{
 				}
@@ -62,40 +64,41 @@ namespace boost
 					return _blocked || (nolock_nograb_connected() == false);
 				}
 				bool nolock_nograb_connected() const {return _connected;}
+//FIXME: make _mutex protected once slot_call_iterator no longer needs it.
+				shared_ptr<mutex_type> _mutex;
 			protected:
 				mutable bool _connected;
 				bool _blocked;
 			};
 
-			template<typename GroupKey, typename SlotType, typename ThreadingModel>
+			template<typename GroupKey, typename SlotType>
 			class ConnectionBody: public ConnectionBodyBase
 			{
 			public:
-				typedef typename ThreadingModel::try_mutex_type mutex_type;
-				ConnectionBody(const SlotType &slot_in):
-					slot(slot_in)
+				ConnectionBody(const shared_ptr<mutex_type> &mutex, const SlotType &slot_in):
+					ConnectionBodyBase(mutex), slot(slot_in)
 				{
 				}
 				virtual ~ConnectionBody() {}
 				virtual void disconnect()
 				{
-					typename mutex_type::scoped_lock lock(mutex);
+					typename mutex_type::scoped_lock lock(*_mutex);
 					nolock_disconnect();
 				}
 				virtual bool connected() const
 				{
-					typename mutex_type::scoped_lock lock(mutex);
+					typename mutex_type::scoped_lock lock(*_mutex);
 					nolock_grab_tracked_objects();
 					return nolock_nograb_connected();
 				}
 				virtual void block(bool should_block)
 				{
-					typename mutex_type::scoped_lock lock(mutex);
+					typename mutex_type::scoped_lock lock(*_mutex);
 					_blocked = should_block;
 				}
 				virtual bool blocked() const
 				{
-					typename mutex_type::scoped_lock lock(mutex);
+					typename mutex_type::scoped_lock lock(*_mutex);
 					nolock_grab_tracked_objects();
 					return nolock_nograb_blocked();
 				}
@@ -125,7 +128,6 @@ namespace boost
 					return locked_objects;
 				}
 				SlotType slot;
-				mutable mutex_type mutex;
 			private:
 				GroupKey _group_key;
 			};

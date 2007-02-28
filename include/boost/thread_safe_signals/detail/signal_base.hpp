@@ -10,7 +10,9 @@
 #ifndef BOOST_TSS_SIGNALS_SIGNAL_BASE_HEADER
 #define BOOST_TSS_SIGNALS_SIGNAL_BASE_HEADER
 
+#include <boost/detail/lightweight_mutex.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
 
 #ifdef BOOST_HAS_ABI_HEADERS
 #  include BOOST_ABI_PREFIX
@@ -20,6 +22,17 @@ namespace boost {
 	namespace signalslib {
 		namespace detail {
 			class slot_base;
+
+			class signal_impl_base
+			{
+			public:
+				typedef boost::detail::lightweight_mutex mutex_type;
+
+				signal_impl_base(): _mutex(new boost::detail::lightweight_mutex)
+				{}
+			protected:
+				mutable shared_ptr<mutex_type> _mutex;
+			};
 
 			class signal_base : public noncopyable
 			{

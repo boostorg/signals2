@@ -90,7 +90,7 @@ namespace boost {
 				}
 				for(;iter != end; ++iter)
 				{
-					lock_type lock((*iter)->mutex);
+					lock_type lock(*(*iter)->_mutex);
 					tracked_ptrs = (*iter)->nolock_grab_tracked_objects();
 					if((*iter)->nolock_nograb_blocked() == false)
 					{
