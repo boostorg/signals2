@@ -7,13 +7,14 @@
 
 // For more information, see http://www.boost.org
 
+#include <boost/shared_ptr.hpp>
 #include <boost/test/minimal.hpp>
 #include <boost/thread_safe_signal.hpp>
 #include <boost/bind.hpp>
 
 typedef boost::signal1<int, int> sig_type;
 
-class with_constant : public boost::BOOST_SIGNALS_NAMESPACE::trackable {
+class with_constant {
 public:
   with_constant(int c) : constant(c) {}
 
@@ -23,12 +24,12 @@ private:
   int constant;
 };
 
-void do_delayed_connect(with_constant* wc,
+void do_delayed_connect(boost::shared_ptr<with_constant> &wc,
                         sig_type& sig,
                         sig_type::slot_type slot)
 {
   // Should invalidate the slot, so that we cannot connect to it
-  delete wc;
+  wc.reset();
 
   boost::BOOST_SIGNALS_NAMESPACE::connection c = sig.connect(slot);
   BOOST_CHECK(!c.connected());
@@ -37,9 +38,9 @@ void do_delayed_connect(with_constant* wc,
 int test_main(int, char*[])
 {
   sig_type s1;
-  with_constant* wc1 = new with_constant(7);
+  boost::shared_ptr<with_constant> wc1(new with_constant(7));
 
-  do_delayed_connect(wc1, s1, boost::bind(&with_constant::add, wc1, _1));
+  do_delayed_connect(wc1, s1, sig_type::slot_type(&with_constant::add, wc1.get(), _1).track(wc1));
 
   return 0;
 }

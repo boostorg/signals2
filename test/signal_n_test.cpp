@@ -8,7 +8,7 @@
 // For more information, see http://www.boost.org
 
 #include <boost/test/minimal.hpp>
-#include <boost/signal.hpp>
+#include <boost/thread_safe_signal.hpp>
 #include <functional>
 
 template<typename T>
@@ -134,15 +134,16 @@ test_one_arg()
 static void
 test_signal_signal_connect()
 {
-  boost::signal1<int, int, max_or_default<int> > s1;
+  typedef boost::signal1<int, int, max_or_default<int> > signal_type;
+  signal_type s1;
 
   s1.connect(std::negate<int>());
 
   BOOST_CHECK(s1(3) == -3);
 
   {
-    boost::signal1<int, int, max_or_default<int> > s2;
-    s1.connect(s2);
+    signal_type s2;
+    s1.connect(signal_type::slot_type(s2).track(s2));
     s2.connect(std::bind1st(std::multiplies<int>(), 2));
     s2.connect(std::bind1st(std::multiplies<int>(), -3));
 

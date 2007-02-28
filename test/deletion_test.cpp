@@ -8,7 +8,7 @@
 // For more information, see http://www.boost.org
 
 #include <boost/test/minimal.hpp>
-#include <boost/signal.hpp>
+#include <boost/thread_safe_signal.hpp>
 #include <iostream>
 #include <string>
 
