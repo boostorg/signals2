@@ -374,7 +374,7 @@ namespace boost
 						it != local_state->connection_bodies.end(); ++it)
 					{
 						typename ConnectionBody<group_key_type, slot_function_type, ThreadingModel>::mutex_type::scoped_lock lock((*it)->mutex);
-						if((*it)->slot == slot)
+						if((*it)->slot.slot_function() == slot)
 						{
 							(*it)->nolock_disconnect();
 						}

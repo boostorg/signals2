@@ -29,6 +29,7 @@ namespace boost
 		template<BOOST_SIGNAL_PREFIXED_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS_NUM_ARGS, Other), typename OtherSlotFunction>
 		friend class BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS);
 
+		typedef SlotFunction slot_function_type;
 		typedef R result_type;
 // typedef Tn argn_type;
 #define BOOST_SIGNAL_MISC_STATEMENT(z, n, data) \
@@ -98,8 +99,8 @@ namespace boost
 			track_signal(signal);
 			return *this;
 		}
+		const slot_function_type& slot_function() const {return _slot_function;}
 	private:
-
 		SlotFunction _slot_function;
 	};
 	namespace signalslib
