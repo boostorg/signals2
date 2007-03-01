@@ -290,15 +290,14 @@ namespace boost
 
 				// clean up disconnected connections
 				void nolock_cleanup_connections(bool grab_tracked,
-					const typename connection_list_type::iterator &begin, const typename connection_list_type::iterator &end) const
+					const typename connection_list_type::iterator &begin, bool break_on_connected = false) const
 				{
-					assert(_shared_state.unique());
+					BOOST_ASSERT(_shared_state.unique());
 					typename connection_list_type::iterator it;
-					for(it = begin; it != end;)
+					for(it = begin; it != _shared_state->connection_bodies.end();)
 					{
 						bool connected;
 						{
-							// skip over slots that are busy
 							typename ConnectionBody<group_key_type, SlotFunction, ThreadingModel>::mutex_type::scoped_lock lock((*it)->mutex);
 							if(grab_tracked)
 								(*it)->nolock_slot_expired();
@@ -310,13 +309,15 @@ namespace boost
 						}else
 						{
 							++it;
+							if(break_on_connected) break;
 						}
 					}
-					_garbage_collector_it = end;
+					_garbage_collector_it = it;
 				}
 				// clean up a few connections in constant time
 				void nolock_cleanup_connections(bool grab_tracked) const
 				{
+					BOOST_ASSERT(_shared_state.unique());
 					typename connection_list_type::iterator begin;
 					if(_garbage_collector_it == _shared_state->connection_bodies.end())
 					{
@@ -325,10 +326,7 @@ namespace boost
 					{
 						begin = _garbage_collector_it;
 					}
-					typename connection_list_type::iterator end = begin;
-					++end;
-					if(end != _shared_state->connection_bodies.end()) ++end;
-					nolock_cleanup_connections(grab_tracked, begin, end);
+					nolock_cleanup_connections(grab_tracked, begin, true);
 				}
 				/* Make a new copy of the slot list if it is currently being read somewhere else
 				*/
@@ -338,7 +336,7 @@ namespace boost
 					{
 						shared_ptr<invocation_state> newState(new invocation_state(*_shared_state));
 						_shared_state = newState;
-						nolock_cleanup_connections(true, _shared_state->connection_bodies.begin(), _shared_state->connection_bodies.end());
+						nolock_cleanup_connections(true, _shared_state->connection_bodies.begin());
 					}else
 					{
 						nolock_cleanup_connections(true);
