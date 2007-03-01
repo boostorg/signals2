@@ -19,7 +19,6 @@
 #include <boost/thread_safe_signals/detail/signals_common_macros.hpp>
 #include <boost/thread_safe_signals/slot_base.hpp>
 #include <boost/thread_safe_signals/track.hpp>
-#include <boost/thread_safe_signals/trackable.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/utility/addressof.hpp>
 #include <boost/weak_ptr.hpp>
