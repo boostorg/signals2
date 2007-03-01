@@ -16,7 +16,6 @@
 
 #include <boost/thread_safe_signals/connection.hpp>
 #include <boost/optional.hpp>
-#include <cassert>
 #include <list>
 #include <map>
 #include <utility>
@@ -108,7 +107,7 @@ namespace boost {
 				{
 					map_iterator map_it;
 					if(key.first == back_ungrouped_slots)
-					{
+					{// optimization
 						map_it = _group_map.end();
 					}else
 					{
@@ -129,19 +128,18 @@ namespace boost {
 				}
 				iterator erase(const group_key_type &key, const iterator &it)
 				{
-					assert(it != _list.end());
+					BOOST_ASSERT(it != _list.end());
 					map_iterator map_it = _group_map.lower_bound(key);
-					assert(map_it != _group_map.end());
-					assert(weakly_equivalent(map_it->first, key));
+					BOOST_ASSERT(map_it != _group_map.end());
+					BOOST_ASSERT(weakly_equivalent(map_it->first, key));
 					if(map_it->second == it)
 					{
 						iterator next = it;
 						++next;
 						// if next is in same group
-						if(next != _list.end() && next != upper_bound(key))
+						if(next != upper_bound(key))
 						{
-							// also erases old entry
-							_group_map.insert(map_it, typename map_type::value_type(key, next));
+							_group_map[key] = next;
 						}else
 						{
 							_group_map.erase(map_it);
@@ -173,7 +171,7 @@ namespace boost {
 					if(lower_bound_it == _group_map.end() ||
 						weakly_equivalent(lower_bound_it->first, key) == false)
 					{
-						_group_map.insert(typename map_type::value_type(key, new_it));
+						_group_map[key] = new_it;
 					}
 				}
 				iterator get_list_iterator(const map_iterator &map_it)
