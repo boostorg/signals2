@@ -36,13 +36,14 @@ namespace boost
 {
 	namespace signalslib
 	{
+		void null_deleter(const void*) {}
 		namespace detail
 		{
 			class ConnectionBodyBase
 			{
 			public:
 				ConnectionBodyBase():
-					_connected(true), _blocked(false)
+					_connected(true)
 				{
 				}
 				virtual ~ConnectionBodyBase() {}
@@ -55,16 +56,20 @@ namespace boost
 					}
 				}
 				virtual bool connected() const = 0;
-				virtual void block(bool should_block) = 0;
-				virtual bool blocked() const = 0;
+				virtual shared_ptr<void> get_blocker() = 0;
+				bool blocked() const
+				{
+					return !_weak_blocker.expired();
+				}
 				bool nolock_nograb_blocked() const
 				{
-					return _blocked || (nolock_nograb_connected() == false);
+					return nolock_nograb_connected() == false || blocked();
 				}
 				bool nolock_nograb_connected() const {return _connected;}
 			protected:
+
 				mutable bool _connected;
-				bool _blocked;
+				weak_ptr<void> _weak_blocker;
 			};
 
 			template<typename GroupKey, typename SlotType, typename ThreadingModel>
@@ -88,16 +93,16 @@ namespace boost
 					nolock_grab_tracked_objects();
 					return nolock_nograb_connected();
 				}
-				virtual void block(bool should_block)
+				virtual shared_ptr<void> get_blocker()
 				{
 					typename mutex_type::scoped_lock lock(mutex);
-					_blocked = should_block;
-				}
-				virtual bool blocked() const
-				{
-					typename mutex_type::scoped_lock lock(mutex);
-					nolock_grab_tracked_objects();
-					return nolock_nograb_blocked();
+					shared_ptr<void> blocker = _weak_blocker.lock();
+					if(blocker == 0)
+					{
+						blocker.reset(this, &null_deleter);
+						_weak_blocker = blocker;
+					}
+					return blocker;
 				}
 				const GroupKey& group_key() const {return _group_key;}
 				void set_group_key(const GroupKey &key) {_group_key = key;}
@@ -131,9 +136,13 @@ namespace boost
 			};
 		}
 
+		class shared_connection_block;
+
 		class connection
 		{
 		public:
+			friend class shared_connection_block;
+
 			connection() {}
 			connection(const connection &other): _weakConnectionBody(other._weakConnectionBody)
 			{}
@@ -152,16 +161,6 @@ namespace boost
 				boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
 				if(connectionBody == 0) return false;
 				return connectionBody->connected();
-			}
-			void block(bool should_block=true)
-			{
-				boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
-				if(connectionBody == 0) return;
-				connectionBody->block(should_block);
-			}
-			void unblock()
-			{
-				block(false);
 			}
 			bool blocked() const
 			{
@@ -186,6 +185,13 @@ namespace boost
 				std::swap(_weakConnectionBody, other._weakConnectionBody);
 			}
 		private:
+			shared_ptr<void> get_blocker()
+			{
+				boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
+				if(connectionBody == 0) return shared_ptr<void>();
+				return connectionBody->get_blocker();
+			}
+
 			boost::weak_ptr<detail::ConnectionBodyBase> _weakConnectionBody;
 		};
 

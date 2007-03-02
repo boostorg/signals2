@@ -94,14 +94,15 @@ test_remove_self()
 
   std::cout << "Blocking 2" << std::endl;
 
-  connections[2].block();
-  test_output = "";
-  s0(); std::cout << std::endl;
-  BOOST_CHECK(test_output == "13");
+  {
+    boost::BOOST_SIGNALS_NAMESPACE::shared_connection_block block(connections[2]);
+    test_output = "";
+    s0(); std::cout << std::endl;
+    BOOST_CHECK(test_output == "13");
+  }
 
   std::cout << "Unblocking 2" << std::endl;
 
-  connections[2].unblock();
   test_output = "";
   s0(); std::cout << std::endl;
   BOOST_CHECK(test_output == "123");
