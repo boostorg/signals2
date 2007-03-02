@@ -79,6 +79,10 @@ namespace boost
 		{
 			return _slot_function(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
 		}
+		R operator()(BOOST_SIGNAL_SIGNATURE_FULL_ARGS(BOOST_SIGNALS_NUM_ARGS)) const
+		{
+			return _slot_function(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
+		}
 		BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)& track(const weak_ptr<void> &tracked)
 		{
 			_trackedObjects.push_back(tracked);
