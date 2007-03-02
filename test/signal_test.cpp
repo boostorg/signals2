@@ -7,6 +7,7 @@
 
 // For more information, see http://www.boost.org
 
+#include <boost/optional.hpp>
 #include <boost/test/minimal.hpp>
 #include <boost/thread_safe_signal.hpp>
 #include <functional>
@@ -19,14 +20,19 @@ struct max_or_default {
   typename InputIterator::value_type
   operator()(InputIterator first, InputIterator last) const
   {
-    if (first == last)
-      return T();
-
-    T max = *first++;
+    boost::optional<T> max;
     for (; first != last; ++first)
-      max = (*first > max)? *first : max;
-
-    return max;
+    {
+      try
+      {
+        if(max == false) max = *first;
+        else max = (*first > max.get())? *first : max;
+      }
+      catch(const boost::bad_weak_ptr &)
+      {}
+    }
+    if(max) return max.get();
+    return T();
   }
 };
 

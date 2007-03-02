@@ -46,13 +46,10 @@ namespace boost
 				}
 				bool expired() const
 				{
-					try
+					tracked_container_type::const_iterator it;
+					for(it = tracked_objects().begin(); it != tracked_objects().end(); ++it)
 					{
-						lock();
-					}
-					catch(const bad_weak_ptr &err)
-					{
-						return true;
+						if(it->expired()) return true;
 					}
 					return false;
 				}

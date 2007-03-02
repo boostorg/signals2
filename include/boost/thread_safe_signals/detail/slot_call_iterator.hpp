@@ -20,6 +20,7 @@
 #include <boost/thread_safe_signals/connection.hpp>
 #include <boost/thread_safe_signals/slot_base.hpp>
 #include <boost/type_traits.hpp>
+#include <boost/weak_ptr.hpp>
 
 #ifdef BOOST_HAS_ABI_HEADERS
 #  include BOOST_ABI_PREFIX
@@ -62,7 +63,15 @@ namespace boost {
 			dereference() const
 			{
 				if (!(*cache)) {
-					cache->reset(f(*iter));
+					try
+					{
+						cache->reset(f(*iter));
+					}
+					catch(const bad_weak_ptr &err)
+					{
+						(*iter)->nolock_disconnect();
+						throw;
+					}
 				}
 				return cache->get();
 			}
@@ -91,7 +100,6 @@ namespace boost {
 				for(;iter != end; ++iter)
 				{
 					lock_type lock((*iter)->mutex);
-					tracked_ptrs = (*iter)->nolock_grab_tracked_objects();
 					if((*iter)->nolock_nograb_blocked() == false)
 					{
 						callable_iter = iter;
@@ -109,7 +117,6 @@ namespace boost {
 			Function f;
 			optional<result_type>* cache;
 			mutable Iterator callable_iter;
-			mutable typename slot_base::locked_container_type tracked_ptrs;
 		};
 		} // end namespace detail
 	} // end namespace BOOST_SIGNALS_NAMESPACE

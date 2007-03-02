@@ -50,10 +50,7 @@ namespace boost
 				virtual void disconnect() = 0;
 				void nolock_disconnect()
 				{
-					if(_connected)
-					{
-						_connected = false;
-					}
+					_connected = false;
 				}
 				virtual bool connected() const = 0;
 				virtual shared_ptr<void> get_blocker() = 0;
