@@ -48,6 +48,18 @@ namespace boost
 		BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)(const F& f): _slot_function(signalslib::detail::get_invocable_slot(f, signalslib::detail::tag_type(f)))
 		{
 		}
+		// copy constructors
+		template<BOOST_SIGNAL_PREFIXED_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS_NUM_ARGS, Other), typename OtherSlotFunction>
+		BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)(const BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)
+			<BOOST_SIGNAL_PREFIXED_SIGNATURE_TEMPLATE_INSTANTIATION(BOOST_SIGNALS_NUM_ARGS, Other), OtherSlotFunction> &other_slot):
+			signalslib::detail::slot_base(other_slot), _slot_function(other_slot._slot_function)
+		{
+		}
+		template<typename Signature, typename OtherSlotFunction>
+		BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)(const slot<Signature, OtherSlotFunction> &other_slot):
+			signalslib::detail::slot_base(other_slot), _slot_function(other_slot._slot_function)
+		{
+		}
 		// bind syntactic sugar
 // ArgTypeN argN
 #define BOOST_SLOT_BINDING_ARG_DECL(z, n, data) \
@@ -63,6 +75,7 @@ namespace boost
 #undef BOOST_SLOT_MAX_BINDING_ARGS
 #undef BOOST_SLOT_BINDING_ARG_DECL
 #undef BOOST_SLOT_BINDING_CONSTRUCTOR
+		// invocation
 		R operator()(BOOST_SIGNAL_SIGNATURE_FULL_ARGS(BOOST_SIGNALS_NUM_ARGS))
 		{
 			locked_container_type locked_objects = lock();
@@ -73,9 +86,19 @@ namespace boost
 			locked_container_type locked_objects = lock();
 			return _slot_function(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
 		}
+		// tracking
 		BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)& track(const weak_ptr<void> &tracked)
 		{
 			_trackedObjects.push_back(tracked);
+			return *this;
+		}
+		BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)& track(const slot_base &slot)
+		{
+			tracked_container_type::const_iterator it;
+			for(it = slot.tracked_objects().begin(); it != slot.tracked_objects().end(); ++it)
+			{
+				track(*it);
+			}
 			return *this;
 		}
 		BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)& track(const signalslib::detail::signal_base &signal)
@@ -84,7 +107,9 @@ namespace boost
 			track_signal(signal);
 			return *this;
 		}
+
 		const slot_function_type& slot_function() const {return _slot_function;}
+		slot_function_type& slot_function() {return _slot_function;}
 	private:
 		SlotFunction _slot_function;
 	};

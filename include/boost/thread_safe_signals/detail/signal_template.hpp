@@ -264,12 +264,12 @@ namespace boost
 					result_type m_invoke(const connection_body_type &connectionBody,
 						const signalslib::detail::unusable *resolver) const
 					{
-						connectionBody->slot(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
+						connectionBody->slot.slot_function()(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
 						return signalslib::detail::unusable();
 					}
 					result_type m_invoke(const connection_body_type &connectionBody, ...) const
 					{
-						return connectionBody->slot(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
+						return connectionBody->slot.slot_function()(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
 					}
 				};
 				// a struct used to optimize (minimize) the number of shared_ptrs that need to be created
