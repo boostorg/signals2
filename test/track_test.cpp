@@ -47,6 +47,7 @@ int test_main(int, char*[])
 {
   typedef boost::signal1<int, int, max_or_default<int> > sig_type;
   sig_type s1;
+  boost::signalslib::connection connection;
 
   // Test auto-disconnection
   BOOST_CHECK(s1(5) == 0);
@@ -77,9 +78,10 @@ int test_main(int, char*[])
     boost::shared_ptr<int> shorty(new int(2));
     boost::slot<int (double)> other_slot(&myfunc, boost::cref(*shorty.get()), _1);
     other_slot.track(shorty);
-    s1.connect(sig_type::slot_type(other_slot, 0.5));
+    connection = s1.connect(sig_type::slot_type(other_slot, 0.5).track(other_slot));
     BOOST_CHECK(s1(3) == 2);
   }
+  BOOST_CHECK(connection.connected() == false);
   BOOST_CHECK(s1(3) == 0);
 
   // Test binding of a signal as a slot
