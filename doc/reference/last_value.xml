@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE header PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
+  "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
+<header name="boost/last_value.hpp" last-revision="$Date$">
+  <namespace name="boost">
+    <class name="last_value">
+      <template>
+        <template-type-parameter name="T"/>
+      </template>
+
+      <purpose>Evaluate an <conceptname>InputIterator</conceptname> sequence and return the
+      last value in the sequence.</purpose>
+
+      <typedef name="result_type"><type>T</type></typedef>
+
+      <method-group name="invocation">
+        <method name="operator()" cv="const">
+          <template>
+            <template-type-parameter name="InputIterator"/>
+          </template>
+          <type>result_type</type>
+          <parameter name="first">
+            <paramtype>InputIterator</paramtype>
+          </parameter>
+          <parameter name="last">
+            <paramtype>InputIterator</paramtype>
+          </parameter>
+
+          <effects><para>Attempts to dereference every iterator in the sequence <computeroutput>[first, last)</computeroutput>.
+          Swallows <class>boost::expired_slot</class> exceptions thrown by failed dereference attempts.</para></effects>
+          <returns><para>The result of the last successful iterator dereference.</para></returns>
+          <throws><para><class>boost::no_slots_error</class> if no iterators were successfully dereferenced,
+          unless the template type of <code>last_value</code> is <code>void</code> or <code>optional&lt;T&gt;</code>.</para></throws>
+        </method>
+      </method-group>
+    </class>
+
+    <class-specialization name="last_value">
+      <template/>
+      <specialization>
+        <template-arg>void</template-arg>
+      </specialization>
+
+      <purpose>Evaluate an InputIterator sequence.</purpose>
+
+      <typedef name="result_type">
+        <type><emphasis>unspecified</emphasis></type>
+      </typedef>
+
+      <method-group name="invocation">
+        <method name="operator()" cv="const">
+          <template>
+            <template-type-parameter name="InputIterator"/>
+          </template>
+          <type>result_type</type>
+          <parameter name="first">
+            <paramtype>InputIterator</paramtype>
+          </parameter>
+          <parameter name="last">
+            <paramtype>InputIterator</paramtype>
+          </parameter>
+
+          <effects><para>Attempts to dereference every iterator in the sequence <computeroutput>[first, last)</computeroutput>.
+          Swallows <class>boost::expired_slot</class> exceptions thrown by failed dereference attempts.</para></effects>
+        </method>
+      </method-group>
+    </class-specialization>
+
+    <class-specialization name="last_value">
+      <template>
+        <template-type-parameter name="T"/>
+      </template>
+      <specialization>
+        <template-arg>optional&lt;T&gt;</template-arg>
+      </specialization>
+
+      <purpose>Evaluate an InputIterator sequence.</purpose>
+
+      <typedef name="result_type">
+        <type>optional&lt;T&gt;</type>
+      </typedef>
+
+      <method-group name="invocation">
+        <method name="operator()" cv="const">
+          <template>
+            <template-type-parameter name="InputIterator"/>
+          </template>
+          <type>result_type</type>
+          <parameter name="first">
+            <paramtype>InputIterator</paramtype>
+          </parameter>
+          <parameter name="last">
+            <paramtype>InputIterator</paramtype>
+          </parameter>
+
+          <effects><para>Attempts to dereference every iterator in the sequence <computeroutput>[first, last)</computeroutput>.
+          Swallows <class>boost::expired_slot</class> exceptions thrown by failed dereference attempts.</para></effects>
+          <returns><para>An <code>optional&lt;T&gt; containing the result of the last successful iterator dereference,
+          or an uninitalized optional&lt;T&gt; if no iterators were successfully dereferenced.</para></returns>
+        </method>
+      </method-group>
+    </class-specialization>
+  </namespace>
+</header>
