@@ -13,6 +13,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread_safe_signals/connection.hpp>
+#include <boost/weak_ptr.hpp>
 
 #ifdef BOOST_HAS_ABI_HEADERS
 #  include BOOST_ABI_PREFIX
@@ -26,13 +27,23 @@ namespace boost
 		{
 		public:
 			shared_connection_block(connection &conn):
-				_blocker(conn.get_blocker())
-			{}
+				_weakConnectionBody(conn._weakConnectionBody)
+			{
+				block();
+			}
+			void block()
+			{
+				if(_blocker) return;
+				boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
+				if(connectionBody == 0) return;
+				_blocker = connectionBody->get_blocker();
+			}
 			void unblock()
 			{
 				_blocker.reset();
 			}
 		private:
+			boost::weak_ptr<detail::ConnectionBodyBase> _weakConnectionBody;
 			shared_ptr<void> _blocker;
 		};
 	}

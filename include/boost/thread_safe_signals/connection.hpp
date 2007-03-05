@@ -182,12 +182,6 @@ namespace boost
 				std::swap(_weakConnectionBody, other._weakConnectionBody);
 			}
 		private:
-			shared_ptr<void> get_blocker()
-			{
-				boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
-				if(connectionBody == 0) return shared_ptr<void>();
-				return connectionBody->get_blocker();
-			}
 
 			boost::weak_ptr<detail::ConnectionBodyBase> _weakConnectionBody;
 		};
