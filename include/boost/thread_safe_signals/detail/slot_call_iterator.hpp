@@ -67,7 +67,7 @@ namespace boost {
 						{
 							cache->reset(f(*iter));
 						}
-						catch(const bad_weak_ptr &err)
+						catch(const expired_slot &err)
 						{
 							(*iter)->disconnect();
 							throw;

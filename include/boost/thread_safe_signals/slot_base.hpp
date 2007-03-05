@@ -23,6 +23,15 @@
 
 namespace boost
 {
+	class expired_slot: public bad_weak_ptr
+	{
+	public:
+		virtual char const * what() const throw()
+		{
+			return "boost::expired_slot";
+		}
+	};
+
 	namespace signalslib
 	{
 		namespace detail
@@ -40,7 +49,14 @@ namespace boost
 					tracked_container_type::const_iterator it;
 					for(it = tracked_objects().begin(); it != tracked_objects().end(); ++it)
 					{
-						locked_objects.push_back(shared_ptr<void>(*it));
+						try
+						{
+							locked_objects.push_back(shared_ptr<void>(*it));
+						}
+						catch(const bad_weak_ptr &err)
+						{
+							throw expired_slot();
+						}
 					}
 					return locked_objects;
 				}
