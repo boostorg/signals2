@@ -42,7 +42,7 @@ namespace boost
 		typedef arg1_type first_argument_type;
 		typedef arg2_type second_argument_type;
 #endif
-		static const int arity = BOOST_SIGNALS_NUM_ARGS;
+		BOOST_STATIC_CONSTANT(int, arity = BOOST_SIGNALS_NUM_ARGS);
 
 		template<typename F>
 		BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)(const F& f): _slot_function(signalslib::detail::get_invocable_slot(f, signalslib::detail::tag_type(f)))

@@ -414,7 +414,7 @@ namespace boost
 		typedef arg1_type first_argument_type;
 		typedef arg2_type second_argument_type;
 #endif
-		static const int arity = BOOST_SIGNALS_NUM_ARGS;
+		BOOST_STATIC_CONSTANT(int, arity = BOOST_SIGNALS_NUM_ARGS);
 
 		BOOST_SIGNAL_CLASS_NAME(const combiner_type &combiner = combiner_type(),
 			const group_compare_type &group_compare = group_compare_type()):
