@@ -6,6 +6,13 @@
   <xi:include href="signal_header.xml"/>
   <xi:include href="slot.xml"/>
   <xi:include href="connection.xml"/>
-  <xi:include href="visit_each.xml"/>
+  <xi:include href="shared_connection_block.xml"/>
   <xi:include href="last_value.xml"/>
+  <xi:include href="auto_threaded.xml"/>
+  <xi:include href="single_threaded.xml"/>
+  <xi:include href="multi_threaded.xml"/>
+  <xi:include href="deconstruct_ptr.xml"/>
+  <xi:include href="postconstructible.xml"/>
+  <xi:include href="predestructible.xml"/>
+  <xi:include href="visit_each.xml"/>
 </library-reference>

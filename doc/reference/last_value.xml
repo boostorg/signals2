@@ -27,9 +27,9 @@
           </parameter>
 
           <effects><para>Attempts to dereference every iterator in the sequence <computeroutput>[first, last)</computeroutput>.
-          Swallows <class>boost::expired_slot</class> exceptions thrown by failed dereference attempts.</para></effects>
+          Swallows <classname>boost::expired_slot</classname> exceptions thrown by failed dereference attempts.</para></effects>
           <returns><para>The result of the last successful iterator dereference.</para></returns>
-          <throws><para><class>boost::no_slots_error</class> if no iterators were successfully dereferenced,
+          <throws><para><classname>boost::no_slots_error</classname> if no iterators were successfully dereferenced,
           unless the template type of <code>last_value</code> is <code>void</code> or <code>optional&lt;T&gt;</code>.</para></throws>
         </method>
       </method-group>
@@ -61,7 +61,7 @@
           </parameter>
 
           <effects><para>Attempts to dereference every iterator in the sequence <computeroutput>[first, last)</computeroutput>.
-          Swallows <class>boost::expired_slot</class> exceptions thrown by failed dereference attempts.</para></effects>
+          Swallows <classname>boost::expired_slot</classname> exceptions thrown by failed dereference attempts.</para></effects>
         </method>
       </method-group>
     </class-specialization>
@@ -94,11 +94,22 @@
           </parameter>
 
           <effects><para>Attempts to dereference every iterator in the sequence <computeroutput>[first, last)</computeroutput>.
-          Swallows <class>boost::expired_slot</class> exceptions thrown by failed dereference attempts.</para></effects>
-          <returns><para>An <code>optional&lt;T&gt; containing the result of the last successful iterator dereference,
-          or an uninitalized optional&lt;T&gt; if no iterators were successfully dereferenced.</para></returns>
+          Swallows <classname>boost::expired_slot</classname> exceptions thrown by failed dereference attempts.</para></effects>
+          <returns><para>An <code>optional&lt;T&gt;</code> containing the result of the last successful iterator dereference,
+          or an uninitalized <code>optional&lt;T&gt;</code> if no iterators were successfully dereferenced.</para></returns>
         </method>
       </method-group>
     </class-specialization>
+
+    <class name="no_slots_error">
+      <inherit access="public"><classname>std::exception</classname></inherit>
+      <purpose>Indicates a combiner was unable to synthesize a return value.</purpose>
+      <description>The <code>no_slots_error</code> exception may be thrown by <classname>last_value</classname>
+        when it is run but unable to obtain any results from its input iterators.
+      </description>
+      <method name="what" cv="const" specifiers="virtual">
+        <type>const char * </type>
+      </method>
+    </class>
   </namespace>
 </header>

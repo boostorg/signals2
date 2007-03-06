@@ -11,10 +11,10 @@
       <type>void</type>
       <parameter name="visitor">
         <paramtype>const Visitor&amp;</paramtype>
-      </parameter>  
+      </parameter>
       <parameter name="t">
         <paramtype>const T&amp;</paramtype>
-      </parameter> 
+      </parameter>
       <parameter>
         <paramtype>int</paramtype>
       </parameter>
@@ -24,7 +24,7 @@
       <description>
         <para>The <functionname>visit_each</functionname> mechanism
         allows a visitor to be applied to every subobject in a given
-        object. It is used by the Signals library to discover
+        object. It was used by the Signals library to discover (now deprecated)
         <classname>signals::trackable</classname> objects within a
         function object, but other uses may surface if used
         universally (e.g., conservative garbage collection). To fit
@@ -35,7 +35,7 @@
 
       <effects><para><code>visitor(t)</code>, and for
       every subobject <code>x</code> of
-      <code>t</code>: 
+      <code>t</code>:
         <itemizedlist>
           <listitem><para>If <code>x</code> is a reference, <code>visit_each(visitor, <functionname>ref</functionname>(x), 0)</code></para></listitem>
           <listitem><para>Otherwise, <code>visit_each(visitor, x, 0)</code></para></listitem>
@@ -55,6 +55,6 @@
 
       <para>Calls to visit_each are required to be unqualified, to
       enable argument-dependent lookup.</para></notes>
-    </function> 
+    </function>
   </namespace>
 </header>

@@ -25,7 +25,7 @@
         </constructor>
 
         <constructor>
-          <parameter name="other"> 
+          <parameter name="other">
             <paramtype>const <classname>connection</classname>&amp;</paramtype>
           </parameter>
 
@@ -37,7 +37,7 @@
         </constructor>
 
         <copy-assignment>
-          <parameter name="other"> 
+          <parameter name="other">
             <paramtype>const <classname>connection</classname>&amp;</paramtype>
           </parameter>
 
@@ -70,22 +70,6 @@
         </method-group>
 
         <method-group name="blocking">
-          <method name="block">
-            <type>void</type>
-            <parameter name="should_block">
-              <paramtype>bool</paramtype>
-              <default>true</default>
-            </parameter>
-            <requires><simpara><code>connected()</code></simpara></requires>
-            <postconditions><simpara><code>blocked() == should_block</code></simpara></postconditions>
-            <throws><simpara>Will not throw.</simpara></throws>
-          </method>
-          <method name="unblock">
-            <type>void</type>
-            <requires><simpara><code>connected()</code></simpara></requires>
-            <postconditions><simpara><code>!blocked()</code></simpara></postconditions>
-            <throws><simpara>Will not throw.</simpara></throws>
-          </method>
           <method name="blocked" cv="const">
             <type>bool</type>
             <returns><simpara><code>true</code> if the associated slot is either disconnected or blocked, <code>false</code> otherwise.</simpara></returns>
@@ -102,9 +86,9 @@
             <effects><para>Swaps the connections referenced in
             <computeroutput>this</computeroutput> and
             <computeroutput>other</computeroutput>.</para></effects>
- 
+
             <throws><para>Will not throw.</para></throws>
-          </method> 
+          </method>
         </method-group>
 
         <method-group name="comparisons">
@@ -160,6 +144,9 @@
       </class>
 
       <class name="scoped_connection">
+        <inherit access="public">
+          <type><classname>connection</classname></type>
+        </inherit>
         <inherit access="private">
           <type><classname>noncopyable</classname></type>
           <purpose>Exposition only</purpose>
@@ -167,7 +154,7 @@
         <purpose>Limits a signal-slot connection lifetime to a particular scope.</purpose>
 
         <constructor>
-          <parameter name="other"> 
+          <parameter name="other">
             <paramtype>const <classname>connection</classname>&amp;</paramtype>
           </parameter>
 
@@ -184,26 +171,7 @@
           disconnects the signal-slot connection.</para></effects>
         </destructor>
 
-        <method-group name="connection management">
-          <method name="disconnect" cv="const">
-            <type>void</type>
-             <effects><para>If
-             <computeroutput>this-&gt;<methodname>connected</methodname>()</computeroutput>,
-             disconnects the signal and slot referenced by this;
-             otherwise, this operation is a no-op.</para></effects>
-
-             <postconditions><para><computeroutput>!this-&gt;<methodname>connected</methodname>()</computeroutput>.</para></postconditions>
-          </method>
-
-          <method name="connected" cv="const">
-            <type>bool</type>
-            <returns><para><computeroutput>true</computeroutput> if this
-            references a non-NULL connection that is still active
-            (connected), and <computeroutput>false</computeroutput>
-            otherwise.</para></returns>
-            <throws><para>Will not throw.</para></throws>
-          </method>
-        </method-group>
+        <description><para>A connection which automatically disconnects on destruction.</para></description>
       </class>
     </namespace>
   </namespace>

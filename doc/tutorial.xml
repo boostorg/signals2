@@ -681,7 +681,7 @@ sig(); <emphasis>// Does nothing: there are no connected slots</emphasis>
 
 <para>Slots can be temporarily "blocked", meaning that they will be
 ignored when the signal is invoked but have not been disconnected. A
-<class>boost::signals::shared_connection_block</class> object will
+<classname>boost::signals::shared_connection_block</classname> object will
 temporarily block a slot.  The connection is unblocked by either
 destroying or calling
 <methodname alt="shared_connection_block::unblock">unblock</methodname>
@@ -861,6 +861,14 @@ deliverNews.<methodname>connect</methodname>(signal_type::slot_type(&amp;NewsMes
 <classname alt="slotN">slot</classname> constructor is passed more than one
 argument, it will automatically pass all the arguments to <code>bind</code> and use the
 returned function object.</para>
+<para>One limitation of using <code>shared_ptr</code> for tracking is that
+an object cannot setup tracking of itself in its constructor.  However, it is
+possible to set up tracking in a post-constructor.  In a post-constructor,
+a <code>shared_ptr</code> to <code>this</code> can be obtained by using
+<classname>enable_shared_from_this</classname>.  You may also find
+<functionname>deconstruct_ptr</functionname> useful as a simple
+post-constructor/pre-destructor framework for your classes.
+</para>
 </section>
 
 <section><title>When can disconnections occur? (Intermediate)</title>
@@ -873,7 +881,7 @@ signal's <code>disconnect</code> method or
 <code>scoped_connection</code>'s destructor.</para></listitem>
 <listitem><para>An object tracked by the slot is
 destroyed.</para></listitem>
-<listitem><para>A slot throws an <class>boost::expired_slot</class> exception.
+<listitem><para>A slot throws an <classname>boost::expired_slot</classname> exception.
 </para></listitem>
 <listitem><para>The signal is destroyed.</para></listitem></itemizedlist>
 <para>These events can occur at any time without disrupting a signal's
