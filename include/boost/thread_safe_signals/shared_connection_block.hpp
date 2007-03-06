@@ -42,6 +42,10 @@ namespace boost
 			{
 				_blocker.reset();
 			}
+			bool blocking() const
+			{
+				return _blocker != 0;
+			}
 		private:
 			boost::weak_ptr<detail::ConnectionBodyBase> _weakConnectionBody;
 			shared_ptr<void> _blocker;
