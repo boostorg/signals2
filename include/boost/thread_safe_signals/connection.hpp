@@ -32,6 +32,10 @@
 #include <boost/weak_ptr.hpp>
 #include <vector>
 
+#ifdef BOOST_HAS_ABI_HEADERS
+#  include BOOST_ABI_PREFIX
+#endif
+
 namespace boost
 {
 	namespace signalslib
@@ -208,5 +212,9 @@ namespace boost
 		};
 	}
 }
+
+#ifdef BOOST_HAS_ABI_HEADERS
+#  include BOOST_ABI_SUFFIX
+#endif
 
 #endif	// _EPG_SIGNALS_CONNECTION_H

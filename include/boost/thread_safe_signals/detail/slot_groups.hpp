@@ -10,15 +10,15 @@
 #ifndef BOOST_TSS_SLOT_GROUPS_HEADER
 #define BOOST_TSS_SLOT_GROUPS_HEADER
 
-#ifdef BOOST_HAS_ABI_HEADERS
-#  include BOOST_ABI_PREFIX
-#endif
-
 #include <boost/thread_safe_signals/connection.hpp>
 #include <boost/optional.hpp>
 #include <list>
 #include <map>
 #include <utility>
+
+#ifdef BOOST_HAS_ABI_HEADERS
+#  include BOOST_ABI_PREFIX
+#endif
 
 namespace boost {
 	namespace signalslib {
