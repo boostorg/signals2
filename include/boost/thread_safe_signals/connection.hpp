@@ -26,7 +26,6 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread_safe_signals/slot.hpp>
-#include <boost/thread_safe_signals/track.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/visit_each.hpp>
 #include <boost/weak_ptr.hpp>
