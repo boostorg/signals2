@@ -39,7 +39,7 @@ namespace boost
 {
 	namespace signalslib
 	{
-		void null_deleter(const void*) {}
+		extern inline void null_deleter(const void*) {}
 		namespace detail
 		{
 			class ConnectionBodyBase
