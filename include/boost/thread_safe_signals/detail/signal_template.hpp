@@ -75,7 +75,7 @@ namespace boost
 				typedef Group group_type;
 				typedef GroupCompare group_compare_type;
 				typedef typename signalslib::detail::slot_call_iterator_t<slot_invoker,
-					typename connection_list_type::iterator, ConnectionBody<group_key_type, SlotFunction, ThreadingModel> > slot_call_iterator;
+					typename connection_list_type::iterator, ConnectionBody<group_key_type, slot_type, ThreadingModel> > slot_call_iterator;
 
 				BOOST_SIGNAL_IMPL_CLASS_NAME(const combiner_type &combiner,
 					const group_compare_type &group_compare):
@@ -298,7 +298,7 @@ namespace boost
 					{
 						bool connected;
 						{
-							typename ConnectionBody<group_key_type, SlotFunction, ThreadingModel>::mutex_type::scoped_lock lock((*it)->mutex);
+							typename ConnectionBody<group_key_type, slot_type, ThreadingModel>::mutex_type::scoped_lock lock((*it)->mutex);
 							if(grab_tracked)
 								(*it)->nolock_slot_expired();
 							connected = (*it)->nolock_nograb_connected();
@@ -365,7 +365,7 @@ namespace boost
 					for(it = local_state->connection_bodies.begin();
 						it != local_state->connection_bodies.end(); ++it)
 					{
-						typename ConnectionBody<group_key_type, slot_function_type, ThreadingModel>::mutex_type::scoped_lock lock((*it)->mutex);
+						typename ConnectionBody<group_key_type, slot_type, ThreadingModel>::mutex_type::scoped_lock lock((*it)->mutex);
 						if((*it)->slot.slot_function() == slot)
 						{
 							(*it)->nolock_disconnect();
