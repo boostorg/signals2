@@ -13,6 +13,7 @@
 #define BOOST_TSS_SIGNALS_SLOT_HEADER
 
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/ref.hpp>
 #include <boost/thread_safe_signals/detail/signals_common.hpp>
