@@ -149,7 +149,7 @@ test_signal_signal_connect()
 
   {
     signal_type s2;
-    s1.connect(signal_type::slot_type(s2).track(s2));
+    s1.connect(signal_type::slot_type(s2));
     s2.connect(std::bind1st(std::multiplies<int>(), 2));
     s2.connect(std::bind1st(std::multiplies<int>(), -3));
 
