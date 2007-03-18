@@ -67,7 +67,7 @@ namespace boost {
 						{
 							cache->reset(f(*iter));
 						}
-						catch(const expired_slot &err)
+						catch(const expired_slot &)
 						{
 							(*iter)->disconnect();
 							throw;

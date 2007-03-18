@@ -53,7 +53,7 @@ namespace boost
 						{
 							locked_objects.push_back(shared_ptr<void>(*it));
 						}
-						catch(const bad_weak_ptr &err)
+						catch(const bad_weak_ptr &)
 						{
 							throw expired_slot();
 						}

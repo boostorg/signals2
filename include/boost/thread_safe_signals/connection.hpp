@@ -122,7 +122,7 @@ namespace boost
 					{
 						locked_objects = slot.lock();
 					}
-					catch(const expired_slot &err)
+					catch(const expired_slot &)
 					{
 						_connected = false;
 						return locked_objects;
