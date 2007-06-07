@@ -23,9 +23,8 @@ namespace boost {
 			class null_scoped_lock
 			{
 			public:
-				null_scoped_lock(const null_mutex &mutex)
+				null_scoped_lock(null_mutex &)
 				{}
-				bool locked() const {return true;}
 			};
 			class null_mutex
 			{

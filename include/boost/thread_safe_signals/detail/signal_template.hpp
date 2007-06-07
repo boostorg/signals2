@@ -262,7 +262,7 @@ namespace boost
 #undef BOOST_SIGNAL_MISC_STATEMENT
 				private:
 					result_type m_invoke(const connection_body_type &connectionBody,
-						const signalslib::detail::unusable *resolver) const
+						const signalslib::detail::unusable *) const
 					{
 						connectionBody->slot.slot_function()(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
 						return signalslib::detail::unusable();
