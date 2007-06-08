@@ -10,6 +10,8 @@
 #ifndef BOOST_SIGNALS_SINGLE_THREADED_MODEL_HEADER
 #define BOOST_SIGNALS_SINGLE_THREADED_MODEL_HEADER
 
+#include <boost/concept_check.hpp>
+
 #ifdef BOOST_HAS_ABI_HEADERS
 #  include BOOST_ABI_PREFIX
 #endif
@@ -23,8 +25,10 @@ namespace boost {
 			class null_scoped_lock
 			{
 			public:
-				null_scoped_lock(null_mutex &)
-				{}
+				null_scoped_lock(null_mutex &mutex)
+				{
+					boost::ignore_unused_variable_warning(mutex);
+				}
 			};
 			class null_mutex
 			{
