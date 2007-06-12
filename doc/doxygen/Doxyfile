@@ -25,7 +25,7 @@ ABBREVIATE_BRIEF       = "The $name class" \
 ALWAYS_DETAILED_SEC    = NO
 INLINE_INHERITED_MEMB  = NO
 FULL_PATH_NAMES        = YES
-STRIP_FROM_PATH        = /home/fhess/svn/sandbox/thread_safe_signals/libs/thread_safe_signals/doc/doxygen/
+STRIP_FROM_PATH        =
 STRIP_FROM_INC_PATH    = 
 SHORT_NAMES            = NO
 JAVADOC_AUTOBRIEF      = NO
@@ -81,7 +81,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = /home/fhess/svn/sandbox/thread_safe_signals/libs/thread_safe_signals/doc/doxygen
+INPUT                  =
 FILE_PATTERNS          = *.c \
                          *.cc \
                          *.cxx \
