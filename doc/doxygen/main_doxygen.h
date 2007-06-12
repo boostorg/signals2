@@ -16,10 +16,11 @@ Online reference documentation is available
 </p>
 <p>The latest version of the code is available in the sandbox of the
 <a href="http://svn.boost.org/trac/boost/wiki/BoostSubversion">boost svn</a>.
-The files for thread_safe_signals are located in sandbox/thread_safe_signals and
+The files for thread_safe_signals are located in <em>sandbox/thread_safe_signals</em> and
 may be checked out with the following command:
-
+\verbatim
 svn co http://svn.boost.org/svn/boost/sandbox/thread_safe_signals thread_safe_signals
+\endverbatim
 
 </p>
 
