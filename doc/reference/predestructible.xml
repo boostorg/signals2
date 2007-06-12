@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE header PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
+  "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
+<header name="boost/predestructible.hpp" last-revision="$Date$">
+  <using-namespace name="boost"/>
+  <namespace name="boost">
+    <class name="predestructible">
+      <destructor specifiers="[protected] virtual"/>
+      <method name="predestruct" specifiers="virtual">
+        <type>void</type>
+        <notes><para>Override <code>predestruct()</code> with your class' pre-destructor.
+          It will be called automatically if you manage your objects with <code>shared_ptr</code>s
+          that use <classname>predestructing_deleter</classname> as their deleter, such as
+          those created with <functionname>deconstruct_ptr()</functionname></para>
+        </notes>
+      </method>
+      <purpose>A base class for classes with predestructors, used in conjunction with <functionname>deconstruct_ptr</functionname>().
+      </purpose>
+    </class>
+  </namespace>
+</header>
