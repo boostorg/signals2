@@ -4,34 +4,47 @@
 <section last-revision="$Date: 2007-06-12 14:01:23 -0400 (Tue, 12 Jun 2007) $">
   <title>Introduction</title>
 
-<para>The Boost.Signals library is an implementation of a managed
-signals and slots system. Signals represent callbacks with multiple
-targets, and are also called publishers or events in similar
-systems. Signals are connected to some set of slots, which are
-callback receivers (also called event targets or subscribers), which
-are called when the signal is "emitted."</para>
+  <para>The Boost.Signals library is an implementation of a managed
+  signals and slots system. Signals represent callbacks with multiple
+  targets, and are also called publishers or events in similar
+  systems. Signals are connected to some set of slots, which are
+  callback receivers (also called event targets or subscribers), which
+  are called when the signal is "emitted."</para>
 
-<para>Signals and slots are managed, in that signals and slots (or,
-more properly, objects that occur as part of the slots) can track
-connections and are capable of automatically disconnecting signal/slot
-connections when either is destroyed. This enables the user to make
-signal/slot connections without expending a great effort to manage the
-lifetimes of those connections with regard to the lifetimes of all
-objects involved.</para>
+  <para>Signals and slots are managed, in that signals and slots (or,
+  more properly, objects that occur as part of the slots) can track
+  connections and are capable of automatically disconnecting signal/slot
+  connections when either is destroyed. This enables the user to make
+  signal/slot connections without expending a great effort to manage the
+  lifetimes of those connections with regard to the lifetimes of all
+  objects involved.</para>
 
-<para>When signals are connected to multiple slots, there is a
-question regarding the relationship between the return values of the
-slots and the return value of the signals. Boost.Signals allows the
-user to specify the manner in which multiple return values are
-combined.</para>
+  <para>When signals are connected to multiple slots, there is a
+  question regarding the relationship between the return values of the
+  slots and the return value of the signals. Boost.Signals allows the
+  user to specify the manner in which multiple return values are
+  combined.</para>
 
-<para>This documentation describes a thread-safe variant of the
-official Boost.Signals library.  There have been some changes to
-the interface to support thread-safety, mostly with respect to
-automatic connection management.  This implementation was written by
-Frank Mori Hess.  Acknowledgements are also due to Timmo Stange, Peter
-Dimov, and Gottlob Frege for ideas and feedback, and to Douglas Gregor
-for the original version of Boost.Signals this effort was based on.
-</para>
-
+  <section>
+    <title>thread_safe_signals</title>
+    <para>This documentation describes a thread-safe variant of the
+    official Boost.Signals library.  There have been some changes to
+    the interface to support thread-safety, mostly with respect to
+    automatic connection management.  This implementation was written by
+    Frank Mori Hess.  Acknowledgements are also due to Timmo Stange, Peter
+    Dimov, and Gottlob Frege for ideas and feedback, and to Douglas Gregor
+    for the original version of Boost.Signals this effort was based on.
+    </para>
+  </section>
+  <section>
+    <title>Download</title>
+    <para>The latest release is available from the <ulink url="http://www.boost-consulting.com/vault/index.php?&amp;direction=0&amp;order=&amp;directory=thread_safe_signals">Boost vault</ulink>.
+    The development version of the code is available in the sandbox of the
+    <ulink url="http://svn.boost.org/trac/boost/wiki/BoostSubversion">Boost svn</ulink>.
+    The files for thread_safe_signals are located in the <code>sandbox/thread_safe_signals</code>
+    subdirectory and may be <ulink url="http://svn.boost.org/trac/boost/browser/sandbox/thread_safe_signals">
+    browsed online</ulink> or checked out with the following command:
+      <programlisting>svn co http://svn.boost.org/svn/boost/sandbox/thread_safe_signals thread_safe_signals</programlisting>
+    </para>
+  </section>
 </section>
