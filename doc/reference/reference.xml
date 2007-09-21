@@ -14,5 +14,4 @@
   <xi:include href="deconstruct_ptr.xml"/>
   <xi:include href="postconstructible.xml"/>
   <xi:include href="predestructible.xml"/>
-  <xi:include href="visit_each.xml"/>
 </library-reference>
