@@ -21,36 +21,36 @@
 
 namespace boost
 {
-	namespace signalslib
-	{
-		class shared_connection_block
-		{
-		public:
-			shared_connection_block(connection &conn):
-				_weakConnectionBody(conn._weakConnectionBody)
-			{
-				block();
-			}
-			void block()
-			{
-				if(_blocker) return;
-				boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
-				if(connectionBody == 0) return;
-				_blocker = connectionBody->get_blocker();
-			}
-			void unblock()
-			{
-				_blocker.reset();
-			}
-			bool blocking() const
-			{
-				return _blocker != 0;
-			}
-		private:
-			boost::weak_ptr<detail::ConnectionBodyBase> _weakConnectionBody;
-			shared_ptr<void> _blocker;
-		};
-	}
+  namespace signalslib
+  {
+    class shared_connection_block
+    {
+    public:
+      shared_connection_block(connection &conn):
+        _weakConnectionBody(conn._weakConnectionBody)
+      {
+        block();
+      }
+      void block()
+      {
+        if(_blocker) return;
+        boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
+        if(connectionBody == 0) return;
+        _blocker = connectionBody->get_blocker();
+      }
+      void unblock()
+      {
+        _blocker.reset();
+      }
+      bool blocking() const
+      {
+        return _blocker != 0;
+      }
+    private:
+      boost::weak_ptr<detail::ConnectionBodyBase> _weakConnectionBody;
+      shared_ptr<void> _blocker;
+    };
+  }
 } // end namespace boost
 
 #ifdef BOOST_HAS_ABI_HEADERS

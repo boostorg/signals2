@@ -17,32 +17,32 @@
 #endif
 
 namespace boost {
-	namespace signalslib {
-		namespace detail
-		{
-			class null_mutex;
+  namespace signalslib {
+    namespace detail
+    {
+      class null_mutex;
 
-			class null_scoped_lock
-			{
-			public:
-				null_scoped_lock(null_mutex &mutex)
-				{
-					boost::ignore_unused_variable_warning(mutex);
-				}
-			};
-			class null_mutex
-			{
-			public:
-				typedef null_scoped_lock scoped_lock;
-			};
-		}
+      class null_scoped_lock
+      {
+      public:
+        null_scoped_lock(null_mutex &mutex)
+        {
+          boost::ignore_unused_variable_warning(mutex);
+        }
+      };
+      class null_mutex
+      {
+      public:
+        typedef null_scoped_lock scoped_lock;
+      };
+    }
 
-		class single_threaded
-		{
-		public:
-			typedef detail::null_mutex mutex_type;
-		};
-	} // end namespace signalslib
+    class single_threaded
+    {
+    public:
+      typedef detail::null_mutex mutex_type;
+    };
+  } // end namespace signalslib
 } // end namespace boost
 
 #ifdef BOOST_HAS_ABI_HEADERS

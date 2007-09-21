@@ -18,13 +18,13 @@
 #endif
 
 namespace boost {
-	namespace signalslib {
-		class multi_threaded
-		{
-		public:
-			typedef mutex mutex_type;
-		};
-	} // end namespace signalslib
+  namespace signalslib {
+    class multi_threaded
+    {
+    public:
+      typedef mutex mutex_type;
+    };
+  } // end namespace signalslib
 } // end namespace boost
 
 #ifdef BOOST_HAS_ABI_HEADERS

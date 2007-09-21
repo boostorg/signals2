@@ -17,13 +17,13 @@
 #endif
 
 namespace boost {
-	namespace signalslib {
-		class auto_threaded
-		{
-		public:
-			typedef boost::detail::lightweight_mutex mutex_type;
-		};
-	} // end namespace signalslib
+  namespace signalslib {
+    class auto_threaded
+    {
+    public:
+      typedef boost::detail::lightweight_mutex mutex_type;
+    };
+  } // end namespace signalslib
 } // end namespace boost
 
 #ifdef BOOST_HAS_ABI_HEADERS

@@ -17,21 +17,21 @@
 #endif
 
 namespace boost {
-	namespace signalslib {
-		namespace detail {
-			class slot_base;
+  namespace signalslib {
+    namespace detail {
+      class slot_base;
 
-			class signal_base : public noncopyable
-			{
-			public:
-				friend class slot_base;
+      class signal_base : public noncopyable
+      {
+      public:
+        friend class slot_base;
 
-				virtual ~signal_base() {}
-			protected:
-				virtual shared_ptr<void> lock_pimpl() const = 0;
-			};
-		} // end namespace detail
-	} // end namespace BOOST_SIGNALS_NAMESPACE
+        virtual ~signal_base() {}
+      protected:
+        virtual shared_ptr<void> lock_pimpl() const = 0;
+      };
+    } // end namespace detail
+  } // end namespace BOOST_SIGNALS_NAMESPACE
 } // end namespace boost
 
 #ifdef BOOST_HAS_ABI_HEADERS

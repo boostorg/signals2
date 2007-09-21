@@ -30,39 +30,39 @@
 
 namespace boost
 {
-	namespace signalslib
-	{
-		namespace detail
-		{
-			// Get the slot so that it can be copied
-			template<typename F>
-			typename F::weak_signal_type
-			get_invocable_slot(const F &signal, signalslib::detail::signal_tag)
-			{ return typename F::weak_signal_type(signal); }
+  namespace signalslib
+  {
+    namespace detail
+    {
+      // Get the slot so that it can be copied
+      template<typename F>
+      typename F::weak_signal_type
+      get_invocable_slot(const F &signal, signalslib::detail::signal_tag)
+      { return typename F::weak_signal_type(signal); }
 
-			template<typename F>
-			const F&
-			get_invocable_slot(const F& f, signalslib::detail::reference_tag)
-			{ return f; }
+      template<typename F>
+      const F&
+      get_invocable_slot(const F& f, signalslib::detail::reference_tag)
+      { return f; }
 
-			template<typename F>
-			const F&
-			get_invocable_slot(const F& f, signalslib::detail::value_tag)
-			{ return f; }
+      template<typename F>
+      const F&
+      get_invocable_slot(const F& f, signalslib::detail::value_tag)
+      { return f; }
 
-			// Determines the type of the slot - is it a signal, a reference to a
-			// slot or just a normal slot.
-			template<typename F>
-			typename signalslib::detail::get_slot_tag<F>::type
-			tag_type(const F&)
-			{
-				typedef typename signalslib::detail::get_slot_tag<F>::type
-				the_tag_type;
-				the_tag_type tag = the_tag_type();
-				return tag;
-			}
-		}
-	}
+      // Determines the type of the slot - is it a signal, a reference to a
+      // slot or just a normal slot.
+      template<typename F>
+      typename signalslib::detail::get_slot_tag<F>::type
+      tag_type(const F&)
+      {
+        typedef typename signalslib::detail::get_slot_tag<F>::type
+        the_tag_type;
+        the_tag_type tag = the_tag_type();
+        return tag;
+      }
+    }
+  }
 } // end namespace boost
 
 #define BOOST_PP_ITERATION_LIMITS (0, BOOST_SIGNALS_MAX_ARGS)
@@ -71,34 +71,34 @@ namespace boost
 
 namespace boost
 {
-	template<typename Signature,
-		typename SlotFunction = boost::function<Signature> >
-	class slot: public signalslib::detail::slotN<function_traits<Signature>::arity,
-		Signature, SlotFunction>::type
-	{
-	private:
-		typedef typename signalslib::detail::slotN<boost::function_traits<Signature>::arity,
-			Signature, SlotFunction>::type base_type;
-	public:
-		template<typename F>
-		slot(const F& f): base_type(f)
-		{}
-		// bind syntactic sugar
+  template<typename Signature,
+    typename SlotFunction = boost::function<Signature> >
+  class slot: public signalslib::detail::slotN<function_traits<Signature>::arity,
+    Signature, SlotFunction>::type
+  {
+  private:
+    typedef typename signalslib::detail::slotN<boost::function_traits<Signature>::arity,
+      Signature, SlotFunction>::type base_type;
+  public:
+    template<typename F>
+    slot(const F& f): base_type(f)
+    {}
+    // bind syntactic sugar
 // AN aN
 #define BOOST_SLOT_BINDING_ARG_DECL(z, n, data) \
-	BOOST_PP_CAT(A, n) BOOST_PP_CAT(a, n)
+  BOOST_PP_CAT(A, n) BOOST_PP_CAT(a, n)
 // template<typename F, typename A0, typename A1, ..., typename An-1> slotN(...
 #define BOOST_SLOT_BINDING_CONSTRUCTOR(z, n, data) \
-		template<typename F, BOOST_PP_ENUM_PARAMS(n, typename A)> \
-		slot(F f, BOOST_PP_ENUM(n, BOOST_SLOT_BINDING_ARG_DECL, ~)): \
-			base_type(f, BOOST_PP_ENUM_PARAMS(n, a)) \
-		{}
+    template<typename F, BOOST_PP_ENUM_PARAMS(n, typename A)> \
+    slot(F f, BOOST_PP_ENUM(n, BOOST_SLOT_BINDING_ARG_DECL, ~)): \
+      base_type(f, BOOST_PP_ENUM_PARAMS(n, a)) \
+    {}
 #define BOOST_SLOT_MAX_BINDING_ARGS 10
-		BOOST_PP_REPEAT_FROM_TO(1, BOOST_SLOT_MAX_BINDING_ARGS, BOOST_SLOT_BINDING_CONSTRUCTOR, ~)
+  BOOST_PP_REPEAT_FROM_TO(1, BOOST_SLOT_MAX_BINDING_ARGS, BOOST_SLOT_BINDING_CONSTRUCTOR, ~)
 #undef BOOST_SLOT_MAX_BINDING_ARGS
 #undef BOOST_SLOT_BINDING_ARG_DECL
 #undef BOOST_SLOT_BINDING_CONSTRUCTOR
-	};
+  };
 }
 
 #ifdef BOOST_HAS_ABI_HEADERS
