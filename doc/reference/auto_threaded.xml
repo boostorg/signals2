@@ -3,9 +3,9 @@
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
 <header name="boost/signals/auto_threaded.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
   <using-namespace name="boost"/>
-  <using-namespace name="boost::signals"/>
+  <using-namespace name="boost::signalslib"/>
   <namespace name="boost">
-    <namespace name="signals">
+    <namespace name="signalslib">
       <class name="auto_threaded">
         <purpose>Automatically enabled/disabled thread-safety for a signal.</purpose>
 
@@ -21,12 +21,12 @@
           <para>When in thread-safe mode, the <code>auto_threaded</code> class uses a
           header-only mutex implementation.  Thus, it has no dependence on the boost.threads
           library.  If you are already using boost.threads, you may prefer to use the
-          <classname>boost::signals::multi_threaded</classname> <code>ThreadingModel</code>, which uses a
+          <classname>boost::signalslib::multi_threaded</classname> <code>ThreadingModel</code>, which uses a
           mutex class provided by boost.threads.
           </para>
           <para>You may wish to use a thread-unsafe signal in a multi-threaded program, if
           the signal is only used by a single thread.  In that case, you may prefer to
-          use the <classname>boost::signals::single_threaded</classname> class as your <code>ThreadingModel</code>.
+          use the <classname>boost::signalslib::single_threaded</classname> class as your <code>ThreadingModel</code>.
           </para>
         </description>
       </class>

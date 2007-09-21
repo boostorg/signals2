@@ -3,7 +3,7 @@
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
 <header name="boost/signal.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
   <namespace name="boost">
-    <namespace name="signals">
+    <namespace name="signalslib">
       <enum name="connect_position">
         <enumvalue name="at_front"/>
         <enumvalue name="at_back"/>
@@ -29,7 +29,7 @@
           <default><classname>functionN</classname>&lt;R, T1, T2, ..., TN&gt;</default>
         </template-type-parameter>
         <template-type-parameter name="ThreadingModel">
-          <default><classname>signals::auto_threaded</classname></default>
+          <default><classname>signalslib::auto_threaded</classname></default>
         </template-type-parameter>
       </template>
       <inherit access="private">
@@ -109,18 +109,18 @@
       <method-group name="connection management">
         <overloaded-method name="connect">
           <signature>
-            <type><classname>signals::connection</classname></type>
+            <type><classname>signalslib::connection</classname></type>
             <parameter name="slot">
               <paramtype>const slot_type&amp;</paramtype>
             </parameter>
             <parameter name="at">
-              <paramtype>signals::connect_position</paramtype>
-              <default>signals::at_back</default>
+              <paramtype>signalslib::connect_position</paramtype>
+              <default>signalslib::at_back</default>
             </parameter>
           </signature>
 
           <signature>
-            <type><classname>signals::connection</classname></type>
+            <type><classname>signalslib::connection</classname></type>
             <parameter name="group">
               <paramtype>const group_type&amp;</paramtype>
             </parameter>
@@ -128,8 +128,8 @@
               <paramtype>const slot_type&amp;</paramtype>
             </parameter>
             <parameter name="at">
-              <paramtype>signals::connect_position</paramtype>
-              <default>signals::at_back</default>
+              <paramtype>signalslib::connect_position</paramtype>
+              <default>signalslib::at_back</default>
             </parameter>
           </signature>
 
@@ -147,7 +147,7 @@
           slots.</simpara></effects>
 
           <returns><simpara>A
-          <computeroutput><classname>signals::connection</classname></computeroutput>
+          <computeroutput><classname>signalslib::connection</classname></computeroutput>
           object that references the newly-created connection between
           the signal and the slot; if the slot is inactive, returns a
           disconnected connection.</simpara></returns>
@@ -344,7 +344,7 @@
           <default><classname>function</classname>&lt;Signature&gt;</default>
         </template-type-parameter>
         <template-type-parameter name="ThreadingModel">
-          <default><classname>signals::auto_threaded</classname></default>
+          <default><classname>signalslib::auto_threaded</classname></default>
         </template-type-parameter>
       </template>
 

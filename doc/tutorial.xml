@@ -5,7 +5,7 @@
   <title>Tutorial</title>
 
   <using-namespace name="boost"/>
-  <using-namespace name="boost::signals"/>
+  <using-namespace name="boost::signalslib"/>
   <using-class name="boost::signalN"/>
   <using-class name="boost::slotN"/>
 
@@ -276,7 +276,7 @@ independent. So what happens if we mix calls to connect that use the
 group parameter and those that don't? The "unnamed" slots (i.e., those
 that have been connected without specifying a group name) can be
 placed at the front or back of the slot list (by passing
-<code>boost::signals::at_front</code> or <code>boost::signals::at_back</code>
+<code>boost::signalslib::at_front</code> or <code>boost::signalslib::at_back</code>
 as the last parameter to <code><methodname
 alt="boost::signalN::connect">connect</methodname></code>, respectively), and defaults to the end of the list. When
 a group is specified, the final parameter describes where the slot
@@ -649,12 +649,12 @@ struct DistributeRequest {
 
 <section><title>Connection Management</title>
 <section><title>Disconnecting Slots (Beginner)</title>
-<para>Slots aren't expected to exist indefinately after they are
+<para>Slots aren't expected to exist indefinitely after they are
 connected. Often slots are only used to receive a few events and
 are then disconnected, and the programmer needs control to decide
 when a slot should no longer be connected.</para>
 <para>The entry point for managing connections explicitly is the
-<code><classname>boost::signals::connection</classname></code> class. The
+<code><classname>boost::signalslib::connection</classname></code> class. The
 <code><classname>connection</classname></code> class uniquely represents the connection
 between a particular signal and a particular slot. The
 <code><methodname alt="connection::connected">connected</methodname>()</code> method checks if the signal and slot are
@@ -664,7 +664,7 @@ called. Each call to the signal's <code>connect()</code> method
 returns a connection object, which can be used to determine if the
 connection still exists or to disconnect the signal and slot.</para>
 <programlisting>
-boost::signals::connection c = sig.<methodname>connect</methodname>(HelloWorld());
+boost::signalslib::connection c = sig.<methodname>connect</methodname>(HelloWorld());
 if (c.<methodname>connected</methodname>()) {
 <emphasis>// c is still connected to the signal</emphasis>
   sig(); <emphasis>// Prints "Hello, World!"</emphasis>
@@ -681,7 +681,7 @@ sig(); <emphasis>// Does nothing: there are no connected slots</emphasis>
 
 <para>Slots can be temporarily "blocked", meaning that they will be
 ignored when the signal is invoked but have not been disconnected. A
-<classname>boost::signals::shared_connection_block</classname> object will
+<classname>boost::signalslib::shared_connection_block</classname> object will
 temporarily block a slot.  The connection is unblocked by either
 destroying or calling
 <methodname alt="shared_connection_block::unblock">unblock</methodname>
@@ -691,28 +691,28 @@ Here is an example of
 blocking/unblocking slots:</para>
 
 <programlisting>
-boost::signals::connection c = sig.<methodname>connect</methodname>(HelloWorld());
+boost::signalslib::connection c = sig.<methodname>connect</methodname>(HelloWorld());
 sig(); <emphasis>// Prints "Hello, World!"</emphasis>
 
 {
-  boost::signals::shared_connection_block block(c); <emphasis>// block the slot</emphasis>
+  boost::signalslib::shared_connection_block block(c); <emphasis>// block the slot</emphasis>
   assert(c.<methodname>blocked</methodname>());
   sig(); <emphasis>// No output: the slot is blocked</emphasis>
-}<emphasis>// shared_connection_block going out of scope unblocks the slot</emphasis>
+} <emphasis>// shared_connection_block going out of scope unblocks the slot</emphasis>
 sig(); <emphasis>// Prints "Hello, World!"</emphasis>
 </programlisting>
 
 </section>
 
 <section><title>Scoped connections (Intermediate)</title>
-<para>The <code>boost::signals::scoped_connection</code> class
+<para>The <code>boost::signalslib::scoped_connection</code> class
 references a signal/slot connection that will be disconnected when
 the <code>scoped_connection</code> class goes out of scope. This
 ability is useful when a connection need only be temporary,
 e.g.,</para>
 <programlisting>
 {
-  boost::signals::scoped_connection c = sig.<methodname>connect</methodname>(ShortLived());
+  boost::signalslib::scoped_connection c = sig.<methodname>connect</methodname>(ShortLived());
   sig(); <emphasis>// will call ShortLived function object</emphasis>
 }
 sig(); <emphasis>// ShortLived function object no longer connected to sig</emphasis>
@@ -722,7 +722,7 @@ sig(); <emphasis>// ShortLived function object no longer connected to sig</empha
 <section><title>Disconnecting equivalent slots (Intermediate)</title>
 <para>One can disconnect slots that are equivalent to a given function
 object using a form of the
-<code><methodname>disconnect</methodname></code> method, so long as
+<code><methodname alt="signalN::disconnect">signal::disconnect</methodname></code> method, so long as
 the type of the function object has an accessible <code>==</code>
 operator. For instance:
 
@@ -877,11 +877,11 @@ occur:</para>
 <itemizedlist>
 <listitem><para>The connection is explicitly disconnected via the connection's
 <code>disconnect</code> method directly, or indirectly via the
-signal's <code>disconnect</code> method or
+signal's <code>disconnect</code> method, or
 <code>scoped_connection</code>'s destructor.</para></listitem>
 <listitem><para>An object tracked by the slot is
 destroyed.</para></listitem>
-<listitem><para>A slot throws an <classname>boost::expired_slot</classname> exception.
+<listitem><para>A slot throws a <classname>boost::expired_slot</classname> exception.
 </para></listitem>
 <listitem><para>The signal is destroyed.</para></listitem></itemizedlist>
 <para>These events can occur at any time without disrupting a signal's
@@ -1004,13 +1004,13 @@ hidden in an implementation detail file.</para>
 {
 public:
     typedef boost::signal&lt;void (bool)&gt;  signal_t;
-    typedef boost::signals::connection  connection_t;
+    typedef boost::signalslib::connection  connection_t;
 
 public:
     Document()
     {}
 
-    connection_t connect(signal_t::slot_function_type subscriber)
+    connection_t connect(const signal_t::slot_type &amp;subscriber)
     {
         return m_sig.connect(subscriber);
     }

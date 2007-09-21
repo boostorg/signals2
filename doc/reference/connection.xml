@@ -3,7 +3,7 @@
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
 <header name="boost/signals/connection.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
   <namespace name="boost">
-    <namespace name="signals">
+    <namespace name="signalslib">
       <class name="connection">
         <!-- Models LessThanComparable and EqualityComparable -->
         <purpose>Query/disconnect a signal-slot connection.</purpose>
@@ -72,6 +72,12 @@
         <method-group name="blocking">
           <method name="blocked" cv="const">
             <type>bool</type>
+            <description>
+              <para>
+                Queries if the connection is blocked.  A connection may be blocked by creating a
+                <classname>boost::signalslib::shared_connection_block</classname> object.
+              </para>
+            </description>
             <returns><simpara><code>true</code> if the associated slot is either disconnected or blocked, <code>false</code> otherwise.</simpara></returns>
             <throws><simpara>Will not throw.</simpara></throws>
           </method>

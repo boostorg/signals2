@@ -46,5 +46,9 @@
     browsed online</ulink> or checked out with the following command:
       <programlisting>svn co http://svn.boost.org/svn/boost/sandbox/thread_safe_signals thread_safe_signals</programlisting>
     </para>
+    <para>
+      The current version of this document should be available
+      <ulink url="http://www.comedi.org/projects/thread_safe_signals/libs/thread_safe_signals/doc/html/index.html">online</ulink>.
+    </para>
   </section>
 </section>

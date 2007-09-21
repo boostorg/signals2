@@ -3,10 +3,10 @@
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
 <header name="boost/signals/shared_connection_block.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
   <using-namespace name="boost"/>
-  <using-namespace name="boost::signals"/>
-  <using-class name="boost::signals::connection"/>
+  <using-namespace name="boost::signalslib"/>
+  <using-class name="boost::signalslib::connection"/>
   <namespace name="boost">
-    <namespace name="signals">
+    <namespace name="signalslib">
       <class name="shared_connection_block">
         <purpose>Blocks a connection between a signal and a slot.</purpose>
 
@@ -27,7 +27,7 @@
 
       <constructor>
           <parameter name="conn">
-            <paramtype>boost::signals::connection &amp;</paramtype>
+            <paramtype>boost::signalslib::connection &amp;</paramtype>
           </parameter>
 
           <effects>
@@ -62,7 +62,7 @@
             <notes><para><code>this->blocking() == true</code> implies <code><methodname>connection::blocked</methodname>() == true</code>
             for the connection.  However, <code>this->blocking() == false</code> does not necessarily imply
             <code>connection::blocked() == false</code>, since the connection may be
-            blocked by another <code>shared_connection_block</code> objects.</para></notes>
+            blocked by another <code>shared_connection_block</code> object.</para></notes>
           </method>
         </method-group>
       </class>

@@ -3,9 +3,9 @@
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
 <header name="boost/signals/multi_threaded.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
   <using-namespace name="boost"/>
-  <using-namespace name="boost::signals"/>
+  <using-namespace name="boost::signalslib"/>
   <namespace name="boost">
-    <namespace name="signals">
+    <namespace name="signalslib">
       <class name="multi_threaded">
         <purpose>Thread-safety for a signal, using Boost.Threads.</purpose>
 
