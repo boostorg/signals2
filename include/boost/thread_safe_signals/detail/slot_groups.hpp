@@ -29,18 +29,6 @@ namespace boost {
       {
         typedef std::pair<enum slot_meta_group, boost::optional<Group> > type;
       };
-#if 0
-      template <typename T>
-      void print_key(const T &key)
-      {
-        std::cerr << "key: " << key.first << " ";
-        if(key.second)
-          std::cerr << key.second.get();
-        else
-          std::cerr << "uninitialized";
-        std::cerr << std::endl;
-      }
-#endif
       template<typename Group, typename GroupCompare>
       class group_key_less
       {
