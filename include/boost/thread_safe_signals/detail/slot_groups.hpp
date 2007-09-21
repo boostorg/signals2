@@ -195,7 +195,7 @@ namespace boost {
     } // end namespace detail
     enum connect_position { at_back, at_front };
   } // end namespace signalslib
-} // end namespace EPG
+} // end namespace boost
 
 #ifdef BOOST_HAS_ABI_HEADERS
 #  include BOOST_ABI_SUFFIX

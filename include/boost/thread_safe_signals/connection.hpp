@@ -18,8 +18,8 @@
 // 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef _EPG_SIGNALS_CONNECTION_H
-#define _EPG_SIGNALS_CONNECTION_H
+#ifndef BOOST_TSS_CONNECTION_HEADER
+#define BOOST_TSS_CONNECTION_HEADER
 
 #include <boost/function.hpp>
 #include <boost/mpl/bool.hpp>
@@ -216,4 +216,4 @@ namespace boost
 #  include BOOST_ABI_SUFFIX
 #endif
 
-#endif  // _EPG_SIGNALS_CONNECTION_H
+#endif  // BOOST_TSS_CONNECTION_HEADER
