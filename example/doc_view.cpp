@@ -20,7 +20,7 @@ public:
     Document()
     {}
 
-    connection_t connect(signal_t::slot_function_type subscriber)
+    connection_t connect(const signal_t::slot_type &subscriber)
     {
         return m_sig.connect(subscriber);
     }
