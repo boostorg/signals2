@@ -23,7 +23,7 @@ namespace boost
   // slot class template.
   template<BOOST_SIGNAL_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS_NUM_ARGS),
     typename SlotFunction = BOOST_FUNCTION_N_DECL(BOOST_SIGNALS_NUM_ARGS)>
-  class BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS): public signalslib::detail::slot_base
+  class BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS): public signalslib::slot_base
   {
   public:
     template<BOOST_SIGNAL_PREFIXED_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS_NUM_ARGS, Other), typename OtherSlotFunction>
@@ -52,12 +52,12 @@ namespace boost
     template<BOOST_SIGNAL_PREFIXED_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS_NUM_ARGS, Other), typename OtherSlotFunction>
     BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)(const BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)
       <BOOST_SIGNAL_PREFIXED_SIGNATURE_TEMPLATE_INSTANTIATION(BOOST_SIGNALS_NUM_ARGS, Other), OtherSlotFunction> &other_slot):
-      signalslib::detail::slot_base(other_slot), _slot_function(other_slot._slot_function)
+      signalslib::slot_base(other_slot), _slot_function(other_slot._slot_function)
     {
     }
     template<typename Signature, typename OtherSlotFunction>
     BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)(const slot<Signature, OtherSlotFunction> &other_slot):
-      signalslib::detail::slot_base(other_slot), _slot_function(other_slot._slot_function)
+      signalslib::slot_base(other_slot), _slot_function(other_slot._slot_function)
     {
     }
     // bind syntactic sugar
@@ -92,7 +92,7 @@ namespace boost
       _trackedObjects.push_back(tracked);
       return *this;
     }
-    BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)& track(const signalslib::detail::slot_base &slot)
+    BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)& track(const signalslib::slot_base &slot)
     {
       tracked_container_type::const_iterator it;
       for(it = slot.tracked_objects().begin(); it != slot.tracked_objects().end(); ++it)

@@ -18,13 +18,13 @@
 
 namespace boost {
   namespace signalslib {
+    class slot_base;
     namespace detail {
-      class slot_base;
 
       class signal_base : public noncopyable
       {
       public:
-        friend class slot_base;
+        friend class boost::signalslib::slot_base;
 
         virtual ~signal_base() {}
       protected:
