@@ -87,7 +87,7 @@ namespace boost
 // AN aN
 #define BOOST_SLOT_BINDING_ARG_DECL(z, n, data) \
   BOOST_PP_CAT(A, n) BOOST_PP_CAT(a, n)
-// template<typename F, typename A0, typename A1, ..., typename An-1> slotN(...
+// template<typename F, typename A0, typename A1, ..., typename An-1> slot(...
 #define BOOST_SLOT_BINDING_CONSTRUCTOR(z, n, data) \
     template<typename F, BOOST_PP_ENUM_PARAMS(n, typename A)> \
     slot(F f, BOOST_PP_ENUM(n, BOOST_SLOT_BINDING_ARG_DECL, ~)): \
