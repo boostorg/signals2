@@ -97,13 +97,13 @@
           <default>group_compare_type()</default>
         </parameter>
 
-        <effects><simpara>Initializes the signal to contain no slots, copies the given combiner into internal storage, and stores the given group comparison function object to compare groups.</simpara></effects>
+        <effects><para>Initializes the signal to contain no slots, copies the given combiner into internal storage, and stores the given group comparison function object to compare groups.</para></effects>
 
-        <postconditions><simpara><computeroutput>this-&gt;<methodname>empty</methodname>()</computeroutput></simpara></postconditions>
+        <postconditions><para><computeroutput>this-&gt;<methodname>empty</methodname>()</computeroutput></para></postconditions>
       </constructor>
 
       <destructor>
-        <effects><simpara>Disconnects all slots connected to <computeroutput>*this</computeroutput>.</simpara></effects>
+        <effects><para>Disconnects all slots connected to <computeroutput>*this</computeroutput>.</para></effects>
       </destructor>
 
       <method-group name="connection management">
@@ -133,7 +133,7 @@
             </parameter>
           </signature>
 
-          <effects><simpara>Connects the signal this to the incoming
+          <effects><para>Connects the signal this to the incoming
           slot. If the slot is inactive, i.e., any of the trackable
           objects bound by the slot call have been destroyed, then the
           call to connect is a no-op. If the second version of
@@ -144,26 +144,26 @@
           connected at the front of the list or group of slots and
           <code>at_back</code> indicates that the slot will be
           connected at the back of the list or group of
-          slots.</simpara></effects>
+          slots.</para></effects>
 
-          <returns><simpara>A
+          <returns><para>A
           <computeroutput><classname>signalslib::connection</classname></computeroutput>
           object that references the newly-created connection between
           the signal and the slot; if the slot is inactive, returns a
-          disconnected connection.</simpara></returns>
+          disconnected connection.</para></returns>
 
-          <throws><simpara>This routine meets the strong exception guarantee,
+          <throws><para>This routine meets the strong exception guarantee,
           where any exception thrown will cause the slot to not be
-          connected to the signal.</simpara></throws>
+          connected to the signal.</para></throws>
 
-          <complexity><simpara>Constant time when connecting a slot
+          <complexity><para>Constant time when connecting a slot
           without a group name or logarithmic in the number of groups
           when connecting to a particular
-          group.</simpara></complexity>
+          group.</para></complexity>
 
-          <notes><simpara>It is unspecified whether connecting a slot while the
+          <notes><para>It is unspecified whether connecting a slot while the
           signal is calling will result in the slot being called
-          immediately.</simpara></notes>
+          immediately.</para></notes>
         </overloaded-method>
 
         <overloaded-method name="disconnect">
@@ -183,70 +183,70 @@
             </parameter>
           </signature>
 
-          <effects><simpara>If the parameter is (convertible to) a
+          <effects><para>If the parameter is (convertible to) a
           group name, any slots in the given group are
           disconnected. Otherwise, any slots equal to the given slot
-          are disconnected.</simpara></effects>
+          are disconnected.</para></effects>
 
-          <throws><simpara>Will not throw unless a user destructor or
+          <throws><para>Will not throw unless a user destructor or
           equality operator <code>==</code> throws. If either throws,
-          not all slots may be disconnected.</simpara></throws>
+          not all slots may be disconnected.</para></throws>
 
-          <complexity><simpara>If a group is given, O(lg g) + k where
+          <complexity><para>If a group is given, O(lg g) + k where
           g is the number of groups in the signal and k is the
           number of slots in the group. Otherwise, linear in the
           number of slots connected to the
-          signal.</simpara></complexity>
+          signal.</para></complexity>
         </overloaded-method>
 
         <method name="disconnect_all_slots">
           <type>void</type>
-          <effects><simpara>Disconnects all slots connected to the signal.</simpara></effects>
+          <effects><para>Disconnects all slots connected to the signal.</para></effects>
 
-          <postconditions><simpara><computeroutput>this-&gt;<methodname>empty</methodname>()</computeroutput>.</simpara></postconditions>
+          <postconditions><para><computeroutput>this-&gt;<methodname>empty</methodname>()</computeroutput>.</para></postconditions>
 
-          <throws><simpara>If disconnecting a slot causes an exception to be
-          thrown, not all slots may be disconnected.</simpara></throws>
+          <throws><para>If disconnecting a slot causes an exception to be
+          thrown, not all slots may be disconnected.</para></throws>
 
-          <complexity><simpara>Linear in the number of slots known to the
-          signal.</simpara></complexity>
+          <complexity><para>Linear in the number of slots known to the
+          signal.</para></complexity>
 
-          <notes><simpara>May be called at any time within the lifetime of the
-          signal, including during calls to the signal's slots.</simpara></notes>
+          <notes><para>May be called at any time within the lifetime of the
+          signal, including during calls to the signal's slots.</para></notes>
         </method>
 
         <method name="empty" cv="const">
           <type>bool</type>
-          <returns><simpara><computeroutput>true</computeroutput> if no slots
+          <returns><para><computeroutput>true</computeroutput> if no slots
           are connected to the signal, and
-          <computeroutput>false</computeroutput> otherwise.</simpara></returns>
+          <computeroutput>false</computeroutput> otherwise.</para></returns>
 
-          <throws><simpara>Will not throw.</simpara></throws>
+          <throws><para>Will not throw.</para></throws>
 
-          <complexity><simpara>Linear in the number of slots known to the
-          signal.</simpara></complexity>
+          <complexity><para>Linear in the number of slots known to the
+          signal.</para></complexity>
 
-          <rationale><simpara>Slots can disconnect at any point in time,
+          <rationale><para>Slots can disconnect at any point in time,
           including while those same slots are being invoked. It is
           therefore possible that the implementation must search
           through a list of disconnected slots to determine if any
-          slots are still connected.</simpara></rationale>
+          slots are still connected.</para></rationale>
         </method>
 
         <method name="num_slots" cv="const">
           <type>std::size_t</type>
-          <returns><simpara>The number of slots connected to the signal</simpara></returns>
+          <returns><para>The number of slots connected to the signal</para></returns>
 
-          <throws><simpara>Will not throw.</simpara></throws>
+          <throws><para>Will not throw.</para></throws>
 
-          <complexity><simpara>Linear in the number of slots known to the
-          signal.</simpara></complexity>
+          <complexity><para>Linear in the number of slots known to the
+          signal.</para></complexity>
 
-          <rationale><simpara>Slots can disconnect at any point in time,
+          <rationale><para>Slots can disconnect at any point in time,
           including while those same slots are being invoked. It is
           therefore possible that the implementation must search
           through a list of disconnected slots to determine how many
-          slots are still connected.</simpara></rationale>
+          slots are still connected.</para></rationale>
         </method>
       </method-group>
 
@@ -268,7 +268,7 @@
             <parameter name="aN"><paramtype>argN_type</paramtype></parameter>
           </signature>
 
-          <effects><simpara>Invokes the combiner with a
+          <effects><para>Invokes the combiner with a
           <computeroutput>slot_call_iterator</computeroutput> range
           [first, last) corresponding to the sequence of calls to the
           slots connected to signal
@@ -276,35 +276,40 @@
           iterator in this range causes a slot call with the given set
           of parameters <computeroutput>(a1, a2, ...,
           aN)</computeroutput>, the result of which is returned from
-          the iterator dereference operation.</simpara></effects>
+          the iterator dereference operation.  Note, dereferencing
+          a slot iterator may throw a <classname>slot_expired</classname>
+          exception, if the slot has been disconnected via automatic
+          connection management.  Combiners should simply swallow
+          such <classname>slot_expired</classname> exceptions and move
+          on to the next slot.</para></effects>
 
-          <returns><simpara>The result returned by the combiner.</simpara></returns>
+          <returns><para>The result returned by the combiner.</para></returns>
 
-          <throws><simpara>If an exception is thrown by a slot call, or if the
+          <throws><para>If an exception is thrown by a slot call, or if the
           combiner does not dereference any slot past some given slot,
           all slots after that slot in the internal list of connected
-          slots will not be invoked.</simpara></throws>
+          slots will not be invoked.</para></throws>
 
-          <notes><simpara>Only the slots associated with iterators that are
+          <notes><para>Only the slots associated with iterators that are
           actually dereferenced will be invoked. Multiple dereferences
           of the same iterator will not result in multiple slot
           invocations, because the return value of the slot will be
-          cached.</simpara>
+          cached.</para>
 
-          <simpara>The <computeroutput>const</computeroutput> version of
+          <para>The <computeroutput>const</computeroutput> version of
           the function call operator will invoke the combiner as
           <computeroutput>const</computeroutput>, whereas the
           non-<computeroutput>const</computeroutput> version will
           invoke the combiner as
-          non-<computeroutput>const</computeroutput>.</simpara>
+          non-<computeroutput>const</computeroutput>.</para>
 
-          <simpara>Calling the function call operator may throw an
+          <para>Calling the function call operator may throw an
           exception if no slots are connected to the signal, depending
           on the combiner used. The default combiner will not throw
           for zero slots when the return type is <code>void</code> or
           <classname>optional</classname>&lt;T&gt;,
           but will throw when the return type is any other type (because there is no
-          way to synthesize a return value).</simpara></notes>
+          way to synthesize a return value).</para></notes>
         </overloaded-method>
       </method-group>
 
@@ -312,16 +317,16 @@
         <method name="combiner" cv="const">
           <type>combiner_type</type>
 
-          <returns><simpara>A copy of the stored combiner.</simpara></returns>
-          <throws><simpara>Will not throw.</simpara></throws>
+          <returns><para>A copy of the stored combiner.</para></returns>
+          <throws><para>Will not throw.</para></throws>
         </method>
         <method name="set_combiner">
           <type>void</type>
           <parameter name="combiner"><paramtype>const combiner_type&amp;</paramtype></parameter>
 
-          <effects><simpara>Copies a new combiner into the signal for use with
-          future signal invocations.</simpara></effects>
-          <throws><simpara>Will not throw.</simpara></throws>
+          <effects><para>Copies a new combiner into the signal for use with
+          future signal invocations.</para></effects>
+          <throws><para>Will not throw.</para></throws>
         </method>
       </method-group>
     </class>
@@ -374,8 +379,8 @@
           <default>group_compare_type()</default>
         </parameter>
 
-        <effects><simpara>Initializes the base class with the given combiner
-        and comparison objects.</simpara></effects>
+        <effects><para>Initializes the base class with the given combiner
+        and comparison objects.</para></effects>
       </constructor>
     </class>
   </namespace>

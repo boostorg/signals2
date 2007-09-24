@@ -78,8 +78,8 @@
                 <classname>boost::signalslib::shared_connection_block</classname> object.
               </para>
             </description>
-            <returns><simpara><code>true</code> if the associated slot is either disconnected or blocked, <code>false</code> otherwise.</simpara></returns>
-            <throws><simpara>Will not throw.</simpara></throws>
+            <returns><para><code>true</code> if the associated slot is either disconnected or blocked, <code>false</code> otherwise.</para></returns>
+            <throws><para>Will not throw.</para></throws>
           </method>
         </method-group>
 

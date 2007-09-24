@@ -5,16 +5,18 @@
   <using-namespace name="boost"/>
   <namespace name="boost">
     <class name="postconstructible">
-      <destructor specifiers="[protected] virtual"/>
-      <method name="postconstruct" specifiers="[protected] virtual">
-        <type>void</type>
-        <notes><para>Override <code>postconstruct()</code> with your class's post-constructor.
-        It will be called automatically if you manage your objects with <code>shared_ptr</code>s
-        created with <functionname>deconstruct_ptr()</functionname>.
-        </para></notes>
-      </method>
       <purpose>A base class for classes with postconstructors, used in conjunction with <functionname>deconstruct_ptr</functionname>().
       </purpose>
+      <access name="protected">
+        <destructor specifiers="virtual"/>
+        <method name="postconstruct" specifiers="virtual">
+          <type>void</type>
+          <notes><para>Override <code>postconstruct()</code> with your class's post-constructor.
+          It will be called automatically if you manage your objects with <code>shared_ptr</code>s
+          created with <functionname>deconstruct_ptr()</functionname>.
+          </para></notes>
+        </method>
+      </access>
     </class>
   </namespace>
 </header>

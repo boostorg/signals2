@@ -5,17 +5,21 @@
   <using-namespace name="boost"/>
   <namespace name="boost">
     <class name="predestructible">
-      <destructor specifiers="[protected] virtual"/>
-      <method name="predestruct" specifiers="virtual">
-        <type>void</type>
-        <notes><para>Override <code>predestruct()</code> with your class' pre-destructor.
-          It will be called automatically if you manage your objects with <code>shared_ptr</code>s
-          that use <classname>predestructing_deleter</classname> as their deleter, such as
-          those created with <functionname>deconstruct_ptr()</functionname></para>
-        </notes>
-      </method>
       <purpose>A base class for classes with predestructors, used in conjunction with <functionname>deconstruct_ptr</functionname>().
       </purpose>
+      <access name="protected">
+        <destructor specifiers="virtual"/>
+      </access>
+      <access name="public">
+        <method name="predestruct" specifiers="virtual">
+          <type>void</type>
+          <notes><para>Override <code>predestruct()</code> with your class' pre-destructor.
+            It will be called automatically if you manage your objects with <code>shared_ptr</code>s
+            that use <classname>predestructing_deleter</classname> as their deleter, such as
+            those created with <functionname>deconstruct_ptr()</functionname></para>
+          </notes>
+        </method>
+      </access>
     </class>
   </namespace>
 </header>
