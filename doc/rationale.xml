@@ -5,65 +5,8 @@
   <title>Design Rationale</title>
 
   <using-namespace name="boost"/>
-  <using-namespace name="boost::signals"/>
+  <using-namespace name="boost::signalslib"/>
   <using-class name="boost::signalN"/>
-
-  <section>
-    <title>Choice of Slot Definitions</title> 
-
-    <para> The definition of a slot differs amongst signals and slots
-    libraries. Within Boost.Signals, a slot is defined in a very loose
-    manner: it can be any function object that is callable given
-    parameters of the types specified by the signal, and whose return
-    value is convertible to the result type expected by the
-    signal. However, alternative definitions have associated pros and
-    cons that were considered prior to the construction of
-    Boost.Signals.</para>
-
-    <itemizedlist>
-      <listitem>
-        <para><emphasis role="bold">Slots derive from a specific base
-        class</emphasis>: generally a scheme such as this will require
-        all user-defined slots to derive from some library-specified
-        <code>Slot</code> abstract class that defines a virtual
-        function calling the slot. Adaptors can be used to convert a
-        definition such as this to a definition similar to that used
-        by Boost.Signals, but the use of a large number of small
-        adaptor classes containing virtual functions has been found to
-        cause an unacceptable increase in the size of executables
-        (polymorphic class types require more code than
-        non-polymorphic types).</para>
-
-        <para> This approach does have the benefit of simplicity of
-        implementation and user interface, from an object-oriented
-        perspective.</para>
-      </listitem>
-
-      <listitem>
-        <para><emphasis role="bold">Slots constructed from a set of
-        primitives</emphasis>: in this scheme the slot can have a
-        limited set of types (often derived from a common abstract
-        base class) that are constructed from some library-defined set
-        of primitives that often include conversions from free
-        function pointers and member function pointers, and a limited
-        set of binding capabilities. Such an approach is reasonably
-        simple and cover most common cases, but it does not allow a
-        large degree of flexibility in slot construction. Libraries
-        for function object composition have become quite advanced and
-        it is out of the scope of a signals and slots library to
-        encorporate such enhancements. Thus Boost.Signals does not
-        include argument binding or function object composition
-        primitives, but instead provides a hook (via the
-        <code><functionname>visit_each</functionname></code>
-        mechanism) that allows existing binder/composition libraries
-        to provide the necessary information to Signals.</para>
-      </listitem>
-    </itemizedlist>
-
-    <para> Users not satisfied with the slot definition choice may opt
-    to replace the default slot function type with an alternative that
-    meets their specific needs.</para>
-  </section>
 
   <section>
     <title>User-level Connection Management</title>
@@ -96,7 +39,7 @@
         existing slot we would need to be able to compare arbitrary
         function objects, which is not feasible.</para>
       </listitem>
-      
+
       <listitem>
         <para><emphasis role="bold">Pass a token to
         disconnect</emphasis>: this approach identifies slots with a
@@ -115,7 +58,7 @@
             implementation, their detection is generally
             nontrivial.</para>
           </listitem>
-          
+
           <listitem>
             <para>Tokens must be unique, otherwise two slots will have
             the same name and will be indistinguishable. In
@@ -140,6 +83,41 @@
         connection management scheme.</para>
       </listitem>
     </itemizedlist>
+  </section>
+
+  <section>
+    <title>Automatic Connection Management</title>
+
+    <para>Automatic connection management in thread_safe_signals
+      depends on the use of <classname>boost::shared_ptr</classname> to
+      manage the lifetimes of tracked objects.  This is differs from
+      the original Boost.Signals library, which instead relied on derivation
+      from the <code><classname>boost::trackable</classname></code> class.
+      The Boost.Signals library would be
+      notified of an object's destruction by the
+      <code><classname>trackable</classname></code> destructor.
+    </para>
+    <para>Unfortunately, the <code><classname>trackable</classname></code>
+      scheme cannot be made thread safe due
+      to destructor ordering.  The destructor of an class derived from
+      <code><classname>trackable</classname></code> will always be
+      called before the destructor of the base <code><classname>trackable</classname></code>
+      class.  However, for thread-safety the connection between the signal and object
+      needs to be disconnected before the object runs its destructors.
+      Otherwise, if an object being destroyed
+      in one thread is connected to a signal concurrently
+      invoking in another thread, the signal may call into
+      a partially destroyed object.
+    </para>
+    <para>We solve this problem by requiring that tracked objects be
+      managed by <classname>shared_ptr</classname>.  Slots keep a
+      <classname>weak_ptr</classname> to every object the slot depends
+      on.  Connections to a slot are disconnected when any of its tracked
+      <classname>weak_ptr</classname>s expire.  Additionally, signals
+      create their own temporary <classname>shared_ptr</classname>s to
+      all of a slot's tracked objects prior to invoking the slot.  This
+      insures none of the tracked objects from destruct in mid-invocation.
+    </para>
   </section>
 
   <section>
@@ -231,15 +209,15 @@ struct push_max {
     return true;
   }
 
-  int get_value() const 
-  { 
+  int get_value() const
+  {
     if (!got_first)
       throw std::runtime_error("Empty!");
-    return max_value; 
+    return max_value;
   }
 
 private:
-  int  max_value; 
+  int  max_value;
   bool got_first;
 };
 </programlisting>
@@ -326,69 +304,13 @@ private:
       </listitem>
     </itemizedlist>
   </section>
-    
-  <section>
-    <title><code>trackable</code> rationale</title>
-
-    <para> The <code><classname>trackable</classname></code>
-      class is the primary user interface to automatic connection
-      lifetime management, and its design affects users directly. Two
-      issues stick out most: the odd copying behavior of
-      <code>trackable</code>, and the limitation requiring users to
-      derive from <code>trackable</code> to create types that can
-      participate in automatic connection management.</para>
-
-    <section>
-      <title><code>trackable</code> copying behavior</title>
-
-      <para> The copying behavior of
-      <code><classname>trackable</classname></code> is essentially
-      that <code><classname>trackable</classname></code> subobjects
-      are never copied; instead, the copy operation is merely a
-      no-op. To understand this, we look at the nature of a
-      signal-slot connection and note that the connection is based on
-      the entities that are being connected; when one of the entities
-      is destroyed, the connection is destroyed. Therefore, when a
-      <code><classname>trackable</classname></code> subobject is
-      copied, we cannot copy the connections because the connections
-      don't refer to the target entity - they refer to the source
-      entity. This reason is dual to the reason signals are
-      noncopyable: the slots connected to them are connected to that
-      particular signal, not the data contained in the signal.</para>
-    </section>
-
-    <section>
-      <title>Why derivation from <code>trackable</code>?</title>
-
-      <para> For <code><classname>trackable</classname></code> to work
-      properly, there are two constraints:</para>
-
-      <itemizedlist>
-        <listitem>
-          <para><code><classname>trackable</classname></code> must
-          have storage space to keep track of all connections made to
-          this object.</para>
-        </listitem>
-
-        <listitem>
-          <para><code><classname>trackable</classname></code> must be
-          notified when the object is being destructed so that it can
-          disconnect its connections.</para>
-        </listitem>
-      </itemizedlist>
-
-      <para>Clearly, deriving from
-      <code><classname>trackable</classname></code> meets these two
-      guidelines. We have not yet found a superior solution.</para>
-    </section>
-  </section>
 
   <section>
     <title>Comparison with other Signal/Slot implementations</title>
 
     <section>
       <title>libsigc++</title>
-      
+
       <para> <ulink
       url="http://libsigc.sourceforge.net">libsigc++</ulink> is a C++
       signals &amp; slots library that originally started as part of
@@ -399,7 +321,7 @@ private:
       indeed Boost.Signals was strongly influenced by Karl Nelson and
       libsigc++. A cursory inspection of each library will find a
       similar syntax for the construction of signals and in the use of
-      connections and automatic connection lifetime management. There
+      connections. There
       are some major differences in design that separate these
       libraries:</para>
 
@@ -411,9 +333,7 @@ private:
           objects (as part of the library), explicit adaptation from
           the argument and return types of the signal to the argument
           and return types of the slot (libsigc++ is, by default, more
-          strict about types than Boost.Signals). A discussion of this
-          approach with a comparison against the approach taken by
-          Boost.Signals is given in Choice of Slot Definitions.</para>
+          strict about types than Boost.Signals).</para>
         </listitem>
 
         <listitem>
