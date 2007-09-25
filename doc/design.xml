@@ -8,33 +8,6 @@
   <using-namespace name="boost::signals"/>
 
   <section>
-    <title><code>connection</code> class</title>
-
-    <para> The <code><classname>connection</classname></code> class is
-    central to the behavior of the Boost.Signals library. It is the
-    only entity within the Boost.Signals system that has knowledge of
-    all objects that are associated by a given connection. To be
-    specific, the <code><classname>connection</classname></code> class
-    itself is merely a thin wrapper over a
-    <code><classname>shared_ptr</classname></code> to a
-    <code>basic_connection</code> object.</para>
-
-    <para> <code><classname>connection</classname></code> objects are
-    stored by all participants in the Signals system: each
-    <code><classname>trackable</classname></code> object contains a
-    list of <code><classname>connection</classname></code> objects
-    describing all connections it is a part of; similarly, all signals
-    contain a set of pairs that define a slot. The pairs consist of a
-    slot function object (generally a Boost.Function object) and a
-    <code><classname>connection</classname></code> object (that will
-    disconnect on destruction). Finally, the mapping from slot groups
-    to slots is based on the key value in a
-    <code><classname>std::multimap</classname></code> (the stored data
-    in the <code><classname>std::multimap</classname></code> is the
-    slot pair).</para>
-  </section>
-
-  <section>
     <title>Slot Call Iterator</title>
 
     <para> The slot call iterator is conceptually a stack of iterator
