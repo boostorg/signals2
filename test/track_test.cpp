@@ -1,5 +1,6 @@
 // Boost.Signals library
 
+// Copyright Douglas Gregor 2001-2006
 // Copyright Frank Mori Hess 2007
 // Use, modification and
 // distribution is subject to the Boost Software License, Version
