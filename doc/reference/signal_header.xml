@@ -134,8 +134,8 @@
           </signature>
 
           <effects><para>Connects the signal this to the incoming
-          slot. If the slot is inactive, i.e., any of the trackable
-          objects bound by the slot call have been destroyed, then the
+          slot. If the slot is inactive, i.e., any of the slots's tracked
+          objects have been destroyed, then the
           call to connect is a no-op. If the second version of
           <computeroutput>connect</computeroutput> is invoked, the
           slot is associated with the given group. The <code>at</code>
