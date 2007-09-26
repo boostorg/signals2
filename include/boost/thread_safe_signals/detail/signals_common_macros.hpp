@@ -1,20 +1,7 @@
 /*
-	Template for Signa1, Signal2, ... classes that support signals
-	with 1, 2, ... parameters
-
-	Author: Frank Hess <frank.hess@nist.gov>
+	Author: Frank Mori Hess <fmhess@users.sourceforge.net>
 	Begin: 2007-01-23
 */
-/* This software was developed at the National Institute of Standards and
- * Technology by employees of the Federal Government in the course of
- * their official duties. Pursuant to title 17 Section 105 of the United
- * States Code this software is not subject to copyright protection and is
- * in the public domain. This is an experimental system. NIST assumes no
- * responsibility whatsoever for its use by other parties, and makes no
- * guarantees, expressed or implied, about its quality, reliability, or
- * any other characteristic. We would appreciate acknowledgement if the
- * software is used.
- */
 // Use, modification and
 // distribution is subject to the Boost Software License, Version
 // 1.0. (See accompanying file LICENSE_1_0.txt or copy at
