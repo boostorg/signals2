@@ -679,13 +679,13 @@ returns a connection object, which can be used to determine if the
 connection still exists or to disconnect the signal and slot.</para>
 <programlisting>
 boost::signalslib::connection c = sig.<methodname>connect</methodname>(HelloWorld());
-if (c.<methodname>connected</methodname>()) {
+if (c.<methodname alt="connection::connected">connected</methodname>()) {
 <emphasis>// c is still connected to the signal</emphasis>
   sig(); <emphasis>// Prints "Hello, World!"</emphasis>
 }
 
-c.disconnect(); <emphasis>// Disconnect the HelloWorld object</emphasis>
-assert(!c.<methodname>connected</methodname>()); <emphasis>c isn't connected any more</emphasis>
+c.<methodname alt="connection::disconnect">disconnect</methodname>(); <emphasis>// Disconnect the HelloWorld object</emphasis>
+assert(!c.<methodname alt="connection::connected">connected</methodname>()); <emphasis>// c isn't connected any more</emphasis>
 
 sig(); <emphasis>// Does nothing: there are no connected slots</emphasis>
 </programlisting>
@@ -710,7 +710,7 @@ sig(); <emphasis>// Prints "Hello, World!"</emphasis>
 
 {
   boost::signalslib::shared_connection_block block(c); <emphasis>// block the slot</emphasis>
-  assert(c.<methodname>blocked</methodname>());
+  assert(c.<methodname alt="connection::blocked">blocked</methodname>());
   sig(); <emphasis>// No output: the slot is blocked</emphasis>
 } <emphasis>// shared_connection_block going out of scope unblocks the slot</emphasis>
 sig(); <emphasis>// Prints "Hello, World!"</emphasis>
@@ -1144,7 +1144,7 @@ public:
 <section>
   <title>Linking against the Signals library</title>
   <para>The thread_safe_signals version of Boost.Signals is currently a header-only library.
-  However, if you use the <classname>boost::signalslib::multithreaded</classname> class as
+  However, if you use the <classname>boost::signalslib::multi_threaded</classname> class as
   the ThreadingModel template parameter for your signals, you will have to link to the
   Boost.threads library, libboost_thread.
   .

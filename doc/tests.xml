@@ -6,7 +6,7 @@
     <lib>../../../libs/test/build/boost_test_exec_monitor</lib>
     <lib>../build/boost_signals</lib>
     <purpose>
-<para>Ensure that calling <methodname>connect</methodname> with a slot
+<para>Ensure that calling <methodname alt="boost::signalN::connect">connect</methodname> with a slot
 that has already expired does not actually
 connect to the slot.</para>
     </purpose>

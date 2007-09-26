@@ -42,9 +42,13 @@
         <type>void</type>
         <parameter name="pointer"><paramtype>const T *</paramtype>
         </parameter>
-        <effects><para>Calls <code>pointer-><methodname>predestruct</methodname>()</code> if <code>T</code> is derived from
-        <classname>predestructible</classname>.  Then <code>pointer</code> is deleted using
-        <functionname>checked_delete</functionname>.</para></effects>
+        <effects>
+          <para>Calls <code>pointer-><methodname alt="predestructible::predestruct">predestruct</methodname>()</code>
+            if <code>T</code> is derived from
+            <classname>predestructible</classname>.  Then <code>pointer</code> is deleted using
+            <functionname>checked_delete</functionname>.
+          </para>
+        </effects>
       </method>
       <purpose>Predestruct object if it is predestructible, then delete.
       </purpose>

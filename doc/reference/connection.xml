@@ -173,7 +173,7 @@
 
         <destructor>
           <effects><para>If
-          <computeroutput>this-&gt;<methodname>connected</methodname>()</computeroutput>,
+          <computeroutput>this-&gt;<methodname alt="connection::connected">connected</methodname>()</computeroutput>,
           disconnects the signal-slot connection.</para></effects>
         </destructor>
 

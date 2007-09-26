@@ -5,6 +5,7 @@
   <using-namespace name="boost"/>
   <using-namespace name="boost::signalslib"/>
   <using-class name="boost::signalN"/>
+  <using-class name="boost::signalslib::slot_base"/>
   <namespace name="boost">
     <class name="slotN">
       <template>
