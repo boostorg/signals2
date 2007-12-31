@@ -172,7 +172,7 @@ namespace boost
       }
       void swap(connection &other)
       {
-        swap(_weakConnectionBody, other._weakConnectionBody);
+        boost::swap(_weakConnectionBody, other._weakConnectionBody);
       }
     private:
 
