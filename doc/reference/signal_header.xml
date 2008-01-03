@@ -353,7 +353,9 @@
         </template-type-parameter>
       </template>
 
-      <inherit access="public"><classname>signalN</classname>&lt;R, T1, T2, ..., TN, Combiner, Group, GroupCompare, SlotFunction, ThreadingModel&gt;</inherit>
+      <inherit access="public">
+        <type><classname>signalN</classname>&lt;R, T1, T2, ..., TN, Combiner, Group, GroupCompare, SlotFunction, ThreadingModel&gt;</type>
+      </inherit>
       <purpose>Safe multicast callback.</purpose>
 
       <description>
