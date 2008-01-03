@@ -4,6 +4,9 @@
 <section last-revision="$Date: 2007-06-12 14:01:23 -0400 (Tue, 12 Jun 2007) $">
   <title>Frequently Asked Questions</title>
 
+  <using-namespace name="boost"/>
+  <using-namespace name="boost::signalslib"/>
+
   <qandaset>
     <qandaentry>
       <question>
@@ -68,6 +71,75 @@ INCLUDEPATH += . /usr/local/include/thread_safe_signals /usr/local/include/boost
         complete examples and a survey of the strengths of the two
         systems.</para>
 
+      </answer>
+    </qandaentry>
+    <qandaentry>
+      <question><para>How has the API changed from Boost.Signals version 1.34?</para></question>
+      <answer>
+        <para>In summary, the following changes have been made to the signals API:</para>
+        <itemizedlist>
+          <listitem>
+            <para>
+              Automatic connection management is achieved through the use of <classname>shared_ptr</classname>/<classname>weak_ptr</classname>
+              and <methodname alt="slotN::track">slot::track</methodname>(), as opposed to the old <code>boost::trackable</code>
+              base class.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              The <classname>slot</classname> class takes a new <code>Signature</code> template parameter,
+              is useable as a function object, and is generally more featureful.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              The <classname>last_value</classname> combiner throws an exception instead of producing undefined
+              behavior when used with no slots connected (except for its specializations which do require any
+              slots to be connected).  An additional specialization
+              last_value&lt;<classname>optional</classname>&lt;T&gt;&nbsp;&gt; (which does not throw) has been added.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              The <classname>signal</classname> class has an additional template parameter for specifying
+              the threading model.
+            </para>
+            <para>The <code>signal::combiner()</code> method, which formerly returned a reference to the
+              signal's combiner has been replaced by <methodname alt="signalN::combiner">signal::combiner</methodname>
+              (which now returns the combiner by value) and <methodname alt="signalN::set_combiner">signal::set_combiner</methodname>.
+            </para>
+          </listitem>
+          <listitem>
+            <para>User-defined combiners are now expected to handle the possibility of a slot throwing an
+              <classname>expired_slot</classname> exception due to automatic disconnection.
+            </para>
+          </listitem>
+          <listitem>
+            <para><code>boost::visit_each</code>, which was used to find <code>boost::trackable</code> objects,
+              is gone.
+            </para>
+          </listitem>
+          <listitem>
+            <para>Connections no longer have <code>block()</code> and <code>unblock()</code> methods.  Blocking
+              of connections is now accomplished by creating <classname>shared_connection_block</classname> objects.
+            </para>
+          </listitem>
+          <listitem>
+            <para>Support for postconstructors (and predestructors) on objects managed by <classname>shared_ptr</classname>
+              has been added with
+              <functionname>deconstruct_ptr</functionname>, <classname>postconstructible</classname>,
+              and <classname>predestructible</classname>.  This was motivated by the importance of
+              <code>shared_ptr</code> for the new connection tracking scheme, and the
+              inability to obtain a <code>shared_ptr</code> to an object in its constructor.
+            </para>
+          </listitem>
+          <listitem>
+            <para>The namespace <code>boost::signals</code> has been renamed <code>boost::signalslib</code>
+              to avoid conflict with Qt's signal macro.  For backward compatibility, a <code>boost::signals</code>
+              namespace alias is provided.
+            </para>
+          </listitem>
+        </itemizedlist>
       </answer>
     </qandaentry>
   </qandaset>
