@@ -376,7 +376,7 @@ namespace boost
   }
 
   template<BOOST_SIGNAL_TEMPLATE_DEFAULTED_DECL>
-  class BOOST_SIGNAL_CLASS_NAME: public signalslib::detail::signal_base
+  class BOOST_SIGNAL_CLASS_NAME: public signalslib::signal_base
   {
   public:
     typedef signalslib::detail::BOOST_WEAK_SIGNAL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION> weak_signal_type;

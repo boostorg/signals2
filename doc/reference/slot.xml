@@ -189,14 +189,28 @@
           </signature>
           <signature>
             <type>slotN &amp;</type>
-            <parameter name="tracked_slot">
-              <paramtype>const signalslib::slot_base &amp;</paramtype>
+            <parameter name="tracked_signal">
+              <paramtype>const <classname>signalslib::signal_base</classname> &amp;</paramtype>
             </parameter>
           </signature>
-          <effects><para>Adds object(s) to the slot's tracked object list.  Should any of the
-            tracked objects expire, then subsequent attempts to call the slot's <code>operator()</code>
-            or <code>lock()</code> methods will throw an <classname>expired_slot</classname> exception.</para>
-            <para>In the case of passing another slot as the argument to <code>track()</code>,
+          <signature>
+            <type>slotN &amp;</type>
+            <parameter name="tracked_slot">
+              <paramtype>const <classname>signalslib::slot_base</classname> &amp;</paramtype>
+            </parameter>
+          </signature>
+          <effects>
+            <para>
+              Adds object(s) to the slot's tracked object list.  Should any of the
+              tracked objects expire, then subsequent attempts to call the slot's <code>operator()</code>
+              or <code>lock()</code> methods will throw an <classname>expired_slot</classname> exception.
+            </para>
+            <para>When tracking a signal, a <classname>shared_ptr</classname>
+              internal to the signal class is used for tracking.  The signal does not
+              need to be owned by an external <code>shared_ptr</code>.
+            </para>
+            <para>
+              In the case of passing another slot as the argument to <code>track()</code>,
               only the objects currently in the other slot's tracked object list are added
               to the tracked object list of <code>this</code>.  The other slot object itself
               is not tracked.

@@ -14,7 +14,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
-#include <boost/thread_safe_signals/detail/signal_base.hpp>
+#include <boost/thread_safe_signals/signal_base.hpp>
 #include <vector>
 
 #ifdef BOOST_HAS_ABI_HEADERS
@@ -68,7 +68,7 @@ namespace boost
         return false;
       }
     protected:
-      void track_signal(const signalslib::detail::signal_base &signal)
+      void track_signal(const signalslib::signal_base &signal)
       {
         _trackedObjects.push_back(signal.lock_pimpl());
       }

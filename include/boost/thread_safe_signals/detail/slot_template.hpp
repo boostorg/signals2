@@ -92,6 +92,11 @@ namespace boost
       _trackedObjects.push_back(tracked);
       return *this;
     }
+    BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)& track(const signalslib::signal_base &signal)
+    {
+      track_signal(signal); 
+      return *this;
+    }
     BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)& track(const signalslib::slot_base &slot)
     {
       tracked_container_type::const_iterator it;

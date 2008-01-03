@@ -2,6 +2,8 @@
 <!DOCTYPE header PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
 <header name="boost/signal.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
+  <using-namespace name="boost"/>
+  <using-namespace name="boost::signalslib"/>
   <namespace name="boost">
     <namespace name="signalslib">
       <enum name="connect_position">
@@ -32,9 +34,8 @@
           <default><classname>signalslib::auto_threaded</classname></default>
         </template-type-parameter>
       </template>
-      <inherit access="private">
-        <type><classname>noncopyable</classname></type>
-	<purpose>Exposition only</purpose>
+      <inherit access="public">
+        <type><classname>signal_base</classname></type>
       </inherit>
 
       <purpose>Set of safe multicast callback types.</purpose>

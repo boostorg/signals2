@@ -4,6 +4,7 @@
 <library-reference xmlns:xi="http://www.w3.org/2001/XInclude"
                    last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
   <xi:include href="signal_header.xml"/>
+  <xi:include href="signal_base.xml"/>
   <xi:include href="slot.xml"/>
   <xi:include href="slot_base.xml"/>
   <xi:include href="connection.xml"/>

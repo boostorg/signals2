@@ -88,7 +88,7 @@ int test_main(int, char*[])
   // Test binding of a signal as a slot
   {
     sig_type s2;
-    s1.connect(sig_type::slot_type(s2));
+    s1.connect(sig_type::slot_type(s2).track(s2));
     s2.connect(sig_type::slot_type(&myfunc, _1, 0.7));
     BOOST_CHECK(s1(4) == 4);
   }

@@ -14,7 +14,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/ref.hpp>
-#include <boost/thread_safe_signals/detail/signal_base.hpp>
+#include <boost/thread_safe_signals/signal_base.hpp>
 #include <boost/type_traits.hpp>
 
 #ifdef BOOST_HAS_ABI_HEADERS
@@ -44,7 +44,6 @@ namespace boost {
       };
 
       // Determine if the given type T is a signal
-      class signal_base;
       template<typename T>
       class is_signal: public mpl::bool_<is_convertible<T*, signal_base*>::value>
       {};

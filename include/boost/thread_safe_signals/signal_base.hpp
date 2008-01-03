@@ -19,18 +19,16 @@
 namespace boost {
   namespace signalslib {
     class slot_base;
-    namespace detail {
 
-      class signal_base : public noncopyable
-      {
-      public:
-        friend class boost::signalslib::slot_base;
+    class signal_base : public noncopyable
+    {
+    public:
+      friend class boost::signalslib::slot_base;
 
-        virtual ~signal_base() {}
-      protected:
-        virtual shared_ptr<void> lock_pimpl() const = 0;
-      };
-    } // end namespace detail
+      virtual ~signal_base() {}
+    protected:
+      virtual shared_ptr<void> lock_pimpl() const = 0;
+    };
   } // end namespace BOOST_SIGNALS_NAMESPACE
 } // end namespace boost
 
