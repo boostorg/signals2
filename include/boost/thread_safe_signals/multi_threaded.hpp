@@ -32,3 +32,4 @@ namespace boost {
 #endif
 
 #endif // BOOST_SIGNALS_MULTI_THREADED_MODEL_HEADER
+

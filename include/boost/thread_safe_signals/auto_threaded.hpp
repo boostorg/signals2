@@ -7,8 +7,8 @@
 
 // For more information, see http://www.boost.org
 
-#ifndef BOOST_SIGNALS_MULTI_THREADED_MODEL_HEADER
-#define BOOST_SIGNALS_MULTI_THREADED_MODEL_HEADER
+#ifndef BOOST_SIGNALS_AUTO_THREADED_MODEL_HEADER
+#define BOOST_SIGNALS_AUTO_THREADED_MODEL_HEADER
 
 #include <boost/detail/lightweight_mutex.hpp>
 
@@ -30,4 +30,5 @@ namespace boost {
 #  include BOOST_ABI_SUFFIX
 #endif
 
-#endif // BOOST_SIGNALS_MULTI_THREADED_MODEL_HEADER
+#endif // BOOST_SIGNALS_AUTO_THREADED_MODEL_HEADER
+

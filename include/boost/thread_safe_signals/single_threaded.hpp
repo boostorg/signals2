@@ -50,3 +50,4 @@ namespace boost {
 #endif
 
 #endif // BOOST_SIGNALS_SINGLE_THREADED_MODEL_HEADER
+
