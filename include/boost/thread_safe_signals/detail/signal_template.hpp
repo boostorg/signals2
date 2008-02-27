@@ -491,13 +491,15 @@ namespace boost
         result_type operator ()(BOOST_SIGNAL_SIGNATURE_FULL_ARGS(BOOST_SIGNALS_NUM_ARGS))
         {
           shared_ptr<signalslib::detail::BOOST_SIGNAL_IMPL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION> >
-            shared_pimpl(_weak_pimpl);
+            shared_pimpl(_weak_pimpl.lock());
+          if(shared_pimpl == 0) throw expired_slot();
           return (*shared_pimpl)(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
         }
         result_type operator ()(BOOST_SIGNAL_SIGNATURE_FULL_ARGS(BOOST_SIGNALS_NUM_ARGS)) const
         {
           shared_ptr<signalslib::detail::BOOST_SIGNAL_IMPL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION> >
-            shared_pimpl(_weak_pimpl);
+            shared_pimpl(_weak_pimpl.lock());
+          if(shared_pimpl == 0) throw expired_slot();
           return (*shared_pimpl)(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
         }
       private:
