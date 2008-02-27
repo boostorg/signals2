@@ -9,6 +9,7 @@
 
 // For more information, see http://www.boost.org
 
+#include <boost/optional.hpp>
 #include <boost/ref.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/test/minimal.hpp>
@@ -27,14 +28,25 @@ struct max_or_default {
   template<typename InputIterator>
   T operator()(InputIterator first, InputIterator last) const
   {
-    if (first == last)
-      return T();
-
-    T max = *first++;
-    for (; first != last; ++first)
-      max = (*first > max)? *first : max;
-
-    return max;
+    boost::optional<T> max;
+    for(; first != last; ++first)
+    {
+      try
+      {
+        T value = *first;
+        if(max == false)
+        {
+          max = value;
+        }else if(value > *max)
+        {
+          max = value;
+        }
+      }
+      catch(const boost::expired_slot &)
+      {}
+    }
+    if(max) return *max;
+    else return T();
   }
 };
 
@@ -88,7 +100,7 @@ int test_main(int, char*[])
   // Test binding of a signal as a slot
   {
     sig_type s2;
-    s1.connect(sig_type::slot_type(s2).track(s2));
+    s1.connect(s2);
     s2.connect(sig_type::slot_type(&myfunc, _1, 0.7));
     BOOST_CHECK(s1(4) == 4);
   }
