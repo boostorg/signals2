@@ -1,0 +1,40 @@
+// thread_safe_signals library
+// Some assorted tests to expose various bugs that existed at some point,
+// to make sure they stay fixed
+
+// Copyright Frank Mori Hess 2008
+// Use, modification and
+// distribution is subject to the Boost Software License, Version
+// 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+// For more information, see http://www.boost.org
+
+#include <boost/test/minimal.hpp>
+#include <boost/thread_safe_signal.hpp>
+
+typedef boost::signal0<void> sig0_type;
+
+void my_slot()
+{
+}
+
+void my_connecting_slot(sig0_type &sig)
+{
+	sig.connect(&my_slot);
+}
+
+void slot_connect_test()
+{
+	sig0_type sig;
+	sig.connect(sig0_type::slot_type(&my_connecting_slot, boost::ref(sig)));
+	/* 2008-02-28: the following signal invocation triggered a (bogus) failed assertion of _shared_state.unique()
+	at detail/signal_template.hpp:285 */
+	sig();
+}
+
+int test_main(int, char*[])
+{
+	slot_connect_test();
+	return 0;
+}
