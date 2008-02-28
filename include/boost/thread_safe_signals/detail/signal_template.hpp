@@ -324,8 +324,7 @@ namespace boost
         {
           if(_shared_state.unique() == false)
           {
-            shared_ptr<invocation_state> newState(new invocation_state(*_shared_state));
-            _shared_state = newState;
+            _shared_state = shared_ptr<invocation_state>(new invocation_state(*_shared_state));
             nolock_cleanup_connections(true, _shared_state->connection_bodies.begin());
           }else
           {
