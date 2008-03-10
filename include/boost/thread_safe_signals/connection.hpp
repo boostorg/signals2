@@ -191,6 +191,7 @@ namespace boost
       }
       const scoped_connection& operator=(const connection &rhs)
       {
+        disconnect();
         boost::signalslib::connection::operator=(rhs);
         return *this;
       }
