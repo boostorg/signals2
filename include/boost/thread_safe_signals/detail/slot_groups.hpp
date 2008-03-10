@@ -147,7 +147,7 @@ namespace boost {
           if(_group_key_compare(arg2, arg1)) return false;
           return true;
         }
-        void m_insert(map_iterator map_it, const group_key_type &key, const ValueType &value)
+        void m_insert(const map_iterator &map_it, const group_key_type &key, const ValueType &value)
         {
           iterator list_it = get_list_iterator(map_it);
           iterator new_it = _list.insert(list_it, value);
@@ -159,7 +159,10 @@ namespace boost {
           if(lower_bound_it == _group_map.end() ||
             weakly_equivalent(lower_bound_it->first, key) == false)
           {
-            _group_map[key] = new_it;
+            /* doing the following instead of just
+              _group_map[key] = new_it;
+              to avoid bogus error when enabling checked iterators with g++ */
+            _group_map.insert(typename map_type::value_type(key, new_it));
           }
         }
         iterator get_list_iterator(const map_iterator &map_it)
