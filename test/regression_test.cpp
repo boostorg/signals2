@@ -15,26 +15,62 @@
 
 typedef boost::signal0<void> sig0_type;
 
+// combiner that returns the number of slots invoked
+struct slot_counter {
+  typedef unsigned result_type;
+  template<typename InputIterator>
+  unsigned operator()(InputIterator first, InputIterator last) const
+  {
+    unsigned count = 0;
+    for (; first != last; ++first)
+    {
+      try
+      {
+        *first;
+        ++count;
+      }
+      catch(const boost::bad_weak_ptr &)
+      {}
+    }
+    return count;
+  }
+};
+
 void my_slot()
 {
 }
 
 void my_connecting_slot(sig0_type &sig)
 {
-	sig.connect(&my_slot);
+  sig.connect(&my_slot);
 }
 
 void slot_connect_test()
 {
-	sig0_type sig;
-	sig.connect(sig0_type::slot_type(&my_connecting_slot, boost::ref(sig)));
-	/* 2008-02-28: the following signal invocation triggered a (bogus) failed assertion of _shared_state.unique()
-	at detail/signal_template.hpp:285 */
-	sig();
+  sig0_type sig;
+  sig.connect(sig0_type::slot_type(&my_connecting_slot, boost::ref(sig)));
+  /* 2008-02-28: the following signal invocation triggered a (bogus) failed assertion of _shared_state.unique()
+  at detail/signal_template.hpp:285 */
+  sig();
+}
+
+/* 2008-03-10: we weren't disconnecting old connection in scoped_connection assignment operator */
+void scoped_connection_test()
+{
+  typedef boost::signal0<void, slot_counter> signal_type;
+  signal_type sig;
+  {
+    boost::signalslib::scoped_connection conn = sig.connect(&my_slot);
+    BOOST_CHECK(sig() == 1);
+    conn = sig.connect(&my_slot);
+    BOOST_CHECK(sig() == 1);
+  }
+  BOOST_CHECK(sig() == 0);
 }
 
 int test_main(int, char*[])
 {
-	slot_connect_test();
-	return 0;
+  slot_connect_test();
+  scoped_connection_test();
+  return 0;
 }
