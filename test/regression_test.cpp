@@ -48,10 +48,17 @@ void my_connecting_slot(sig0_type &sig)
 void slot_connect_test()
 {
   sig0_type sig;
-  sig.connect(sig0_type::slot_type(&my_connecting_slot, boost::ref(sig)));
+  sig.connect(sig0_type::slot_type(&my_connecting_slot, boost::ref(sig)).track(sig));
   /* 2008-02-28: the following signal invocation triggered a (bogus) failed assertion of _shared_state.unique()
   at detail/signal_template.hpp:285 */
   sig();
+  BOOST_CHECK(sig.num_slots() == 2);
+  sig.disconnect(&my_slot);
+  BOOST_CHECK(sig.num_slots() == 1);
+  /* 2008-03-11: checked iterator barfed on next line, due to bad semantics of copy construction
+  for boost::signalslib::detail::grouped_list */
+  sig();
+  BOOST_CHECK(sig.num_slots() == 2);
 }
 
 /* 2008-03-10: we weren't disconnecting old connection in scoped_connection assignment operator */
