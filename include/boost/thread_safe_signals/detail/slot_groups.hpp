@@ -53,14 +53,37 @@ namespace boost {
         typedef std::list<ValueType> list_type;
         typedef std::map<typename group_key<Group>::type, typename list_type::iterator> map_type;
         typedef typename map_type::iterator map_iterator;
+        typedef typename map_type::const_iterator const_map_iterator;
       public:
         typedef typename list_type::iterator iterator;
+        typedef typename list_type::const_iterator const_iterator;
         typedef typename group_key<Group>::type group_key_type;
         typedef group_key_less<Group, GroupCompare> group_key_compare_type;
 
         grouped_list(const group_key_compare_type &group_key_compare):
           _group_key_compare(group_key_compare)
         {}
+        grouped_list(const grouped_list &other): _list(other._list),
+          _group_key_compare(other._group_key_compare)
+        {
+          typename map_type::const_iterator other_map_it;
+          typename list_type::iterator this_list_it = _list.begin();
+          for(other_map_it = other._group_map.begin();
+            other_map_it != other._group_map.end();
+            ++other_map_it)
+          {
+            typename list_type::const_iterator other_list_it = other.get_list_iterator(other_map_it);
+            _group_map.insert(typename map_type::value_type(other_map_it->first, this_list_it));
+            typename map_type::const_iterator other_next_map_it = other_map_it;
+            ++other_next_map_it;
+            typename list_type::const_iterator other_next_list_it = other.get_list_iterator(other_next_map_it);
+            while(other_list_it != other_next_list_it)
+            {
+              ++other_list_it;
+              ++this_list_it;
+            }
+          }
+        }
         iterator begin()
         {
           return _list.begin();
@@ -141,6 +164,9 @@ namespace boost {
           _group_map.clear();
         }
       private:
+        /* Suppress default assignment operator, since it has the wrong semantics. */
+        grouped_list& operator=(const grouped_list &other);
+
         bool weakly_equivalent(const group_key_type &arg1, const group_key_type &arg2)
         {
           if(_group_key_compare(arg1, arg2)) return false;
@@ -165,9 +191,21 @@ namespace boost {
             _group_map.insert(typename map_type::value_type(key, new_it));
           }
         }
-        iterator get_list_iterator(const map_iterator &map_it)
+        iterator get_list_iterator(const const_map_iterator &map_it)
         {
           iterator list_it;
+          if(map_it == _group_map.end())
+          {
+            list_it = _list.end();
+          }else
+          {
+            list_it = map_it->second;
+          }
+          return list_it;
+        }
+        const_iterator get_list_iterator(const const_map_iterator &map_it) const
+        {
+          const_iterator list_it;
           if(map_it == _group_map.end())
           {
             list_it = _list.end();
