@@ -64,16 +64,19 @@ namespace boost {
           _group_key_compare(group_key_compare)
         {}
         grouped_list(const grouped_list &other): _list(other._list),
-          _group_key_compare(other._group_key_compare)
+          _group_map(other._group_map), _group_key_compare(other._group_key_compare)
         {
+          // fix up _group_map
           typename map_type::const_iterator other_map_it;
           typename list_type::iterator this_list_it = _list.begin();
+          typename map_type::iterator this_map_it = _group_map.begin();
           for(other_map_it = other._group_map.begin();
             other_map_it != other._group_map.end();
-            ++other_map_it)
+            ++other_map_it, ++this_map_it)
           {
+            BOOST_ASSERT(this_map_it != _group_map.end());
+            this_map_it->second = this_list_it;
             typename list_type::const_iterator other_list_it = other.get_list_iterator(other_map_it);
-            _group_map.insert(typename map_type::value_type(other_map_it->first, this_list_it));
             typename map_type::const_iterator other_next_map_it = other_map_it;
             ++other_next_map_it;
             typename list_type::const_iterator other_next_list_it = other.get_list_iterator(other_next_map_it);
