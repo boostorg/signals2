@@ -33,6 +33,7 @@
             connection block goes into effect concurrently with signal invocation,
             or in a single-threaded environment if a slot blocks its own
             connection.
+          </para>
         </description>
 
       <constructor>
