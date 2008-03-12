@@ -910,6 +910,14 @@ slot B that invokes signal A...). The disconnection behavior does
 not change in the recursive case, except that the slot calling
 sequence includes slot calls for all nested invocations of the
 signal.</para>
+<para>
+  Note, even after a connection is disconnected, its's associated slot
+  may still be in the process of executing.  In other words, disconnection
+  does not block waiting for the connection's associated slot to complete execution.
+  This situation may occur in a multi-threaded environment if the
+  disconnection occurs concurrently with signal invocation,
+  or in a single-threaded environment if a slot disconnects itself.
+</para>
 </section>
 
 <section><title>Passing slots (Intermediate)</title>
@@ -1147,7 +1155,6 @@ public:
   However, if you use the <classname>boost::signalslib::multi_threaded</classname> class as
   the ThreadingModel template parameter for your signals, you will have to link to the
   Boost.threads library, libboost_thread.
-  .
   </para>
 </section>
 
