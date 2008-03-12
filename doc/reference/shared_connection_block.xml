@@ -23,6 +23,16 @@
           after the <classname>connection</classname> object it was constructed
           from has been destroyed, or the connection it references has been
           disconnected.</para>
+          <para>
+            Note, blocking a connection does not guarantee the associated slot
+            has finished execution if it is already in the process of being run
+            when the connection block goes into effect.  This is similar
+            to the behaviour of disconnect, in that blocking a connection
+            will not wait for the connection's associated slot to complete execution.
+            This situation may arise in a multi-threaded environment if the
+            connection block goes into effect concurrently with signal invocation,
+            or in a single-threaded environment if a slot blocks its own
+            connection.
         </description>
 
       <constructor>
