@@ -869,7 +869,7 @@ e.g.:</para>
 boost::shared_ptr&lt;NewsMessageArea&gt; newsMessageArea(new NewsMessageArea(/* ... */));
 // ...
 deliverNews.<methodname>connect</methodname>(signal_type::slot_type(&amp;NewsMessageArea::displayNews,
-  newsMessageArea, _1).track(newsMessageArea));
+  newsMessageArea.get(), _1).track(newsMessageArea));
 </programlisting>
 <para>Note there is no explicit call to bind() needed in the above example.  If the
 <classname alt="slotN">slot</classname> constructor is passed more than one
