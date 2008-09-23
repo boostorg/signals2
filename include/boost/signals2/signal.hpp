@@ -37,10 +37,6 @@
 #include <boost/signals2/slot.hpp>
 #include <functional>
 
-#ifdef BOOST_HAS_ABI_HEADERS
-#  include BOOST_ABI_PREFIX
-#endif
-
 #define BOOST_PP_ITERATION_LIMITS (0, BOOST_SIGNALS_MAX_ARGS)
 #define BOOST_PP_FILENAME_1 <boost/signals2/detail/signal_template.hpp>
 #include BOOST_PP_ITERATE()
@@ -68,9 +64,5 @@ namespace boost
     };
   }
 }
-
-#ifdef BOOST_HAS_ABI_HEADERS
-#  include BOOST_ABI_SUFFIX
-#endif
 
 #endif	// _THREAD_SAFE_SIGNAL_HPP

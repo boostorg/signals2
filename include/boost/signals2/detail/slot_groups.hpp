@@ -17,10 +17,6 @@
 #include <map>
 #include <utility>
 
-#ifdef BOOST_HAS_ABI_HEADERS
-#  include BOOST_ABI_PREFIX
-#endif
-
 namespace boost {
   namespace signals2 {
     namespace detail {
@@ -229,9 +225,5 @@ namespace boost {
     enum connect_position { at_back, at_front };
   } // end namespace signals2
 } // end namespace boost
-
-#ifdef BOOST_HAS_ABI_HEADERS
-#  include BOOST_ABI_SUFFIX
-#endif
 
 #endif // BOOST_TSS_SLOT_GROUPS_HEADER

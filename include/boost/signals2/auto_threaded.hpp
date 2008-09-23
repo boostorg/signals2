@@ -12,10 +12,6 @@
 
 #include <boost/detail/lightweight_mutex.hpp>
 
-#ifdef BOOST_HAS_ABI_HEADERS
-#  include BOOST_ABI_PREFIX
-#endif
-
 namespace boost {
   namespace signals2 {
     class auto_threaded
@@ -25,10 +21,6 @@ namespace boost {
     };
   } // end namespace signals2
 } // end namespace boost
-
-#ifdef BOOST_HAS_ABI_HEADERS
-#  include BOOST_ABI_SUFFIX
-#endif
 
 #endif // BOOST_SIGNALS_AUTO_THREADED_MODEL_HEADER
 

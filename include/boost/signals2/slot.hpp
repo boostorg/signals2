@@ -24,10 +24,6 @@
 #include <boost/weak_ptr.hpp>
 #include <vector>
 
-#ifdef BOOST_HAS_ABI_HEADERS
-#  include BOOST_ABI_PREFIX
-#endif
-
 namespace boost
 {
   namespace signals2
@@ -103,9 +99,5 @@ namespace boost
     };
   } // namespace signals2
 }
-
-#ifdef BOOST_HAS_ABI_HEADERS
-#  include BOOST_ABI_SUFFIX
-#endif
 
 #endif // BOOST_SIGNALS_SLOT_HEADER

@@ -17,10 +17,6 @@
 #include <boost/signals2/signal_base.hpp>
 #include <boost/type_traits.hpp>
 
-#ifdef BOOST_HAS_ABI_HEADERS
-#  include BOOST_ABI_PREFIX
-#endif
-
 namespace boost {
   namespace signals2 {
     namespace detail {
@@ -68,9 +64,5 @@ namespace boost {
     } // end namespace detail
   } // end namespace signals2
 } // end namespace boost
-
-#ifdef BOOST_HAS_ABI_HEADERS
-#  include BOOST_ABI_SUFFIX
-#endif
 
 #endif // BOOST_TSS_SIGNALS_COMMON_HEADER
