@@ -9,10 +9,10 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/test/minimal.hpp>
-#include <boost/thread_safe_signal.hpp>
+#include <boost/signals2.hpp>
 #include <boost/bind.hpp>
 
-typedef boost::signal1<int, int> sig_type;
+typedef boost::signals2::signal1<int, int> sig_type;
 
 class with_constant {
 public:
@@ -31,7 +31,7 @@ void do_delayed_connect(boost::shared_ptr<with_constant> &wc,
   // Should invalidate the slot, so that we cannot connect to it
   wc.reset();
 
-  boost::BOOST_SIGNALS_NAMESPACE::connection c = sig.connect(slot);
+  boost::signals2::connection c = sig.connect(slot);
   BOOST_CHECK(!c.connected());
 }
 

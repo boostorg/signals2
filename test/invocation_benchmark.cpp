@@ -1,10 +1,10 @@
 #include <cstdlib>
 #include <iostream>
 #include <boost/bind.hpp>
-#include <boost/thread_safe_signal.hpp>
+#include <boost/signals2.hpp>
 #include <boost/thread/thread.hpp>
 
-typedef boost::signal<void ()> signal_type;
+typedef boost::signals2::signal<void ()> signal_type;
 
 void myslot()
 {

@@ -1,6 +1,7 @@
-// Boost.Signals library
+// Boost.Signals2 library
 
-// Copyright Douglas Gregor 2001-2003. Use, modification and
+// Copyright Douglas Gregor 2001-2003.
+// Use, modification and
 // distribution is subject to the Boost Software License, Version
 // 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -8,11 +9,11 @@
 // For more information, see http://www.boost.org
 
 #include <boost/test/minimal.hpp>
-#include <boost/thread_safe_signal.hpp>
+#include <boost/signals2.hpp>
 #include <iostream>
 #include <string>
 
-static boost::BOOST_SIGNALS_NAMESPACE::connection connections[5];
+static boost::signals2::connection connections[5];
 
 static std::string test_output;
 
@@ -39,7 +40,7 @@ bool operator==(const remove_connection& x, const remove_connection& y)
 static void
 test_remove_self()
 {
-  boost::signal0<void> s0;
+  boost::signals2::signal0<void> s0;
 
   connections[0] = s0.connect(remove_connection(0));
   connections[1] = s0.connect(remove_connection(1));
@@ -95,7 +96,7 @@ test_remove_self()
   std::cout << "Blocking 2" << std::endl;
 
   {
-    boost::BOOST_SIGNALS_NAMESPACE::shared_connection_block block(connections[2]);
+    boost::signals2::shared_connection_block block(connections[2]);
     test_output = "";
     s0(); std::cout << std::endl;
     BOOST_CHECK(test_output == "13");
@@ -129,7 +130,7 @@ test_remove_self()
 static void
 test_remove_prior()
 {
-  boost::signal0<void> s0;
+  boost::signals2::signal0<void> s0;
 
   connections[0] = s0.connect(remove_connection(0));
   connections[1] = s0.connect(remove_connection(1, 0));
@@ -168,7 +169,7 @@ test_remove_prior()
 static void
 test_remove_after()
 {
-  boost::signal0<void> s0;
+  boost::signals2::signal0<void> s0;
 
   connections[0] = s0.connect(remove_connection(0, 1));
   connections[1] = s0.connect(remove_connection(1));
@@ -207,7 +208,7 @@ test_remove_after()
 static void
 test_bloodbath()
 {
-  boost::signal0<void> s0;
+  boost::signals2::signal0<void> s0;
 
   connections[0] = s0.connect(remove_connection(0, 1));
   connections[1] = s0.connect(remove_connection(1, 1));
@@ -228,7 +229,7 @@ test_bloodbath()
 static void
 test_disconnect_equal()
 {
-  boost::signal0<void> s0;
+  boost::signals2::signal0<void> s0;
 
   connections[0] = s0.connect(remove_connection(0));
   connections[1] = s0.connect(remove_connection(1));

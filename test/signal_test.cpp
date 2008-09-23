@@ -9,7 +9,7 @@
 
 #include <boost/optional.hpp>
 #include <boost/test/minimal.hpp>
-#include <boost/thread_safe_signal.hpp>
+#include <boost/signals2.hpp>
 #include <functional>
 #include <iostream>
 
@@ -65,13 +65,13 @@ test_zero_args()
   make_int i62(62, 61);
 
   {
-    boost::signal<int (), max_or_default<int> > s0;
+    boost::signals2::signal<int (), max_or_default<int> > s0;
 
     std::cout << "sizeof(signal) = " << sizeof(s0) << std::endl;
-    boost::BOOST_SIGNALS_NAMESPACE::connection c2 = s0.connect(i2);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c72 = s0.connect(72, i72);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c62 = s0.connect(60, i62);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c42 = s0.connect(i42);
+    boost::signals2::connection c2 = s0.connect(i2);
+    boost::signals2::connection c72 = s0.connect(72, i72);
+    boost::signals2::connection c62 = s0.connect(60, i62);
+    boost::signals2::connection c42 = s0.connect(i42);
 
     BOOST_CHECK(s0() == 72);
 
@@ -100,13 +100,13 @@ test_zero_args()
   }
 
   {
-    boost::signal<int (), max_or_default<int> > s0;
-    boost::BOOST_SIGNALS_NAMESPACE::connection c2 = s0.connect(i2);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c72 = s0.connect(i72);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c62 = s0.connect(i62);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c42 = s0.connect(i42);
+    boost::signals2::signal<int (), max_or_default<int> > s0;
+    boost::signals2::connection c2 = s0.connect(i2);
+    boost::signals2::connection c72 = s0.connect(i72);
+    boost::signals2::connection c62 = s0.connect(i62);
+    boost::signals2::connection c42 = s0.connect(i42);
 
-    const boost::signal<int (), max_or_default<int> >& cs0 = s0;
+    const boost::signals2::signal<int (), max_or_default<int> >& cs0 = s0;
     BOOST_CHECK(cs0() == 72);
   }
 
@@ -114,9 +114,9 @@ test_zero_args()
     make_increasing_int<7> i7;
     make_increasing_int<10> i10;
 
-    boost::signal<int (), max_or_default<int> > s0;
-    boost::BOOST_SIGNALS_NAMESPACE::connection c7 = s0.connect(i7);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c10 = s0.connect(i10);
+    boost::signals2::signal<int (), max_or_default<int> > s0;
+    boost::signals2::connection c7 = s0.connect(i7);
+    boost::signals2::connection c10 = s0.connect(i10);
 
     BOOST_CHECK(s0() == 10);
     BOOST_CHECK(s0() == 11);
@@ -126,7 +126,7 @@ test_zero_args()
 static void
 test_one_arg()
 {
-  boost::signal<int (int value), max_or_default<int> > s1;
+  boost::signals2::signal<int (int value), max_or_default<int> > s1;
 
   s1.connect(std::negate<int>());
   s1.connect(std::bind1st(std::multiplies<int>(), 2));
@@ -138,7 +138,7 @@ test_one_arg()
 static void
 test_signal_signal_connect()
 {
-  typedef boost::signal<int (int value), max_or_default<int> > signal_type;
+  typedef boost::signals2::signal<int (int value), max_or_default<int> > signal_type;
   signal_type s1;
 
   s1.connect(std::negate<int>());

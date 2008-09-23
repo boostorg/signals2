@@ -13,7 +13,7 @@
 #include <boost/ref.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/test/minimal.hpp>
-#include <boost/thread_safe_signal.hpp>
+#include <boost/signals2.hpp>
 #include <boost/bind.hpp>
 
 struct swallow {
@@ -42,7 +42,7 @@ struct max_or_default {
           max = value;
         }
       }
-      catch(const boost::expired_slot &)
+      catch(const boost::signals2::expired_slot &)
       {}
     }
     if(max) return *max;
@@ -58,9 +58,9 @@ static int myfunc(int i, double z)
 
 int test_main(int, char*[])
 {
-  typedef boost::signal1<int, int, max_or_default<int> > sig_type;
+  typedef boost::signals2::signal1<int, int, max_or_default<int> > sig_type;
   sig_type s1;
-  boost::signalslib::connection connection;
+  boost::signals2::connection connection;
 
   // Test auto-disconnection
   BOOST_CHECK(s1(5) == 0);
@@ -89,7 +89,7 @@ int test_main(int, char*[])
   // Test binding of a slot to another slot
   {
     boost::shared_ptr<int> shorty(new int(2));
-    boost::slot<int (double)> other_slot(&myfunc, boost::cref(*shorty.get()), _1);
+    boost::signals2::slot<int (double)> other_slot(&myfunc, boost::cref(*shorty.get()), _1);
     other_slot.track(shorty);
     connection = s1.connect(sig_type::slot_type(other_slot, 0.5).track(other_slot));
     BOOST_CHECK(s1(3) == 2);

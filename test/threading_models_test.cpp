@@ -10,9 +10,9 @@
 // For more information, see http://www.boost.org
 
 #include <boost/test/minimal.hpp>
-#include <boost/thread_safe_signal.hpp>
-#include <boost/thread_safe_signals/multi_threaded.hpp>
-#include <boost/thread_safe_signals/single_threaded.hpp>
+#include <boost/signals2.hpp>
+#include <boost/signals2/multi_threaded.hpp>
+#include <boost/signals2/single_threaded.hpp>
 
 // combiner that returns the number of slots invoked
 struct slot_counter {
@@ -52,11 +52,11 @@ void simple_test()
 
 int test_main(int, char*[])
 {
-  typedef boost::signal<void (), slot_counter, int, std::less<int>, boost::function<void ()>,
-    boost::signalslib::multi_threaded> sig0_mt_type;
+  typedef boost::signals2::signal<void (), slot_counter, int, std::less<int>, boost::function<void ()>,
+    boost::signals2::multi_threaded> sig0_mt_type;
   simple_test<sig0_mt_type>();
-  typedef boost::signal<void (), slot_counter, int, std::less<int>, boost::function<void ()>,
-    boost::signalslib::single_threaded> sig0_st_type;
+  typedef boost::signals2::signal<void (), slot_counter, int, std::less<int>, boost::function<void ()>,
+    boost::signals2::single_threaded> sig0_st_type;
   simple_test<sig0_st_type>();
   return 0;
 }

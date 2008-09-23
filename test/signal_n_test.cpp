@@ -9,7 +9,7 @@
 
 #include <boost/optional.hpp>
 #include <boost/test/minimal.hpp>
-#include <boost/thread_safe_signal.hpp>
+#include <boost/signals2.hpp>
 #include <functional>
 
 template<typename T>
@@ -65,12 +65,12 @@ test_zero_args()
   make_int i62(62, 61);
 
   {
-    boost::signal0<int, max_or_default<int>, std::string> s0;
-    boost::BOOST_SIGNALS_NAMESPACE::connection c2 = s0.connect(i2);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c72 = s0.connect("72", i72);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c62 = s0.connect("6x", i62);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c42 = s0.connect(i42);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c37 = s0.connect(&get_37);
+    boost::signals2::signal0<int, max_or_default<int>, std::string> s0;
+    boost::signals2::connection c2 = s0.connect(i2);
+    boost::signals2::connection c72 = s0.connect("72", i72);
+    boost::signals2::connection c62 = s0.connect("6x", i62);
+    boost::signals2::connection c42 = s0.connect(i42);
+    boost::signals2::connection c37 = s0.connect(&get_37);
 
     BOOST_CHECK(s0() == 72);
 
@@ -102,13 +102,13 @@ test_zero_args()
   }
 
   {
-    boost::signal0<int, max_or_default<int> > s0;
-    boost::BOOST_SIGNALS_NAMESPACE::connection c2 = s0.connect(i2);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c72 = s0.connect(i72);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c62 = s0.connect(i62);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c42 = s0.connect(i42);
+    boost::signals2::signal0<int, max_or_default<int> > s0;
+    boost::signals2::connection c2 = s0.connect(i2);
+    boost::signals2::connection c72 = s0.connect(i72);
+    boost::signals2::connection c62 = s0.connect(i62);
+    boost::signals2::connection c42 = s0.connect(i42);
 
-    const boost::signal0<int, max_or_default<int> >& cs0 = s0;
+    const boost::signals2::signal0<int, max_or_default<int> >& cs0 = s0;
     BOOST_CHECK(cs0() == 72);
   }
 
@@ -116,9 +116,9 @@ test_zero_args()
     make_increasing_int<7> i7;
     make_increasing_int<10> i10;
 
-    boost::signal0<int, max_or_default<int> > s0;
-    boost::BOOST_SIGNALS_NAMESPACE::connection c7 = s0.connect(i7);
-    boost::BOOST_SIGNALS_NAMESPACE::connection c10 = s0.connect(i10);
+    boost::signals2::signal0<int, max_or_default<int> > s0;
+    boost::signals2::connection c7 = s0.connect(i7);
+    boost::signals2::connection c10 = s0.connect(i10);
 
     BOOST_CHECK(s0() == 10);
     BOOST_CHECK(s0() == 11);
@@ -128,7 +128,7 @@ test_zero_args()
 static void
 test_one_arg()
 {
-  boost::signal1<int, int, max_or_default<int> > s1;
+  boost::signals2::signal1<int, int, max_or_default<int> > s1;
 
   s1.connect(std::negate<int>());
   s1.connect(std::bind1st(std::multiplies<int>(), 2));
@@ -140,7 +140,7 @@ test_one_arg()
 static void
 test_signal_signal_connect()
 {
-  typedef boost::signal1<int, int, max_or_default<int> > signal_type;
+  typedef boost::signals2::signal1<int, int, max_or_default<int> > signal_type;
   signal_type s1;
 
   s1.connect(std::negate<int>());
@@ -176,10 +176,10 @@ static void
 test_ref()
 {
   EventCounter ec;
-  boost::signal0<void> s;
+  boost::signals2::signal0<void> s;
 
   {
-    boost::BOOST_SIGNALS_NAMESPACE::scoped_connection c = s.connect(boost::ref(ec));
+    boost::signals2::scoped_connection c = s.connect(boost::ref(ec));
     BOOST_CHECK(ec.count == 0);
     s();
     BOOST_CHECK(ec.count == 1);
