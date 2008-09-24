@@ -7,4 +7,5 @@
 
 // For more information, see http://www.boost.org
 
+#include <boost/signals2/deconstruct_ptr.hpp>
 #include <boost/signals2/signal.hpp>
