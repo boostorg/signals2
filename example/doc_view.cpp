@@ -7,14 +7,14 @@
 
 #include <iostream>
 #include <string>
-#include <boost/signal.hpp>
+#include <boost/signals2.hpp>
 #include <boost/bind.hpp>
 
 class Document
 {
 public:
-    typedef boost::signal<void (bool)>  signal_t;
-    typedef boost::signals::connection  connection_t;
+    typedef boost::signals2::signal<void (bool)>  signal_t;
+    typedef boost::signals2::connection  connection_t;
 
 public:
     Document()
