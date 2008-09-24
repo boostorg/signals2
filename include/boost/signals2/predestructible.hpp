@@ -18,13 +18,16 @@ namespace boost
 {
   namespace signals2
   {
+    template<typename T> class predestructing_deleter;
+
     class predestructible
     {
-    public:
-      virtual void predestruct() {}
     protected:
+      template<typename T>
+        friend class predestructing_deleter;
       predestructible() {}
       virtual ~predestructible() {}
+      virtual void predestruct() {}
     };
   }
 }
