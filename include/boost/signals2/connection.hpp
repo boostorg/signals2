@@ -1,14 +1,15 @@
 /*
+  boost::signals2::connection provides a handle to a signal/slot connection.
 
   Author: Frank Mori Hess <fmhess@users.sourceforge.net>
   Begin: 2007-01-23
 */
 // Copyright Frank Mori Hess 2007-2008.
-//
-// Use, modification and
-// distribution is subject to the Boost Software License, Version
+// Distributed under the Boost Software License, Version
 // 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
+
+// See http://www.boost.org/libs/signals2 for library home page.
 
 #ifndef BOOST_TSS_CONNECTION_HEADER
 #define BOOST_TSS_CONNECTION_HEADER
@@ -30,14 +31,14 @@ namespace boost
     extern inline void null_deleter(const void*) {}
     namespace detail
     {
-      class ConnectionBodyBase
+      class connection_body_base
       {
       public:
-        ConnectionBodyBase():
+        connection_body_base():
           _connected(true)
         {
         }
-        virtual ~ConnectionBodyBase() {}
+        virtual ~connection_body_base() {}
         virtual void disconnect() = 0;
         void nolock_disconnect()
         {
@@ -61,15 +62,15 @@ namespace boost
       };
 
       template<typename GroupKey, typename SlotType, typename ThreadingModel>
-      class ConnectionBody: public ConnectionBodyBase
+      class connection_body: public connection_body_base
       {
       public:
         typedef typename ThreadingModel::mutex_type mutex_type;
-        ConnectionBody(const SlotType &slot_in):
+        connection_body(const SlotType &slot_in):
           slot(slot_in)
         {
         }
-        virtual ~ConnectionBody() {}
+        virtual ~connection_body() {}
         virtual void disconnect()
         {
           typename mutex_type::scoped_lock lock(mutex);
@@ -132,50 +133,50 @@ namespace boost
       friend class shared_connection_block;
 
       connection() {}
-      connection(const connection &other): _weakConnectionBody(other._weakConnectionBody)
+      connection(const connection &other): _weak_connection_body(other._weak_connection_body)
       {}
-      connection(boost::weak_ptr<detail::ConnectionBodyBase> connectionBody):
-        _weakConnectionBody(connectionBody)
+      connection(boost::weak_ptr<detail::connection_body_base> connectionBody):
+        _weak_connection_body(connectionBody)
       {}
       ~connection() {}
       void disconnect() const
       {
-        boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
+        boost::shared_ptr<detail::connection_body_base> connectionBody(_weak_connection_body.lock());
         if(connectionBody == 0) return;
         connectionBody->disconnect();
       }
       bool connected() const
       {
-        boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
+        boost::shared_ptr<detail::connection_body_base> connectionBody(_weak_connection_body.lock());
         if(connectionBody == 0) return false;
         return connectionBody->connected();
       }
       bool blocked() const
       {
-        boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
+        boost::shared_ptr<detail::connection_body_base> connectionBody(_weak_connection_body.lock());
         if(connectionBody == 0) return true;
         return connectionBody->blocked();
       }
       bool operator==(const connection& other) const
       {
-        boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
-        boost::shared_ptr<detail::ConnectionBodyBase> otherConnectionBody(other._weakConnectionBody.lock());
+        boost::shared_ptr<detail::connection_body_base> connectionBody(_weak_connection_body.lock());
+        boost::shared_ptr<detail::connection_body_base> otherConnectionBody(other._weak_connection_body.lock());
         return connectionBody == otherConnectionBody;
       }
       bool operator<(const connection& other) const
       {
-        boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
-        boost::shared_ptr<detail::ConnectionBodyBase> otherConnectionBody(other._weakConnectionBody.lock());
+        boost::shared_ptr<detail::connection_body_base> connectionBody(_weak_connection_body.lock());
+        boost::shared_ptr<detail::connection_body_base> otherConnectionBody(other._weak_connection_body.lock());
         return connectionBody < otherConnectionBody;
       }
       void swap(connection &other)
       {
         using std::swap;
-        swap(_weakConnectionBody, other._weakConnectionBody);
+        swap(_weak_connection_body, other._weak_connection_body);
       }
     private:
 
-      boost::weak_ptr<detail::ConnectionBodyBase> _weakConnectionBody;
+      boost::weak_ptr<detail::connection_body_base> _weak_connection_body;
     };
 
     class scoped_connection: public connection

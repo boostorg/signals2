@@ -26,7 +26,7 @@ namespace boost
     public:
       virtual char const * what() const throw()
       {
-        return "boost::expired_slot";
+        return "boost::signals2::expired_slot";
       }
     };
 
@@ -36,7 +36,7 @@ namespace boost
       typedef std::vector<boost::weak_ptr<void> > tracked_container_type;
       typedef std::vector<boost::shared_ptr<void> > locked_container_type;
 
-      const tracked_container_type& tracked_objects() const {return _trackedObjects;}
+      const tracked_container_type& tracked_objects() const {return _tracked_objects;}
       locked_container_type lock() const
       {
         locked_container_type locked_objects;
@@ -66,10 +66,10 @@ namespace boost
     protected:
       void track_signal(const signal_base &signal)
       {
-        _trackedObjects.push_back(signal.lock_pimpl());
+        _tracked_objects.push_back(signal.lock_pimpl());
       }
 
-      tracked_container_type _trackedObjects;
+      tracked_container_type _tracked_objects;
     };
   }
 } // end namespace boost

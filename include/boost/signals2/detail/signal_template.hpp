@@ -56,7 +56,7 @@ namespace boost
       private:
         class slot_invoker;
         typedef typename group_key<Group>::type group_key_type;
-        typedef shared_ptr<ConnectionBody<group_key_type, slot_type, ThreadingModel> > connection_body_type;
+        typedef shared_ptr<connection_body<group_key_type, slot_type, ThreadingModel> > connection_body_type;
         typedef grouped_list<Group, GroupCompare, connection_body_type> connection_list_type;
       public:
         typedef typename slot_function_type::result_type slot_result_type;
@@ -65,7 +65,7 @@ namespace boost
         typedef Group group_type;
         typedef GroupCompare group_compare_type;
         typedef typename detail::slot_call_iterator_t<slot_invoker,
-          typename connection_list_type::iterator, ConnectionBody<group_key_type, slot_type, ThreadingModel> > slot_call_iterator;
+          typename connection_list_type::iterator, connection_body<group_key_type, slot_type, ThreadingModel> > slot_call_iterator;
 
         BOOST_SIGNAL_IMPL_CLASS_NAME(const combiner_type &combiner,
           const group_compare_type &group_compare):
@@ -288,7 +288,7 @@ namespace boost
           {
             bool connected;
             {
-              typename ConnectionBody<group_key_type, slot_type, ThreadingModel>::mutex_type::scoped_lock lock((*it)->mutex);
+              typename connection_body<group_key_type, slot_type, ThreadingModel>::mutex_type::scoped_lock lock((*it)->mutex);
               if(grab_tracked)
                 (*it)->nolock_slot_expired();
               connected = (*it)->nolock_nograb_connected();
@@ -339,7 +339,7 @@ namespace boost
         connection_body_type create_new_connection(const slot_type &slot)
         {
           nolock_force_unique_connection_list();
-          return connection_body_type(new ConnectionBody<group_key_type, slot_type, ThreadingModel>(slot));
+          return connection_body_type(new connection_body<group_key_type, slot_type, ThreadingModel>(slot));
         }
         void do_disconnect(const group_type &group, mpl::bool_<true> is_group)
         {
@@ -354,7 +354,7 @@ namespace boost
           for(it = local_state->connection_bodies.begin();
             it != local_state->connection_bodies.end(); ++it)
           {
-            typename ConnectionBody<group_key_type, slot_type, ThreadingModel>::mutex_type::scoped_lock lock((*it)->mutex);
+            typename connection_body<group_key_type, slot_type, ThreadingModel>::mutex_type::scoped_lock lock((*it)->mutex);
             if((*it)->slot.slot_function() == slot)
             {
               (*it)->nolock_disconnect();

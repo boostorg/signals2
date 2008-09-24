@@ -91,7 +91,7 @@ namespace boost
       // tracking
       BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)& track(const weak_ptr<void> &tracked)
       {
-        _trackedObjects.push_back(tracked);
+        _tracked_objects.push_back(tracked);
         return *this;
       }
       BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)& track(const signal_base &signal)

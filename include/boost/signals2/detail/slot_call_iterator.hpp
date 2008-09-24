@@ -52,7 +52,7 @@ namespace boost {
           iter(iter_in), end(end_in), f(f),
           cache(&c), callable_iter(end_in)
         {
-          lockNextCallable();
+          lock_next_callable();
         }
 
         typename inherited::reference
@@ -75,7 +75,7 @@ namespace boost {
         void increment()
         {
           ++iter;
-          lockNextCallable();
+          lock_next_callable();
           cache->reset();
         }
 
@@ -87,7 +87,7 @@ namespace boost {
       private:
         typedef typename ConnectionBody::mutex_type::scoped_lock lock_type;
 
-        void lockNextCallable() const
+        void lock_next_callable() const
         {
           if(iter == callable_iter)
           {

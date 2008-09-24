@@ -23,14 +23,14 @@ namespace boost
     {
     public:
       shared_connection_block(connection &conn):
-        _weakConnectionBody(conn._weakConnectionBody)
+        _weak_connection_body(conn._weak_connection_body)
       {
         block();
       }
       void block()
       {
         if(_blocker) return;
-        boost::shared_ptr<detail::ConnectionBodyBase> connectionBody(_weakConnectionBody.lock());
+        boost::shared_ptr<detail::connection_body_base> connectionBody(_weak_connection_body.lock());
         if(connectionBody == 0) return;
         _blocker = connectionBody->get_blocker();
       }
@@ -43,7 +43,7 @@ namespace boost
         return _blocker != 0;
       }
     private:
-      boost::weak_ptr<detail::ConnectionBodyBase> _weakConnectionBody;
+      boost::weak_ptr<detail::connection_body_base> _weak_connection_body;
       shared_ptr<void> _blocker;
     };
   }
