@@ -19,6 +19,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/signals2/connection.hpp>
 #include <boost/signals2/slot_base.hpp>
+#include <boost/signals2/detail/unique_lock.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/weak_ptr.hpp>
 
@@ -85,7 +86,7 @@ namespace boost {
         }
 
       private:
-        typedef typename ConnectionBody::mutex_type::scoped_lock lock_type;
+        typedef unique_lock<typename ConnectionBody::mutex_type> lock_type;
 
         void lock_next_callable() const
         {

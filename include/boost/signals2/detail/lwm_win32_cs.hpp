@@ -1,0 +1,99 @@
+#ifndef BOOST_SIGNALS2_LWM_WIN32_CS_HPP_INCLUDED
+#define BOOST_SIGNALS2_LWM_WIN32_CS_HPP_INCLUDED
+
+// MS compatible compilers support #pragma once
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif
+
+//
+//  boost/signals2/detail/lwm_win32_cs.hpp
+//
+//  Copyright (c) 2002, 2003 Peter Dimov
+//  Copyright (c) 2008 Frank Mori Hess
+//
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+//
+
+#ifdef BOOST_USE_WINDOWS_H
+#  include <windows.h>
+#endif
+
+namespace boost
+{
+
+namespace signals2
+{
+
+#ifndef BOOST_USE_WINDOWS_H
+
+struct critical_section
+{
+    struct critical_section_debug * DebugInfo;
+    long LockCount;
+    long RecursionCount;
+    void * OwningThread;
+    void * LockSemaphore;
+#if defined(_WIN64)
+    unsigned __int64 SpinCount;
+#else
+    unsigned long SpinCount;
+#endif
+};
+
+extern "C" __declspec(dllimport) void __stdcall InitializeCriticalSection(critical_section *);
+extern "C" __declspec(dllimport) void __stdcall EnterCriticalSection(critical_section *);
+extern "C" __declspec(dllimport) void __stdcall LeaveCriticalSection(critical_section *);
+extern "C" __declspec(dllimport) void __stdcall DeleteCriticalSection(critical_section *);
+
+#else
+
+typedef ::CRITICAL_SECTION critical_section;
+
+#endif // #ifndef BOOST_USE_WINDOWS_H
+
+class lightweight_mutex
+{
+private:
+
+    critical_section cs_;
+
+    lightweight_mutex(lightweight_mutex const &);
+    lightweight_mutex & operator=(lightweight_mutex const &);
+
+public:
+
+    lightweight_mutex()
+    {
+        InitializeCriticalSection(&cs_);
+    }
+
+    ~lightweight_mutex()
+    {
+        DeleteCriticalSection(&cs_);
+    }
+
+    void lock()
+    {
+        EnterCriticalSection(&cs_);
+    }
+
+    bool try_lock()
+    {
+        return TryEnterCriticalSection(&cs_);
+    }
+
+    void unlock()
+    {
+        LeaveCriticalSection(&cs_);
+    }
+};
+
+} // namespace signals2
+
+} // namespace boost
+
+#endif // #ifndef BOOST_SIGNALS2_LWM_WIN32_CS_HPP_INCLUDED

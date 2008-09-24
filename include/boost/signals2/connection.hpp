@@ -19,6 +19,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2/slot.hpp>
+#include <boost/signals2/detail/unique_lock.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/visit_each.hpp>
 #include <boost/weak_ptr.hpp>
@@ -61,11 +62,11 @@ namespace boost
         weak_ptr<void> _weak_blocker;
       };
 
-      template<typename GroupKey, typename SlotType, typename ThreadingModel>
+      template<typename GroupKey, typename SlotType, typename Mutex>
       class connection_body: public connection_body_base
       {
       public:
-        typedef typename ThreadingModel::mutex_type mutex_type;
+        typedef Mutex mutex_type;
         connection_body(const SlotType &slot_in):
           slot(slot_in)
         {
@@ -73,18 +74,18 @@ namespace boost
         virtual ~connection_body() {}
         virtual void disconnect()
         {
-          typename mutex_type::scoped_lock lock(mutex);
+          unique_lock<mutex_type> lock(mutex);
           nolock_disconnect();
         }
         virtual bool connected() const
         {
-          typename mutex_type::scoped_lock lock(mutex);
+          unique_lock<mutex_type> lock(mutex);
           nolock_grab_tracked_objects();
           return nolock_nograb_connected();
         }
         virtual shared_ptr<void> get_blocker()
         {
-          typename mutex_type::scoped_lock lock(mutex);
+          unique_lock<mutex_type> lock(mutex);
           shared_ptr<void> blocker = _weak_blocker.lock();
           if(blocker == 0)
           {
