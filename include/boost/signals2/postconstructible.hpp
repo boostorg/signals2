@@ -19,15 +19,15 @@ namespace boost
   namespace signals2
   {
     class postconstructible;
-    namespace deconstruct_detail
+    namespace detail
     {
-      void do_postconstruct(const boost::postconstructible *ptr);
+      void do_postconstruct(const boost::signals2::postconstructible *ptr);
     }
 
     class postconstructible
     {
     public:
-      friend void deconstruct_detail::do_postconstruct(const boost::postconstructible *ptr);
+      friend void detail::do_postconstruct(const boost::signals2::postconstructible *ptr);
     protected:
       postconstructible() {}
       virtual ~postconstructible() {}

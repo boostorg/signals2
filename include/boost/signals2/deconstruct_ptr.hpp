@@ -14,19 +14,19 @@
 #define BOOST_DECONSTRUCT_PTR_HEADER
 
 #include <boost/checked_delete.hpp>
-#include <boost/postconstructible.hpp>
-#include <boost/predestructible.hpp>
+#include <boost/signals2/postconstructible.hpp>
+#include <boost/signals2/predestructible.hpp>
 #include <boost/shared_ptr.hpp>
 
 namespace boost
 {
   namespace signals2
   {
-    namespace deconstruct_detail
+    namespace detail
     {
-      extern inline void do_postconstruct(const boost::postconstructible *ptr)
+      extern inline void do_postconstruct(const postconstructible *ptr)
       {
-        boost::postconstructible *nonconst_ptr = const_cast<boost::postconstructible*>(ptr);
+        postconstructible *nonconst_ptr = const_cast<postconstructible*>(ptr);
         nonconst_ptr->postconstruct();
       }
       extern inline void do_postconstruct(...)
@@ -45,9 +45,9 @@ namespace boost
       static void m_predestruct(...)
       {
       }
-      static void m_predestruct(const boost::predestructible *ptr)
+      static void m_predestruct(const predestructible *ptr)
       {
-        boost::predestructible *nonconst_ptr = const_cast<boost::predestructible*>(ptr);
+        predestructible *nonconst_ptr = const_cast<predestructible*>(ptr);
         nonconst_ptr->predestruct();
       }
     };
@@ -56,8 +56,8 @@ namespace boost
     shared_ptr<T> deconstruct_ptr(T *ptr)
     {
       if(ptr == 0) return shared_ptr<T>(ptr);
-      shared_ptr<T> shared(ptr, boost::predestructing_deleter<T>());
-      deconstruct_detail::do_postconstruct(ptr);
+      shared_ptr<T> shared(ptr, boost::signals2::predestructing_deleter<T>());
+      detail::do_postconstruct(ptr);
       return shared;
     }
     template<typename T, typename D>
@@ -65,7 +65,7 @@ namespace boost
     {
       shared_ptr<T> shared(ptr, deleter);
       if(ptr == 0) return shared;
-      deconstruct_detail::do_postconstruct(ptr);
+      detail::do_postconstruct(ptr);
       return shared;
     }
   }
