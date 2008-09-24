@@ -11,8 +11,7 @@
 
 #include <boost/test/minimal.hpp>
 #include <boost/signals2.hpp>
-#include <boost/signals2/multi_threaded.hpp>
-#include <boost/signals2/single_threaded.hpp>
+#include <boost/thread/mutex.hpp>
 
 // combiner that returns the number of slots invoked
 struct slot_counter {
@@ -53,10 +52,10 @@ void simple_test()
 int test_main(int, char*[])
 {
   typedef boost::signals2::signal<void (), slot_counter, int, std::less<int>, boost::function<void ()>,
-    boost::signals2::multi_threaded> sig0_mt_type;
+    boost::mutex> sig0_mt_type;
   simple_test<sig0_mt_type>();
   typedef boost::signals2::signal<void (), slot_counter, int, std::less<int>, boost::function<void ()>,
-    boost::signals2::single_threaded> sig0_st_type;
+    boost::signals2::dummy_mutex> sig0_st_type;
   simple_test<sig0_st_type>();
   return 0;
 }
