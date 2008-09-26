@@ -33,17 +33,17 @@ namespace boost
 
       typedef SlotFunction slot_function_type;
       typedef R result_type;
-  // typedef Tn argn_type;
-  #define BOOST_SIGNAL_MISC_STATEMENT(z, n, data) \
+// typedef Tn argn_type;
+#define BOOST_SIGNAL_MISC_STATEMENT(z, n, data) \
     typedef BOOST_PP_CAT(T, BOOST_PP_INC(n)) BOOST_PP_CAT(BOOST_PP_CAT(arg, BOOST_PP_INC(n)), _type);
           BOOST_PP_REPEAT(BOOST_SIGNALS_NUM_ARGS, BOOST_SIGNAL_MISC_STATEMENT, ~)
-  #undef BOOST_SIGNAL_MISC_STATEMENT
-  #if BOOST_SIGNALS_NUM_ARGS == 1
+#undef BOOST_SIGNAL_MISC_STATEMENT
+#if BOOST_SIGNALS_NUM_ARGS == 1
       typedef arg1_type argument_type;
-  #elif BOOST_SIGNALS_NUM_ARGS == 2
+#elif BOOST_SIGNALS_NUM_ARGS == 2
       typedef arg1_type first_argument_type;
       typedef arg2_type second_argument_type;
-  #endif
+#endif
       BOOST_STATIC_CONSTANT(int, arity = BOOST_SIGNALS_NUM_ARGS);
 
       template<typename F>
@@ -63,20 +63,20 @@ namespace boost
       {
       }
       // bind syntactic sugar
-  // ArgTypeN argN
-  #define BOOST_SLOT_BINDING_ARG_DECL(z, n, data) \
-    BOOST_PP_CAT(ArgType, n) BOOST_PP_CAT(arg, n)
-  // template<typename Func, typename ArgType0, typename ArgType1, ..., typename ArgTypen-1> slotN(...
-  #define BOOST_SLOT_BINDING_CONSTRUCTOR(z, n, data) \
-      template<typename Func BOOST_PP_COMMA_IF(n) BOOST_PP_ENUM_PARAMS(n, typename ArgType)> \
-      BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)(Func func BOOST_PP_COMMA_IF(n) BOOST_PP_ENUM(n, BOOST_SLOT_BINDING_ARG_DECL, ~)): \
-        _slot_function(bind(func BOOST_PP_COMMA_IF(n) BOOST_PP_ENUM_PARAMS(n, arg))) \
+// const ArgTypeN & argN
+#define BOOST_SLOT_BINDING_ARG_DECL(z, n, data) \
+    const BOOST_PP_CAT(ArgType, n) & BOOST_PP_CAT(arg, n)
+// template<typename Func, typename ArgType0, typename ArgType1, ..., typename ArgTypen-1> slotN(...
+#define BOOST_SLOT_BINDING_CONSTRUCTOR(z, n, data) \
+      template<typename Func, BOOST_PP_ENUM_PARAMS(n, typename ArgType)> \
+      BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)(const Func &func,  BOOST_PP_ENUM(n, BOOST_SLOT_BINDING_ARG_DECL, ~)): \
+        _slot_function(bind(func, BOOST_PP_ENUM_PARAMS(n, arg))) \
       {}
-  #define BOOST_SLOT_MAX_BINDING_ARGS 10
+#define BOOST_SLOT_MAX_BINDING_ARGS 10
       BOOST_PP_REPEAT_FROM_TO(1, BOOST_SLOT_MAX_BINDING_ARGS, BOOST_SLOT_BINDING_CONSTRUCTOR, ~)
-  #undef BOOST_SLOT_MAX_BINDING_ARGS
-  #undef BOOST_SLOT_BINDING_ARG_DECL
-  #undef BOOST_SLOT_BINDING_CONSTRUCTOR
+#undef BOOST_SLOT_MAX_BINDING_ARGS
+#undef BOOST_SLOT_BINDING_ARG_DECL
+#undef BOOST_SLOT_BINDING_CONSTRUCTOR
       // invocation
       R operator()(BOOST_SIGNAL_SIGNATURE_FULL_ARGS(BOOST_SIGNALS_NUM_ARGS))
       {

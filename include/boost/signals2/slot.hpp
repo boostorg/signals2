@@ -82,13 +82,13 @@ namespace boost
       slot(const F& f): base_type(f)
       {}
       // bind syntactic sugar
-// AN aN
+// const AN & aN
 #define BOOST_SLOT_BINDING_ARG_DECL(z, n, data) \
-  BOOST_PP_CAT(A, n) BOOST_PP_CAT(a, n)
+  const BOOST_PP_CAT(A, n) & BOOST_PP_CAT(a, n)
 // template<typename F, typename A0, typename A1, ..., typename An-1> slot(...
 #define BOOST_SLOT_BINDING_CONSTRUCTOR(z, n, data) \
   template<typename F, BOOST_PP_ENUM_PARAMS(n, typename A)> \
-  slot(F f, BOOST_PP_ENUM(n, BOOST_SLOT_BINDING_ARG_DECL, ~)): \
+  slot(const F &f, BOOST_PP_ENUM(n, BOOST_SLOT_BINDING_ARG_DECL, ~)): \
     base_type(f, BOOST_PP_ENUM_PARAMS(n, a)) \
   {}
 #define BOOST_SLOT_MAX_BINDING_ARGS 10
