@@ -19,7 +19,7 @@
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/function.hpp>
-#include <boost/last_value.hpp>
+#include <boost/signals2/last_value.hpp>
 #include <boost/preprocessor/arithmetic.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/iteration.hpp>
