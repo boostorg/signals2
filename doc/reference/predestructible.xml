@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE header PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
-<header name="boost/predestructible.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
+<header name="boost/signals2/predestructible.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
   <using-namespace name="boost"/>
   <namespace name="boost">
-    <class name="predestructible">
-      <purpose>A base class for classes with predestructors, used in conjunction with <functionname>deconstruct_ptr</functionname>().
-      </purpose>
-      <access name="protected">
-        <destructor specifiers="virtual"/>
-      </access>
-      <access name="public">
-        <method name="predestruct" specifiers="virtual">
-          <type>void</type>
-          <notes><para>Override <code>predestruct()</code> with your class' pre-destructor.
-            It will be called automatically if you manage your objects with <code>shared_ptr</code>s
-            that use <classname>predestructing_deleter</classname> as their deleter, such as
-            those created with <functionname>deconstruct_ptr()</functionname></para>
-          </notes>
-        </method>
-      </access>
-    </class>
+    <namespace name="signals2">
+      <class name="predestructible">
+        <purpose>A base class for classes with predestructors, used in conjunction with <functionname>deconstruct_ptr</functionname>().
+        </purpose>
+        <access name="protected">
+          <destructor specifiers="virtual"/>
+          <method name="predestruct" specifiers="virtual">
+            <type>void</type>
+            <notes><para>Override <code>predestruct()</code> with your class' pre-destructor.
+              It will be called automatically if you manage your objects with <code>shared_ptr</code>s
+              that use <classname>predestructing_deleter</classname> as their deleter, such as
+              those created with <functionname>deconstruct_ptr()</functionname></para>
+            </notes>
+          </method>
+        </access>
+      </class>
+    </namespace>
   </namespace>
 </header>

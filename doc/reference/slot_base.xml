@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE header PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
-<header name="boost/signals/slot_base.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
+<header name="boost/signals2/slot_base.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
   <using-namespace name="boost"/>
-  <using-namespace name="boost::signalslib"/>
+  <using-namespace name="boost::signals2"/>
   <namespace name="boost">
-    <namespace name="signalslib">
+    <namespace name="signals2">
       <class name="slot_base">
         <purpose>Base class for slots.</purpose>
 
@@ -37,21 +37,21 @@
           </method>
         </method-group>
       </class>
+      <class name="expired_slot">
+        <inherit access="public"><classname>bad_weak_ptr</classname></inherit>
+        <purpose>Indicates at least one of a slot's tracked objects has expired.</purpose>
+        <description>The <code>expired_slot</code> exception is thrown to indicate at least one of
+          a slot's tracked objects has expired.  A <classname alt="signalN">signal</classname>
+          will automatically disconnect any slot which throws this exception during
+          signal invocation.  Combiners
+          that wish to support disconnection via expired_slot exceptions should be
+          prepared to handle <code>expired_slot</code> exceptions thrown
+          by the slot iterator dereference operation.
+        </description>
+        <method name="what" cv="const" specifiers="virtual">
+          <type>const char * </type>
+        </method>
+      </class>
     </namespace>
-    <class name="expired_slot">
-      <inherit access="public"><classname>bad_weak_ptr</classname></inherit>
-      <purpose>Indicates at least one of a slot's tracked objects has expired.</purpose>
-      <description>The <code>expired_slot</code> exception is thrown to indicate at least one of
-        a slot's tracked objects has expired.  A <classname alt="signalN">signal</classname>
-        will automatically disconnect any slot which throws this exception during
-        signal invocation.  Combiners
-        that wish to support disconnection via expired_slot exceptions should be
-        prepared to handle <code>expired_slot</code> exceptions thrown
-        by the slot iterator dereference operation.
-      </description>
-      <method name="what" cv="const" specifiers="virtual">
-        <type>const char * </type>
-      </method>
-    </class>
-   </namespace>
+  </namespace>
 </header>

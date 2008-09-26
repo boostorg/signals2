@@ -11,18 +11,17 @@ XML_SRCS=\
 	signals.xml \
 	tests.xml \
 	tutorial.xml \
-	reference/auto_threaded.xml \
 	reference/connection.xml \
 	reference/deconstruct_ptr.xml \
+	reference/dummy_mutex.xml \
 	reference/last_value.xml \
-	reference/multi_threaded.xml \
+	reference/lightweight_mutex.xml \
 	reference/postconstructible.xml \
 	reference/predestructible.xml \
 	reference/reference.xml \
 	reference/shared_connection_block.xml \
 	reference/signal_base.xml \
 	reference/signal_header.xml \
-	reference/single_threaded.xml \
 	reference/slot_base.xml \
 	reference/slot.xml
 #	reference/trackable.xml \

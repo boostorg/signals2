@@ -4,7 +4,7 @@
 <section last-revision="$Date: 2007-06-12 14:01:23 -0400 (Tue, 12 Jun 2007) $">
   <title>Introduction</title>
 
-  <para>The Boost.Signals library is an implementation of a managed
+  <para>The Boost.Signals2 library is an implementation of a managed
   signals and slots system. Signals represent callbacks with multiple
   targets, and are also called publishers or events in similar
   systems. Signals are connected to some set of slots, which are
@@ -21,14 +21,14 @@
 
   <para>When signals are connected to multiple slots, there is a
   question regarding the relationship between the return values of the
-  slots and the return value of the signals. Boost.Signals allows the
+  slots and the return value of the signals. Boost.Signals2 allows the
   user to specify the manner in which multiple return values are
   combined.</para>
 
   <section>
-    <title>thread_safe_signals</title>
+    <title>Signals2 (formerly known as thread_safe_signals)</title>
     <para>This documentation describes a thread-safe variant of the
-    official Boost.Signals library.  There have been some changes to
+    orignal Boost.Signals library.  There have been some changes to
     the interface to support thread-safety, mostly with respect to
     automatic connection management.  This implementation was written by
     Frank Mori Hess.  Acknowledgements are also due to Timmo Stange, Peter
@@ -38,17 +38,20 @@
   </section>
   <section>
     <title>Download</title>
-    <para>The latest release is available from the <ulink url="http://www.boost-consulting.com/vault/index.php?&amp;direction=0&amp;order=&amp;directory=thread_safe_signals">Boost vault</ulink>.
-    The development version of the code is available in the sandbox of the
-    <ulink url="http://svn.boost.org/trac/boost/wiki/BoostSubversion">Boost svn</ulink>.
-    The files for thread_safe_signals are located in the <code>sandbox/thread_safe_signals</code>
-    subdirectory and may be <ulink url="http://svn.boost.org/trac/boost/browser/sandbox/thread_safe_signals">
-    browsed online</ulink> or checked out with the following command:
-      <programlisting>svn co http://svn.boost.org/svn/boost/sandbox/thread_safe_signals thread_safe_signals</programlisting>
+    <para>
+      The latest release is available from the
+      <ulink url="http://www.boost-consulting.com/vault/index.php?&amp;direction=0&amp;order=&amp;directory=thread_safe_signals">
+      Boost vault</ulink>.
+      The development version of the code is available in the sandbox of the
+      <ulink url="http://svn.boost.org/trac/boost/wiki/BoostSubversion">Boost svn</ulink>.
+      The files for thread_safe_signals are located in the <code>sandbox/thread_safe_signals</code>
+      subdirectory and may be <ulink url="http://svn.boost.org/trac/boost/browser/sandbox/thread_safe_signals">
+      browsed online</ulink> or the trunk checked out with the following command:
+      <programlisting>svn co http://svn.boost.org/svn/boost/sandbox/thread_safe_signals/trunk thread_safe_signals</programlisting>
     </para>
     <para>
       The current version of this document should be available
-      <ulink url="http://www.comedi.org/projects/thread_safe_signals/libs/thread_safe_signals/doc/html/index.html">online</ulink>.
+      <ulink url="http://www.comedi.org/projects/thread_safe_signals/libs/signals2/doc/html/index.html">online</ulink>.
     </para>
   </section>
 </section>

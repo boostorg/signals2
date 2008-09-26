@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE header PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
-<header name="boost/signals/connection.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
+<header name="boost/signals2/connection.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
   <namespace name="boost">
-    <namespace name="signalslib">
+    <namespace name="signals2">
       <class name="connection">
         <!-- Models LessThanComparable and EqualityComparable -->
         <purpose>Query/disconnect a signal-slot connection.</purpose>
@@ -75,7 +75,7 @@
             <description>
               <para>
                 Queries if the connection is blocked.  A connection may be blocked by creating a
-                <classname>boost::signalslib::shared_connection_block</classname> object.
+                <classname>boost::signals2::shared_connection_block</classname> object.
               </para>
             </description>
             <returns><para><code>true</code> if the associated slot is either disconnected or blocked, <code>false</code> otherwise.</para></returns>

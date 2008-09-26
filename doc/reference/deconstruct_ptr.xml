@@ -1,57 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE header PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
-<header name="boost/deconstruct_ptr.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
+<header name="boost/signals2/deconstruct_ptr.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
   <using-namespace name="boost"/>
+  <using-namespace name="boost::signals2"/>
   <namespace name="boost">
-    <overloaded-function name="deconstruct_ptr">
-      <signature>
-        <template>
-         <template-type-parameter name="T"/>
-        </template>
-        <type>shared_ptr&lt;T&gt;</type>
-        <parameter name="pointer"><paramtype>T*</paramtype></parameter>
-      </signature>
-      <signature>
-        <template>
-         <template-type-parameter name="T"/>
-         <template-type-parameter name="D"/>
-        </template>
-        <type>shared_ptr&lt;T&gt;</type>
-        <parameter name="pointer"><paramtype>T*</paramtype></parameter>
-        <parameter name="deleter"><paramtype>D</paramtype></parameter>
-      </signature>
+    <namespace name="signals2">
+      <overloaded-function name="deconstruct_ptr">
+        <signature>
+          <template>
+          <template-type-parameter name="T"/>
+          </template>
+          <type>shared_ptr&lt;T&gt;</type>
+          <parameter name="pointer"><paramtype>T*</paramtype></parameter>
+        </signature>
+        <signature>
+          <template>
+          <template-type-parameter name="T"/>
+          <template-type-parameter name="D"/>
+          </template>
+          <type>shared_ptr&lt;T&gt;</type>
+          <parameter name="pointer"><paramtype>T*</paramtype></parameter>
+          <parameter name="deleter"><paramtype>D</paramtype></parameter>
+        </signature>
 
-      <purpose>Create a <code>shared_ptr</code> which supports post-constructors and pre-destructors.</purpose>
+        <purpose>Create a <code>shared_ptr</code> which supports post-constructors and pre-destructors.</purpose>
 
-      <effects><para>Creates a <code>shared_ptr&lt;T&gt;</code> by passing the <code>pointer</code> and
-      <code>deleter</code> parameters to the <code>shared_ptr</code> constructor.  If no
-      <code>deleter</code> is specified, then <classname>predestructing_deleter</classname> is
-      used as the default.  If <code>T</code> is derived from <classname>postconstructible</classname>
-      (and <code>pointer</code> is not a null pointer),
-      then <code>pointer->postconstruct()</code> will be called after the <code>shared_ptr</code> is constructed.</para>
-      </effects>
-      <returns><para>A <code>shared_ptr&lt;T&gt;</code> owning <code>pointer</code>.</para></returns>
-    </overloaded-function>
-
-    <class name="predestructing_deleter">
-      <template>
-        <template-type-parameter name="T"/>
-      </template>
-      <method name="operator()" cv="const">
-        <type>void</type>
-        <parameter name="pointer"><paramtype>const T *</paramtype>
-        </parameter>
-        <effects>
-          <para>Calls <code>pointer-><methodname alt="predestructible::predestruct">predestruct</methodname>()</code>
-            if <code>T</code> is derived from
-            <classname>predestructible</classname>.  Then <code>pointer</code> is deleted using
-            <functionname>checked_delete</functionname>.
-          </para>
+        <effects><para>Creates a <code>shared_ptr&lt;T&gt;</code> by passing the <code>pointer</code> and
+        <code>deleter</code> parameters to the <code>shared_ptr</code> constructor.  If no
+        <code>deleter</code> is specified, then <classname>predestructing_deleter</classname> is
+        used as the default.  If <code>T</code> is derived from <classname>postconstructible</classname>
+        (and <code>pointer</code> is not a null pointer),
+        then <code>pointer->postconstruct()</code> will be called after the <code>shared_ptr</code> is constructed.</para>
         </effects>
-      </method>
-      <purpose>Predestruct object if it is predestructible, then delete.
-      </purpose>
-    </class>
+        <returns><para>A <code>shared_ptr&lt;T&gt;</code> owning <code>pointer</code>.</para></returns>
+      </overloaded-function>
+
+      <class name="predestructing_deleter">
+        <template>
+          <template-type-parameter name="T"/>
+        </template>
+        <method name="operator()" cv="const">
+          <type>void</type>
+          <parameter name="pointer"><paramtype>const T *</paramtype>
+          </parameter>
+          <effects>
+            <para>Calls <code>pointer-><methodname alt="predestructible::predestruct">predestruct</methodname>()</code>
+              if <code>T</code> is derived from
+              <classname>predestructible</classname>.  Then <code>pointer</code> is deleted using
+              <functionname>checked_delete</functionname>.
+            </para>
+          </effects>
+        </method>
+        <purpose>Predestruct object if it is predestructible, then delete.
+        </purpose>
+      </class>
+    </namespace>
   </namespace>
 </header>

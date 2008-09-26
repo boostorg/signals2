@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE library PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
-<library name="Signals" dirname="thread_safe_signals"
-         xmlns:xi="http://www.w3.org/2001/XInclude" id="signals"
+<library name="Signals2" dirname="signals2"
+         xmlns:xi="http://www.w3.org/2001/XInclude" id="signals2"
          last-revision="$Date: 2007-06-12 14:01:23 -0400 (Tue, 12 Jun 2007) $">
 <libraryinfo>
   <author>
@@ -26,11 +26,12 @@
   </copyright>
   <copyright>
     <year>2007</year>
+    <year>2008</year>
     <holder>Frank Mori Hess</holder>
   </copyright>
 
   <legalnotice>
-    <para>Use, modification and distribution is subject to the Boost
+    <para>Distributed under the Boost
     Software License, Version 1.0. (See accompanying file
     <filename>LICENSE_1_0.txt</filename> or copy at <ulink
     url="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</ulink>)</para>
@@ -40,7 +41,7 @@
   <librarycategory name="category:higher-order"/>
 </libraryinfo>
 
-<title>Boost.Signals (thread_safe_signals version)</title>
+<title>Boost.Signals2</title>
   <xi:include href="introduction.xml"/>
   <xi:include href="tutorial.xml"/>
   <xi:include href="reference/reference.xml"/>
