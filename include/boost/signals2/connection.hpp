@@ -221,6 +221,7 @@ namespace boost
         _released = true;
         return conn;
       }
+      bool released() const {return _released;}
       void swap(scoped_connection &other)
       {
         connection::swap(other);
