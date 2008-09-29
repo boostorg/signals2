@@ -459,7 +459,7 @@ default behavior of a signal that has a return type
 <code><classname>boost::signals2::signal</classname></code> class template) is to call all slots and
 then return the result returned by the last slot called. This
 behavior is admittedly silly for this example, because slots have
-no side effects and the result is the last slot connect.</para>
+no side effects and the result is the last slot connected.</para>
 <para>A more interesting signal result would be the maximum of the
 values returned by any slot. To do this, we create a custom
 combiner that looks like this:</para>
@@ -694,7 +694,10 @@ sig(); <emphasis>// Does nothing: there are no connected slots</emphasis>
 <section><title>Blocking Slots (Beginner)</title>
 
 <para>Slots can be temporarily "blocked", meaning that they will be
-ignored when the signal is invoked but have not been disconnected. A
+ignored when the signal is invoked but have not been permanently disconnected.
+This is typically used to prevent infinite recursion in cases where
+otherwise running a slot would cause the signal it is connected to to be
+invoked again.  A
 <classname>boost::signals2::shared_connection_block</classname> object will
 temporarily block a slot.  The connection is unblocked by either
 destroying or calling
@@ -726,10 +729,28 @@ ability is useful when a connection need only be temporary,
 e.g.,</para>
 <programlisting>
 {
-  boost::signals2::scoped_connection c = sig.<methodname>connect</methodname>(ShortLived());
+  boost::signals2::scoped_connection c(sig.<methodname>connect</methodname>(ShortLived()));
   sig(); <emphasis>// will call ShortLived function object</emphasis>
 }
 sig(); <emphasis>// ShortLived function object no longer connected to sig</emphasis>
+</programlisting>
+
+<para>
+  Note, attempts to initialize a scoped_connection with the assignment syntax
+  will fail due to it being noncopyable.  Either the explicit initialization syntax
+  or default construction followed by assignment from a <classname>connection</classname>
+  will work:
+</para>
+<programlisting>
+// doesn't compile due to compiler attempting to copy a temporary scoped_connection object
+// boost::signals2::scoped_connection c0 = sig.<methodname>connect</methodname>(ShortLived());
+
+// okay
+boost::signals2::scoped_connection c1(sig.<methodname>connect</methodname>(ShortLived()));
+
+// also okay
+boost::signals2::scoped_connection c2;
+c2 = sig.<methodname>connect</methodname>(ShortLived());
 </programlisting>
 </section>
 
@@ -756,7 +777,7 @@ operator. For instance:
 void foo();
 void bar();
 
-signal&lt;void()&gt; sig;
+boost::signals2::signal&lt;void()&gt; sig;
 
 sig.connect(&amp;foo);
 sig.connect(&amp;bar);
@@ -770,7 +791,7 @@ sig.disconnect(&amp;foo);
 void foo();
 void bar();
 
-signal0&lt;void&gt; sig;
+boost::signals2::signal0&lt;void&gt; sig;
 
 sig.connect(&amp;foo);
 sig.connect(&amp;bar);
@@ -942,7 +963,7 @@ passed to a <code>slot_type</code> parameter. For instance:</para>
 <programlisting>
 class Button
 {
-  typedef boost::signals2::signal&lt;void (int x, int y)&gt; OnClick;
+  typedef <classname>boost::signals2::signal</classname>&lt;void (int x, int y)&gt; OnClick;
 
 public:
   void doOnClick(const OnClick::slot_type&amp; slot);
