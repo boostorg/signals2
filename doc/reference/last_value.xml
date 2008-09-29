@@ -28,7 +28,7 @@
             </parameter>
 
             <effects><para>Attempts to dereference every iterator in the sequence <computeroutput>[first, last)</computeroutput>.
-            Swallows <classname>expired_slot</classname> exceptions thrown by failed dereference attempts.</para></effects>
+              </para></effects>
             <returns><para>The result of the last successful iterator dereference.</para></returns>
             <throws><para><classname>no_slots_error</classname> if no iterators were successfully dereferenced,
             unless the template type of <code>last_value</code> is <code>void</code> or <code>optional&lt;T&gt;</code>.</para></throws>
@@ -62,7 +62,7 @@
             </parameter>
 
             <effects><para>Attempts to dereference every iterator in the sequence <computeroutput>[first, last)</computeroutput>.
-            Swallows <classname>expired_slot</classname> exceptions thrown by failed dereference attempts.</para></effects>
+              </para></effects>
           </method>
         </method-group>
       </class-specialization>
@@ -95,7 +95,7 @@
             </parameter>
 
             <effects><para>Attempts to dereference every iterator in the sequence <computeroutput>[first, last)</computeroutput>.
-            Swallows <classname>expired_slot</classname> exceptions thrown by failed dereference attempts.</para></effects>
+              </para></effects>
             <returns><para>An <code>optional&lt;T&gt;</code> containing the result of the last successful iterator dereference,
             or an uninitalized <code>optional&lt;T&gt;</code> if no iterators were successfully dereferenced.</para></returns>
           </method>

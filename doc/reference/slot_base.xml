@@ -41,12 +41,7 @@
         <inherit access="public"><classname>bad_weak_ptr</classname></inherit>
         <purpose>Indicates at least one of a slot's tracked objects has expired.</purpose>
         <description>The <code>expired_slot</code> exception is thrown to indicate at least one of
-          a slot's tracked objects has expired.  A <classname alt="signalN">signal</classname>
-          will automatically disconnect any slot which throws this exception during
-          signal invocation.  Combiners
-          that wish to support disconnection via expired_slot exceptions should be
-          prepared to handle <code>expired_slot</code> exceptions thrown
-          by the slot iterator dereference operation.
+          a slot's tracked objects has expired.
         </description>
         <method name="what" cv="const" specifiers="virtual">
           <type>const char * </type>

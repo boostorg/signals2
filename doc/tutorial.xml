@@ -476,13 +476,8 @@ struct maximum
     // default-constructed value
     T max_value = T();
     while (first != last) {
-      try {
-        if (max_value &lt; *first)
-          max_value = *first;
-      }
-      // Iterator dereference may throw boost::signals2::expired_slot if the
-      // slot has expired due to automatic connection management.
-      catch(const boost::signals2::expired_slot &amp;) {}
+      if (max_value &lt; *first)
+        max_value = *first;
       ++first;
     }
 
@@ -559,10 +554,7 @@ struct aggregate_values
     Container values;
 
     while(first != last) {
-      try {
-        values.push_back(*first);
-      }
-      catch(const boost::signals2::expired_slot &amp;) {}
+      values.push_back(*first);
       ++first;
     }
     return values;
@@ -647,11 +639,8 @@ struct DistributeRequest {
   result_type operator()(InputIterator first, InputIterator last) const
   {
     while (first != last) {
-      try {
-        if (result_type fulfilled = *first)
-          return fulfilled;
-      }
-      catch(const boost::signals2::expired_slot &amp;) {}
+      if (result_type fulfilled = *first)
+        return fulfilled;
       ++first;
     }
     return 0;
@@ -916,8 +905,6 @@ signal's <code>disconnect</code> method, or
 <code>scoped_connection</code>'s destructor.</para></listitem>
 <listitem><para>An object tracked by the slot is
 destroyed.</para></listitem>
-<listitem><para>A slot throws a <classname>boost::signals2::expired_slot</classname> exception.
-</para></listitem>
 <listitem><para>The signal is destroyed.</para></listitem></itemizedlist>
 <para>These events can occur at any time without disrupting a signal's
 calling sequence. If a signal/slot connection is disconnected at

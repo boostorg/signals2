@@ -276,12 +276,7 @@
             iterator in this range causes a slot call with the given set
             of parameters <computeroutput>(a1, a2, ...,
             aN)</computeroutput>, the result of which is returned from
-            the iterator dereference operation.  Note, dereferencing
-            a slot iterator may throw a <classname>expired_slot</classname>
-            exception, if the slot has been disconnected via automatic
-            connection management.  Combiners should simply swallow
-            such <classname>expired_slot</classname> exceptions and move
-            on to the next slot.</para></effects>
+            the iterator dereference operation.</para></effects>
 
             <returns><para>The result returned by the combiner.</para></returns>
 
