@@ -57,6 +57,26 @@ namespace boost
         the_tag_type tag = the_tag_type();
         return tag;
       }
+
+      // used to automatically track signal objects that are passed directly to slots
+      template<typename SlotTag>
+      class auto_tracker
+      {
+      public:
+        template<typename Slot, typename F>
+          auto_tracker(Slot *slot, const F &f)
+        {}
+      };
+      template<>
+      class auto_tracker<signal_tag>
+      {
+      public:
+        template<typename Slot, typename F>
+          auto_tracker(Slot *slot, const F &f)
+        {
+          slot->track(f);
+        }
+      };
     }
   }
 } // end namespace boost

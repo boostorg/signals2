@@ -49,6 +49,7 @@ namespace boost
       template<typename F>
       BOOST_SLOT_CLASS_NAME(BOOST_SIGNALS_NUM_ARGS)(const F& f): _slot_function(detail::get_invocable_slot(f, detail::tag_type(f)))
       {
+        detail::auto_tracker<typename detail::get_slot_tag<F>::type> at(this, f);
       }
       // copy constructors
       template<BOOST_SIGNAL_PREFIXED_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS_NUM_ARGS, Other), typename OtherSlotFunction>

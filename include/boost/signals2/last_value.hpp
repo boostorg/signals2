@@ -17,7 +17,6 @@
 
 namespace boost {
   namespace signals2 {
-    class expired_slot;
     // no_slots_error is thrown when we are unable to generate a return value
     // due to no slots being connected to the signal.
     class no_slots_error: public std::exception
@@ -52,12 +51,7 @@ namespace boost {
         optional<T> value;
         while (first != last)
         {
-          try
-          {
-            value = *first;
-          }
-          catch(const expired_slot &)
-          {}
+          value = *first;
           ++first;
         }
         if(value) return value.get();
@@ -81,12 +75,7 @@ namespace boost {
       {
         while (first != last)
         {
-          try
-          {
-            *first;
-          }
-          catch(const expired_slot &)
-          {}
+          *first;
           ++first;
         }
         return result_type();

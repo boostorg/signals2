@@ -31,19 +31,14 @@ struct max_or_default {
     boost::optional<T> max;
     for(; first != last; ++first)
     {
-      try
+      T value = *first;
+      if(max == false)
       {
-        T value = *first;
-        if(max == false)
-        {
-          max = value;
-        }else if(value > *max)
-        {
-          max = value;
-        }
+        max = value;
+      }else if(value > *max)
+      {
+        max = value;
       }
-      catch(const boost::signals2::expired_slot &)
-      {}
     }
     if(max) return *max;
     else return T();
