@@ -15,6 +15,16 @@
           signal and slot are currently connected, and to disconnect
           the signal and slot. It is always safe to query or
           disconnect a connection.</para>
+          <section>
+            <title>Thread Safety</title>
+            <para>The methods of the <code>connection</code> class are thread-safe with the exception
+              of <methodname>swap</methodname> and the assignment operator.  A <code>connection</code> object
+              should not be accessed concurrently when either of these operations is in progress.
+              However, it is always safe to access a different <code>connection</code> object
+              in another thread, even if the two <code>connection</code> objects are copies
+              of each other which refer to the same underlying connection.
+            </para>
+          </section>
         </description>
 
         <constructor>
@@ -258,7 +268,20 @@
             </description>
           </copy-assignment>
         </access>
-        <description><para>A connection which automatically disconnects on destruction.</para></description>
+        <description>
+          <para>A <classname>connection</classname> which automatically disconnects on destruction.</para>
+          <section>
+            <title>Thread Safety</title>
+            <para>The methods of the <code>scoped_connection</code> class (including those
+              inherited from its base <code>connection</code> class) are thread-safe with the exception
+              of <methodname>swap</methodname>, <methodname>release</methodname>, and
+              the assignment operator  A <code>scoped_connection</code> object
+              should not be accessed concurrently when any of these operations is in progress.
+              However, it is always safe to access a different <code>connection</code> object
+              in another thread, even if it references the same underlying signal-slot connection.
+            </para>
+          </section>
+        </description>
         <free-function-group name="specialized algorithms">
           <function name="swap">
             <type>void</type>
