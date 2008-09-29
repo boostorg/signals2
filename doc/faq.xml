@@ -74,7 +74,7 @@ INCLUDEPATH += . /usr/local/include/thread_safe_signals /usr/local/include/boost
       </answer>
     </qandaentry>
     <qandaentry>
-      <question><para>How has the API changed from Boost.Signals version 1.34?</para></question>
+      <question><para>How has the API changed from the original Boost.Signals?</para></question>
       <answer>
         <para>In summary, the following changes have been made to the signals API:</para>
         <itemizedlist>
