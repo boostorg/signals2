@@ -39,7 +39,8 @@ void swap_test()
   }
 
   {
-    bs2::scoped_connection conn1 = sig.connect(&myslot);
+    bs2::scoped_connection conn1;
+    conn1 = sig.connect(&myslot);
     BOOST_CHECK(conn1.connected());
     bs2::scoped_connection conn2;
     BOOST_CHECK(conn2.connected() == false);
