@@ -179,7 +179,7 @@ test_ref()
   boost::signals2::signal0<void> s;
 
   {
-    boost::signals2::scoped_connection c = s.connect(boost::ref(ec));
+    boost::signals2::scoped_connection c(s.connect(boost::ref(ec)));
     BOOST_CHECK(ec.count == 0);
     s();
     BOOST_CHECK(ec.count == 1);

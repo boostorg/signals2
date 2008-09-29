@@ -288,7 +288,7 @@ namespace boost
           {
             bool connected;
             {
-              unique_lock<Mutex> lock((*it)->mutex);
+              unique_lock<connection_body_base> lock(**it);
               if(grab_tracked)
                 (*it)->nolock_slot_expired();
               connected = (*it)->nolock_nograb_connected();
@@ -354,7 +354,7 @@ namespace boost
           for(it = local_state->connection_bodies.begin();
             it != local_state->connection_bodies.end(); ++it)
           {
-            unique_lock<Mutex> lock((*it)->mutex);
+            unique_lock<connection_body_base> lock(**it);
             if((*it)->slot.slot_function() == slot)
             {
               (*it)->nolock_disconnect();

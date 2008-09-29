@@ -67,7 +67,7 @@ void scoped_connection_test()
   typedef boost::signals2::signal0<void, slot_counter> signal_type;
   signal_type sig;
   {
-    boost::signals2::scoped_connection conn = sig.connect(&my_slot);
+    boost::signals2::scoped_connection conn(sig.connect(&my_slot));
     BOOST_CHECK(sig() == 1);
     conn = sig.connect(&my_slot);
     BOOST_CHECK(sig() == 1);

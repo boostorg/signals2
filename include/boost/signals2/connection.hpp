@@ -40,13 +40,27 @@ namespace boost
         {
         }
         virtual ~connection_body_base() {}
-        virtual void disconnect() = 0;
+        void disconnect()
+        {
+          unique_lock<connection_body_base> lock(*this);
+          nolock_disconnect();
+        }
         void nolock_disconnect()
         {
           _connected = false;
         }
         virtual bool connected() const = 0;
-        virtual shared_ptr<void> get_blocker() = 0;
+        shared_ptr<void> get_blocker()
+        {
+          unique_lock<connection_body_base> lock(*this);
+          shared_ptr<void> blocker = _weak_blocker.lock();
+          if(blocker == 0)
+          {
+            blocker.reset(this, &null_deleter);
+            _weak_blocker = blocker;
+          }
+          return blocker;
+        }
         bool blocked() const
         {
           return !_weak_blocker.expired();
@@ -56,6 +70,10 @@ namespace boost
           return nolock_nograb_connected() == false || blocked();
         }
         bool nolock_nograb_connected() const {return _connected;}
+        // expose part of Lockable concept of mutex
+        virtual void lock() = 0;
+        virtual void unlock() = 0;
+
       protected:
 
         mutable bool _connected;
@@ -72,27 +90,11 @@ namespace boost
         {
         }
         virtual ~connection_body() {}
-        virtual void disconnect()
-        {
-          unique_lock<mutex_type> lock(mutex);
-          nolock_disconnect();
-        }
         virtual bool connected() const
         {
-          unique_lock<mutex_type> lock(mutex);
+          unique_lock<mutex_type> lock(_mutex);
           nolock_grab_tracked_objects();
           return nolock_nograb_connected();
-        }
-        virtual shared_ptr<void> get_blocker()
-        {
-          unique_lock<mutex_type> lock(mutex);
-          shared_ptr<void> blocker = _weak_blocker.lock();
-          if(blocker == 0)
-          {
-            blocker.reset(this, &null_deleter);
-            _weak_blocker = blocker;
-          }
-          return blocker;
         }
         const GroupKey& group_key() const {return _group_key;}
         void set_group_key(const GroupKey &key) {_group_key = key;}
@@ -119,9 +121,18 @@ namespace boost
           }
           return locked_objects;
         }
+        // expose Lockable concept of mutex
+        virtual void lock()
+        {
+          _mutex.lock();
+        }
+        virtual void unlock()
+        {
+          _mutex.unlock();
+        }
         SlotType slot;
-        mutable mutex_type mutex;
       private:
+        mutable mutex_type _mutex;
         GroupKey _group_key;
       };
     }
@@ -136,7 +147,7 @@ namespace boost
       connection() {}
       connection(const connection &other): _weak_connection_body(other._weak_connection_body)
       {}
-      connection(boost::weak_ptr<detail::connection_body_base> connectionBody):
+      connection(const boost::weak_ptr<detail::connection_body_base> &connectionBody):
         _weak_connection_body(connectionBody)
       {}
       ~connection() {}
@@ -175,32 +186,57 @@ namespace boost
         using std::swap;
         swap(_weak_connection_body, other._weak_connection_body);
       }
-    private:
+    protected:
 
       boost::weak_ptr<detail::connection_body_base> _weak_connection_body;
     };
+    void swap(connection &conn1, connection &conn2)
+    {
+      conn1.swap(conn2);
+    }
 
     class scoped_connection: public connection
     {
     public:
-      scoped_connection() {}
-      scoped_connection(const connection &other): connection(other)
+      scoped_connection(): _released(false) {}
+      scoped_connection(const connection &other):
+        connection(other), _released(false)
       {}
       ~scoped_connection()
       {
-        disconnect();
+        if(_released == false)
+          disconnect();
       }
-      const scoped_connection& operator=(const connection &rhs)
+      scoped_connection& operator=(const connection &rhs)
       {
-        disconnect();
+        if(_released == false)
+          disconnect();
+        _released = false;
         connection::operator=(rhs);
         return *this;
+      }
+      connection release()
+      {
+        connection conn(_weak_connection_body);
+        _released = true;
+        return conn;
       }
       void swap(scoped_connection &other)
       {
         connection::swap(other);
+        using std::swap;
+        swap(_released, other._released);
       }
+    private:
+      scoped_connection(const scoped_connection &other);
+      scoped_connection& operator=(const scoped_connection &rhs);
+
+      bool _released;
     };
+    void swap(scoped_connection &conn1, scoped_connection &conn2)
+    {
+      conn1.swap(conn2);
+    }
   }
 }
 

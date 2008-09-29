@@ -86,7 +86,7 @@ namespace boost {
         }
 
       private:
-        typedef unique_lock<typename ConnectionBody::mutex_type> lock_type;
+        typedef unique_lock<connection_body_base> lock_type;
 
         void lock_next_callable() const
         {
@@ -96,7 +96,7 @@ namespace boost {
           }
           for(;iter != end; ++iter)
           {
-            lock_type lock((*iter)->mutex);
+            lock_type lock(**iter);
             tracked_ptrs = (*iter)->nolock_grab_tracked_objects();
             if((*iter)->nolock_nograb_blocked() == false)
             {
