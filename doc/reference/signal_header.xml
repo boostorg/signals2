@@ -30,7 +30,7 @@
             <default><classname>functionN</classname>&lt;R, T1, T2, ..., TN&gt;</default>
           </template-type-parameter>
           <template-type-parameter name="Mutex">
-            <default><classname>lightweight_mutex</classname></default>
+            <default><classname>mutex</classname></default>
           </template-type-parameter>
         </template>
         <inherit access="public">
@@ -349,7 +349,7 @@
             <default><classname>function</classname>&lt;Signature&gt;</default>
           </template-type-parameter>
           <template-type-parameter name="Mutex">
-            <default><classname>lightweight_mutex</classname></default>
+            <default><classname>mutex</classname></default>
           </template-type-parameter>
         </template>
 

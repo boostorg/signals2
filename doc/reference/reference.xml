@@ -17,7 +17,7 @@
   <xi:include href="connection.xml"/>
   <xi:include href="shared_connection_block.xml"/>
   <xi:include href="last_value.xml"/>
-  <xi:include href="lightweight_mutex.xml"/>
+  <xi:include href="mutex.xml"/>
   <xi:include href="dummy_mutex.xml"/>
   <xi:include href="deconstruct_ptr.xml"/>
   <xi:include href="postconstructible.xml"/>

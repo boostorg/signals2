@@ -15,7 +15,7 @@ XML_SRCS=\
 	reference/deconstruct_ptr.xml \
 	reference/dummy_mutex.xml \
 	reference/last_value.xml \
-	reference/lightweight_mutex.xml \
+	reference/mutex.xml \
 	reference/postconstructible.xml \
 	reference/predestructible.xml \
 	reference/reference.xml \
