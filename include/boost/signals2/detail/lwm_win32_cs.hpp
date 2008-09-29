@@ -55,23 +55,23 @@ typedef ::CRITICAL_SECTION critical_section;
 
 #endif // #ifndef BOOST_USE_WINDOWS_H
 
-class lightweight_mutex
+class mutex
 {
 private:
 
     critical_section cs_;
 
-    lightweight_mutex(lightweight_mutex const &);
-    lightweight_mutex & operator=(lightweight_mutex const &);
+    mutex(mutex const &);
+    mutex & operator=(mutex const &);
 
 public:
 
-    lightweight_mutex()
+    mutex()
     {
         InitializeCriticalSection(&cs_);
     }
 
-    ~lightweight_mutex()
+    ~mutex()
     {
         DeleteCriticalSection(&cs_);
     }

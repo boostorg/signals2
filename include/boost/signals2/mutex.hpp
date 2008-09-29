@@ -1,5 +1,5 @@
-#ifndef BOOST_SIGNALS2_LIGHTWEIGHT_MUTEX_HPP_INCLUDED
-#define BOOST_SIGNALS2_LIGHTWEIGHT_MUTEX_HPP_INCLUDED
+#ifndef BOOST_SIGNALS2_MUTEX_HPP_INCLUDED
+#define BOOST_SIGNALS2_MUTEX_HPP_INCLUDED
 
 // MS compatible compilers support #pragma once
 
@@ -8,7 +8,7 @@
 #endif
 
 //
-//  boost/signals2/lightweight_mutex.hpp - lightweight mutex
+//  boost/signals2/mutex.hpp - header-only mutex
 //
 //  Copyright (c) 2002, 2003 Peter Dimov and Multi Media Ltd.
 //  Copyright (c) 2008 Frank Mori Hess
@@ -17,7 +17,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-//  boost::signals2::lightweight_mutex is a modification of
+//  boost::signals2::mutex is a modification of
 //  boost::detail::lightweight_mutex to follow the newer Lockable
 //  concept of Boost.Thread.
 //
@@ -35,4 +35,4 @@
 #  error Unrecognized threading platform
 #endif
 
-#endif // #ifndef BOOST_SIGNALS2_LIGHTWEIGHT_MUTEX_HPP_INCLUDED
+#endif // #ifndef BOOST_SIGNALS2_MUTEX_HPP_INCLUDED

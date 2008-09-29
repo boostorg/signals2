@@ -31,7 +31,7 @@
 #include <boost/signals2/detail/signals_common_macros.hpp>
 #include <boost/signals2/detail/slot_groups.hpp>
 #include <boost/signals2/detail/slot_call_iterator.hpp>
-#include <boost/signals2/lightweight_mutex.hpp>
+#include <boost/signals2/mutex.hpp>
 #include <boost/signals2/connection.hpp>
 #include <boost/signals2/shared_connection_block.hpp>
 #include <boost/signals2/slot.hpp>
@@ -50,7 +50,7 @@ namespace boost
       typename Group = int,
       typename GroupCompare = std::less<Group>,
       typename SlotFunction = function<Signature>,
-      typename Mutex = lightweight_mutex >
+      typename Mutex = mutex >
     class signal: public detail::signalN<function_traits<Signature>::arity,
       Signature, Combiner, Group, GroupCompare, SlotFunction, Mutex>::type
     {

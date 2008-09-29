@@ -26,18 +26,18 @@ namespace boost
 namespace signals2
 {
 
-class lightweight_mutex
+class mutex
 {
 private:
 
     pthread_mutex_t m_;
 
-    lightweight_mutex(lightweight_mutex const &);
-    lightweight_mutex & operator=(lightweight_mutex const &);
+    mutex(mutex const &);
+    mutex & operator=(mutex const &);
 
 public:
 
-    lightweight_mutex()
+    mutex()
     {
 
 // HPUX 10.20 / DCE has a nonstandard pthread_mutex_init
@@ -49,7 +49,7 @@ public:
 #endif
     }
 
-    ~lightweight_mutex()
+    ~mutex()
     {
         pthread_mutex_destroy(&m_);
     }

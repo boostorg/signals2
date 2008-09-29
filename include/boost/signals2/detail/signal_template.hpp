@@ -25,7 +25,7 @@
   typename Group = int, \
   typename GroupCompare = std::less<Group>, \
   typename SlotFunction = BOOST_FUNCTION_N_DECL(BOOST_SIGNALS_NUM_ARGS), \
-  typename Mutex = signals2::lightweight_mutex
+  typename Mutex = signals2::mutex
 // typename R, typename T1, typename T2, ..., typename TN, typename Combiner, ...
 #define BOOST_SIGNAL_TEMPLATE_DECL \
   BOOST_SIGNAL_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS_NUM_ARGS), \

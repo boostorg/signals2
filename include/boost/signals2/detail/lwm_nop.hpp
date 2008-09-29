@@ -26,7 +26,7 @@ namespace boost
 namespace signals2
 {
 
-class lightweight_mutex: public dummy_mutex
+class mutex: public dummy_mutex
 {
 };
 
