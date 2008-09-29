@@ -76,7 +76,13 @@
             with <code>target</code>, which may be any
             function object with which a
             <code>SlotFunction</code> can be
-            constructed.  The slot's tracked object list is initially empty.</para>
+            constructed.
+            </para>
+            <para>In this special case where the template type parameter <code>Slot</code> is
+              a compatible <classname>signal</classname> or <classname>signalN</classname> type,
+              the signal will automatically be added to the slot's tracked object list.
+              Otherwise, the slot's tracked object list is initially empty.
+            </para>
           </effects>
         </constructor>
       <constructor>
