@@ -14,8 +14,8 @@
             The <code>mutex</code> class implements the <code>Lockable</code>
             concept of Boost.Thread, and is the default <code>Mutex</code> template parameter
             type for signals.
-            If boost has detected thread support in the compiler's current
-            translation mode, mutex will map to a CRITICAL_SECTION on Windows
+            If boost has detected thread support in your compiler, the <code>mutex</code>
+            class will map to a CRITICAL_SECTION on Windows
             or a pthread_mutex on POSIX.  If thread support is not detected, <code>mutex</code>
             will behave similarly to a <classname>dummy_mutex</classname>.
             The header file <code>boost/config.hpp</code>
