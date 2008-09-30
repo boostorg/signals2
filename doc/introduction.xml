@@ -28,7 +28,7 @@
   <section>
     <title>Signals2 (formerly known as thread_safe_signals)</title>
     <para>This documentation describes a thread-safe variant of the
-    orignal Boost.Signals library.  There have been some changes to
+    original Boost.Signals library.  There have been some changes to
     the interface to support thread-safety, mostly with respect to
     automatic connection management.  This implementation was written by
     Frank Mori Hess.  Acknowledgements are also due to Timmo Stange, Peter
