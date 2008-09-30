@@ -5,7 +5,8 @@
   <run-test filename="connection_test.cpp">
     <lib>../../../libs/test/build/boost_test_exec_monitor</lib>
     <purpose>
-      <para>Test functionality of <classname>connection</classname> and <classname>scoped_connection</classname>
+      <para>Test functionality of <classname>boost::signals2::connection</classname>
+        and <classname>boost::signals2::scoped_connection</classname>
         objects, including release() and swap().</para>
     </purpose>
   </run-test>
@@ -22,7 +23,8 @@ connect to the slot.</para>
   <run-test filename="deconstruct_test.cpp">
     <lib>../../../libs/test/build/boost_test_exec_monitor</lib>
     <purpose>
-      <para>Test postconstruction/predestruction functionality of <functionname>deconstruct_ptr</functionname> and friends.</para>
+      <para>Test postconstruction/predestruction functionality of
+        <functionname>boost::signals2::deconstruct_ptr</functionname> and friends.</para>
     </purpose>
   </run-test>
 

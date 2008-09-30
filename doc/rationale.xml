@@ -6,7 +6,7 @@
 
   <using-namespace name="boost"/>
   <using-namespace name="boost::signals2"/>
-  <using-class name="boost::signalN"/>
+  <using-class name="boost::signals2::signalN"/>
 
   <section>
     <title>User-level Connection Management</title>

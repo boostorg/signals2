@@ -175,7 +175,7 @@
             <returns><para>The result returned by the slot's <code>SlotFunction</code> object.</para></returns>
 
             <throws><para>Any exceptions thrown by the slot's <code>SlotFunction</code> object.
-            <classname>boost::expired_slot</classname> if any object in the tracked object list
+            <classname>boost::signals2::expired_slot</classname> if any object in the tracked object list
             has expired.</para></throws>
 
             <notes><para>If you have already used <methodname>lock</methodname> to insure the
