@@ -149,7 +149,7 @@ test_signal_signal_connect()
 
   {
     signal_type s2;
-    s1.connect(signal_type::slot_type(s2));
+    s1.connect(s2);
     s2.connect(std::bind1st(std::multiplies<int>(), 2));
     s2.connect(std::bind1st(std::multiplies<int>(), -3));
 
@@ -188,6 +188,24 @@ test_ref()
   BOOST_CHECK(ec.count == 1);
 }
 
+static void test_default_combiner()
+{
+  boost::signals2::signal0<int> sig;
+  boost::optional<int> result;
+  result = sig();
+  BOOST_CHECK(!result);
+
+  sig.connect(make_int(0, 0));
+  result = sig();
+  BOOST_CHECK(result);
+  BOOST_CHECK(*result == 0);
+
+  sig.connect(make_int(1, 1));
+  result = sig();
+  BOOST_CHECK(result);
+  BOOST_CHECK(*result == 1);
+}
+
 int
 test_main(int, char* [])
 {
@@ -195,5 +213,6 @@ test_main(int, char* [])
   test_one_arg();
   test_signal_signal_connect();
   test_ref();
+  test_default_combiner();
   return 0;
 }

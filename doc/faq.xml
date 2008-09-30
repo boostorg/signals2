@@ -57,10 +57,14 @@
           </listitem>
           <listitem>
             <para>
-              The <classname>last_value</classname> combiner throws an exception instead of producing undefined
-              behavior when used with no slots connected (except for its specializations which do not require any
-              slots to be connected).  An additional specialization
-              last_value&lt;<classname>optional</classname>&lt;T&gt;&nbsp;&gt; (which does not throw) has been added.
+              The <classname>optional_last_value</classname> has replaced <classname>last_value</classname>
+              as the default combiner for signals.
+            </para>
+            <para>
+              The <classname>last_value</classname> combiner is still provided, and it
+              throws an exception instead of requiring at least one slot to be connected
+              on signal invocation (except for its void specialization which does not require any
+              slots to be connected).
             </para>
           </listitem>
           <listitem>

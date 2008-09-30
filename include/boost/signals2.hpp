@@ -9,4 +9,5 @@
 
 #include <boost/signals2/deconstruct_ptr.hpp>
 #include <boost/signals2/dummy_mutex.hpp>
+#include <boost/signals2/last_value.hpp>
 #include <boost/signals2/signal.hpp>

@@ -24,18 +24,7 @@ namespace boost {
     public:
       virtual const char* what() {return "boost::no_slots_error";}
     };
-    namespace last_value_detail {
-      template<typename T>
-      T default_construct(const T *resolver)
-      {
-        throw no_slots_error();
-      }
-      template<typename T>
-      optional<T> default_construct(const optional<T> *resolver)
-      {
-        return optional<T>();
-      }
-    }
+
     template<typename T>
     struct last_value {
       typedef T result_type;
@@ -46,7 +35,7 @@ namespace boost {
         T * resolver = 0;
         if(first == last)
         {
-          return last_value_detail::default_construct(resolver);
+          throw no_slots_error();
         }
         optional<T> value;
         while (first != last)
@@ -55,7 +44,7 @@ namespace boost {
           ++first;
         }
         if(value) return value.get();
-        return last_value_detail::default_construct(resolver);
+        throw no_slots_error();
       }
     };
 

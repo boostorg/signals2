@@ -16,6 +16,7 @@ XML_SRCS=\
 	reference/dummy_mutex.xml \
 	reference/last_value.xml \
 	reference/mutex.xml \
+	reference/optional_last_value.xml \
 	reference/postconstructible.xml \
 	reference/predestructible.xml \
 	reference/reference.xml \

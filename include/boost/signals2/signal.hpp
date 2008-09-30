@@ -19,7 +19,7 @@
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/function.hpp>
-#include <boost/signals2/last_value.hpp>
+#include <boost/signals2/optional_last_value.hpp>
 #include <boost/preprocessor/arithmetic.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/iteration.hpp>
@@ -46,7 +46,7 @@ namespace boost
   namespace signals2
   {
     template<typename Signature,
-      typename Combiner = last_value<typename boost::function_traits<Signature>::result_type>,
+      typename Combiner = optional_last_value<typename boost::function_traits<Signature>::result_type>,
       typename Group = int,
       typename GroupCompare = std::less<Group>,
       typename SlotFunction = function<Signature>,

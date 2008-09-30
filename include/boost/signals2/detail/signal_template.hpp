@@ -18,10 +18,10 @@
 #define BOOST_WEAK_SIGNAL_CLASS_NAME BOOST_PP_CAT(weak_, BOOST_SIGNAL_CLASS_NAME)
 #define BOOST_SIGNAL_IMPL_CLASS_NAME BOOST_PP_CAT(BOOST_SIGNAL_CLASS_NAME, _impl)
 
-// typename R, typename T1, typename T2, ..., typename TN, typename Combiner = last_value<R>, ...
+// typename R, typename T1, typename T2, ..., typename TN, typename Combiner = optional_last_value<R>, ...
 #define BOOST_SIGNAL_TEMPLATE_DEFAULTED_DECL \
   BOOST_SIGNAL_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS_NUM_ARGS), \
-  typename Combiner = last_value<R>, \
+  typename Combiner = optional_last_value<R>, \
   typename Group = int, \
   typename GroupCompare = std::less<Group>, \
   typename SlotFunction = BOOST_FUNCTION_N_DECL(BOOST_SIGNALS_NUM_ARGS), \

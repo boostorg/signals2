@@ -428,7 +428,7 @@ sig.<methodname>connect</methodname>(&amp;quotient);
 sig.<methodname>connect</methodname>(&amp;sum);
 sig.<methodname>connect</methodname>(&amp;difference);
 
-std::cout &lt;&lt; sig(5, 3) &lt;&lt; std::endl;
+std::cout &lt;&lt; *sig(5, 3) &lt;&lt; std::endl;
 </programlisting>
 </entry>
 <entry>
@@ -445,7 +445,7 @@ sig.<methodname>connect</methodname>(&amp;quotient);
 sig.<methodname>connect</methodname>(&amp;sum);
 sig.<methodname>connect</methodname>(&amp;difference);
 
-std::cout &lt;&lt; sig(5, 3) &lt;&lt; std::endl;
+std::cout &lt;&lt; *sig(5, 3) &lt;&lt; std::endl;
 </programlisting>
 </entry>
             </row>
@@ -457,7 +457,8 @@ std::cout &lt;&lt; sig(5, 3) &lt;&lt; std::endl;
 default behavior of a signal that has a return type
 (<code>float</code>, the first template argument given to the
 <code><classname>boost::signals2::signal</classname></code> class template) is to call all slots and
-then return the result returned by the last slot called. This
+then return a <classname>boost::optional</classname> containing
+the result returned by the last slot called. This
 behavior is admittedly silly for this example, because slots have
 no side effects and the result is the last slot connected.</para>
 <para>A more interesting signal result would be the maximum of the

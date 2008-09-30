@@ -10,16 +10,17 @@
     </para>
   </header>
 
+  <xi:include href="connection.xml"/>
+  <xi:include href="deconstruct_ptr.xml"/>
+  <xi:include href="dummy_mutex.xml"/>
+  <xi:include href="last_value.xml"/>
+  <xi:include href="mutex.xml"/>
+  <xi:include href="optional_last_value.xml"/>
+  <xi:include href="postconstructible.xml"/>
+  <xi:include href="predestructible.xml"/>
+  <xi:include href="shared_connection_block.xml"/>
   <xi:include href="signal_header.xml"/>
   <xi:include href="signal_base.xml"/>
   <xi:include href="slot.xml"/>
   <xi:include href="slot_base.xml"/>
-  <xi:include href="connection.xml"/>
-  <xi:include href="shared_connection_block.xml"/>
-  <xi:include href="last_value.xml"/>
-  <xi:include href="mutex.xml"/>
-  <xi:include href="dummy_mutex.xml"/>
-  <xi:include href="deconstruct_ptr.xml"/>
-  <xi:include href="postconstructible.xml"/>
-  <xi:include href="predestructible.xml"/>
 </library-reference>
