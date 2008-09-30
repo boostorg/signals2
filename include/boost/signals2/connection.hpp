@@ -198,46 +198,30 @@ namespace boost
     class scoped_connection: public connection
     {
     public:
-      scoped_connection(): _released(false) {}
+      scoped_connection() {}
       scoped_connection(const connection &other):
-        connection(other), _released(false)
+        connection(other)
       {}
       ~scoped_connection()
       {
-        if(_released == false)
-          disconnect();
+        disconnect();
       }
       scoped_connection& operator=(const connection &rhs)
       {
-        if(_released == false)
-          disconnect();
-        _released = false;
+        disconnect();
         connection::operator=(rhs);
         return *this;
       }
       connection release()
       {
         connection conn(_weak_connection_body);
-        _released = true;
+        _weak_connection_body.reset();
         return conn;
-      }
-      bool released() const {return _released;}
-      void swap(scoped_connection &other)
-      {
-        connection::swap(other);
-        using std::swap;
-        swap(_released, other._released);
       }
     private:
       scoped_connection(const scoped_connection &other);
       scoped_connection& operator=(const scoped_connection &rhs);
-
-      bool _released;
     };
-    void swap(scoped_connection &conn1, scoped_connection &conn2)
-    {
-      conn1.swap(conn2);
-    }
   }
 }
 

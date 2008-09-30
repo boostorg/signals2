@@ -168,7 +168,7 @@
         <access name="public">
           <constructor>
             <postconditions>
-              <para><code><methodname>released</methodname>() == false &amp;&amp; <methodname alt="connection::connected">connected</methodname>() == false </code></para>
+              <para><code><methodname alt="connection::connected">connected</methodname>() == false </code></para>
             </postconditions>
             <description>
               <para>Default constructs an empty scoped_connection.</para>
@@ -186,7 +186,7 @@
               <computeroutput>other</computeroutput>.</para></effects>
 
             <postconditions>
-              <para><code><methodname>released</methodname>() == false &amp;&amp; <methodname alt="connection::connected">connected</methodname>() == other.connected()</code></para>
+              <para><code><methodname alt="connection::connected">connected</methodname>() == other.connected()</code></para>
             </postconditions>
 
             <throws><para>Will not throw.</para></throws>
@@ -194,8 +194,7 @@
 
           <destructor>
             <effects><para>If
-            <computeroutput>this-&gt;<methodname alt="connection::connected">connected</methodname>()</computeroutput>
-            and this-><methodname>released</methodname>() == false,
+            <computeroutput>this-&gt;<methodname alt="connection::connected">connected</methodname>()</computeroutput>,
             disconnects the signal-slot connection.</para></effects>
           </destructor>
           <method-group name="public methods">
@@ -208,45 +207,30 @@
                 <para><computeroutput>this</computeroutput> references
                   the connection referenced by
                   <computeroutput>rhs</computeroutput>.  If <code>this</code> already references another
-                  connection which has not been released, the old connection will be disconnected first.
+                  connection, the old connection will be disconnected first.
                 </para>
               </effects>
               <postconditions>
-               <para><code><methodname>released</methodname>() == false &amp;&amp; <methodname alt="connection::connected">connected</methodname>() == rhs.connected()</code></para>
+                <para><code><methodname alt="connection::connected">connected</methodname>() == rhs.connected()</code></para>
               </postconditions>
             </method>
             <method name="release">
               <type><classname>connection</classname></type>
-              <postconditions>
-                <para><code>released() == true</code></para>
-              </postconditions>
               <effects>
                 <para>
-                  Prevents the <code>scoped_connection</code> from disconnecting when the
-                  it is destroyed or reassigned.
+                  Releases the connection so it will not be disconnected by the <code>scoped_connection</code>
+                  when it is destroyed or reassigned.  The <code>scoped_connection</code> is reset to
+                  the NULL connection after this call completes.
                 </para>
               </effects>
-            </method>
-            <method name="released" cv="const">
-              <type>bool</type>
+              <postconditions>
+                <para><code><methodname alt="connection::connected">connected</methodname>() == false</code></para>
+              </postconditions>
               <returns>
-                <para>
-                  Returns <code>false</code> if the scoped_connection will disconnect the connection when the
-                  <code>scoped_connection</code> is destroyed or reassigned.  Otherwise, returns <code>true</code>.
+                <para>A <classname>connection</classname> object referencing the connection which was
+                  released by the <code>scoped_connection</code>.
                 </para>
               </returns>
-            </method>
-            <method name="swap">
-              <type>void</type>
-              <parameter name="other">
-                <paramtype>const <classname>scoped_connection</classname>&amp;</paramtype>
-              </parameter>
-              <effects><para>Swaps the connections referenced in
-              <computeroutput>this</computeroutput> and
-              <computeroutput>other</computeroutput>, as well as their "released" state
-              (see the <methodname>released</methodname> method).</para></effects>
-
-              <throws><para>Will not throw.</para></throws>
             </method>
           </method-group>
         </access>
@@ -274,7 +258,7 @@
             <title>Thread Safety</title>
             <para>The methods of the <code>scoped_connection</code> class (including those
               inherited from its base <code>connection</code> class) are thread-safe with the exception
-              of <methodname>swap</methodname>, <methodname>release</methodname>, and
+              of <methodname>connection::swap</methodname>, <methodname>release</methodname>, and
               the assignment operator  A <code>scoped_connection</code> object
               should not be accessed concurrently when any of these operations is in progress.
               However, it is always safe to access a different <code>connection</code> object
@@ -282,20 +266,6 @@
             </para>
           </section>
         </description>
-        <free-function-group name="specialized algorithms">
-          <function name="swap">
-            <type>void</type>
-            <parameter name="x">
-              <paramtype><classname>scoped_connection</classname>&amp;</paramtype>
-            </parameter>
-            <parameter name="y">
-              <paramtype><classname>scoped_connection</classname>&amp;</paramtype>
-            </parameter>
-
-            <effects><para><computeroutput>x.swap(y)</computeroutput></para></effects>
-            <throws><para>Will not throw.</para></throws>
-          </function>
-        </free-function-group>
       </class>
     </namespace>
   </namespace>
