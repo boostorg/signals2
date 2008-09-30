@@ -44,7 +44,7 @@
       Boost vault</ulink>.
       The development version of the code is available in the sandbox of the
       <ulink url="http://svn.boost.org/trac/boost/wiki/BoostSubversion">Boost svn</ulink>.
-      The files for thread_safe_signals are located in the <code>sandbox/thread_safe_signals</code>
+      The files for Signals2 are located in the <code>sandbox/thread_safe_signals</code>
       subdirectory and may be <ulink url="http://svn.boost.org/trac/boost/browser/sandbox/thread_safe_signals">
       browsed online</ulink> or the trunk checked out with the following command:
       <programlisting>svn co http://svn.boost.org/svn/boost/sandbox/thread_safe_signals/trunk thread_safe_signals</programlisting>

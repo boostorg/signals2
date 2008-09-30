@@ -5,7 +5,7 @@
   <title>Frequently Asked Questions</title>
 
   <using-namespace name="boost"/>
-  <using-namespace name="boost::signalslib"/>
+  <using-namespace name="boost::signals2"/>
 
   <qandaset>
     <qandaentry>
@@ -23,54 +23,18 @@
     </qandaentry>
     <qandaentry>
       <question>
-        <para>Is Boost.Signals thread-safe?</para>
+        <para>Is Boost.Signals2 thread-safe?</para>
       </question>
       <answer>
-        <para>Yes, if the ThreadingModel template parameter of the signal is set to
-        <code>boost::signalslib::multi_threaded</code>, or if it is set to
-        <code>boost::signalslib::auto_threaded</code> and boost has detected thread support
-        in the compiler's current translation mode.  If you use <code>boost::signalslib::multi_threaded</code>,
-        you will also have to link to libboost_thread.</para>
-      </answer>
-    </qandaentry>
-    <qandaentry>
-      <question>
-        <para>How do I get Boost.Signals to work with Qt?</para>
-      </question>
-      <answer>
-        <para>When building with Qt, the Moc keywords
-        <code>signals</code> and <code>slots</code> are defined using
-        preprocessor macros, causing a conflict with the <code>boost::signals</code>
-        namespace.  For thread_safe_signals, <code>boost::signals</code> is actually
-        just a namespace alias to <code>boost::signalslib</code>.  So by always using the
-        namespace <code>boost::signalslib</code> instead of
-        <code>boost::signals</code> in your
-        code, you can avoid any conflict with the Qt <code>signals</code> macro.
+        <para>
+          Yes, as long as the Mutex template parameter is not set to
+          a fake mutex type like <classname>boost::signals2::dummy_mutex</classname>.
+          Also, if your slots depend on objects which may be destroyed concurrently
+          with signal invocation, you will need to use automatic connection management.
+          That is, the objects will need to be owned by
+          <classname>shared_ptr</classname> and passed to the slot's
+          <methodname alt="slotN::track">track</methodname>() method before the slot is connected.
         </para>
-
-        <para>Alternatively, for <emphasis>Qt 4.1 and later</emphasis>
-        the <code>signals</code> and <code>slots</code> macros
-        can be turned off in Qt on a per-project or per-file basis
-        with the <code>no_keywords</code> option.  This works with
-        out-of-the-box builds of Boost and Qt. You do not need to
-        re-configure, re-build, or duplicate existing libraries. For a
-        project where you want to use both Boost.Signals and Qt
-        Signals and Slots, the relevant part of your .pro file might
-        look like this:</para>
-
-        <programlisting>CONFIG      += no_keywords # so Qt won't #define any non-all-caps `keywords'
-INCLUDEPATH += . /usr/local/include/thread_safe_signals /usr/local/include/boost-1_33_1/ # ...your exact paths may vary
-</programlisting>
-
-        <para>Now you can mix Boost.Signals and Qt Signals and Slots
-        in the same files, and even within the same class or function.
-        You will have to use the upper-case versions of Qt macros in
-        your own code.  See the article <ulink
-        url="http://scottcollins.net/articles/a-deeper-look-at-signals-and-slots.html">A
-        Deeper Look at Signals and Slots</ulink> [off-site] for more
-        complete examples and a survey of the strengths of the two
-        systems.</para>
-
       </answer>
     </qandaentry>
     <qandaentry>
@@ -102,7 +66,7 @@ INCLUDEPATH += . /usr/local/include/thread_safe_signals /usr/local/include/boost
           <listitem>
             <para>
               The <classname>signal</classname> class has an additional template parameter for specifying
-              the threading model.
+              the mutex type used internally by the signal.
             </para>
             <para>The <code>signal::combiner()</code> method, which formerly returned a reference to the
               signal's combiner has been replaced by <methodname alt="signalN::combiner">signal::combiner</methodname>
@@ -129,9 +93,12 @@ INCLUDEPATH += . /usr/local/include/thread_safe_signals /usr/local/include/boost
             </para>
           </listitem>
           <listitem>
-            <para>The namespace <code>boost::signals</code> has been renamed <code>boost::signalslib</code>
-              to avoid conflict with Qt's signal macro.  For backward compatibility, a <code>boost::signals</code>
-              namespace alias is provided.
+            <para>The namespace <code>boost::signals</code> has been replaced by <code>boost::signals2</code>
+              to avoid conflict with the original Signals implementation, and the Qt "signals" macro.
+              Also, some classes and headers
+              have been moved to comply with Boost's guidelines.  For example, the signal class is now
+              in the boost::signals2 namespace instead of the boost namespace,
+              and it's header file is now at boost/signals2/signal.hpp instead of boost/signal.hpp.
             </para>
           </listitem>
         </itemizedlist>

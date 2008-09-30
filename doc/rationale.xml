@@ -5,7 +5,7 @@
   <title>Design Rationale</title>
 
   <using-namespace name="boost"/>
-  <using-namespace name="boost::signalslib"/>
+  <using-namespace name="boost::signals2"/>
   <using-class name="boost::signalN"/>
 
   <section>
@@ -13,7 +13,7 @@
 
     <para> Users need to have fine control over the connection of
     signals to slots and their eventual disconnection. The approach
-    taken by Boost.Signals is to return a
+    taken by Boost.Signals2 is to return a
     <code><classname>connection</classname></code> object that enables
     connected/disconnected query, manual disconnection, and an
     automatic disconnection on destruction mode. Some other possible
@@ -45,7 +45,7 @@
         disconnect</emphasis>: this approach identifies slots with a
         token that is easily comparable (e.g., a string), enabling
         slots to be arbitrary function objects. While this approach is
-        essentially equivalent to the approach taken by Boost.Signals,
+        essentially equivalent to the approach taken by Boost.Signals2,
         it is possibly more error-prone for several reasons:</para>
 
         <itemizedlist>
@@ -77,7 +77,7 @@
           </listitem>
         </itemizedlist>
 
-        <para> This type of interface is supported in Boost.Signals
+        <para> This type of interface is supported in Boost.Signals2
         via the slot grouping mechanism. It augments the
         <code><classname>connection</classname></code> object-based
         connection management scheme.</para>
@@ -88,12 +88,12 @@
   <section>
     <title>Automatic Connection Management</title>
 
-    <para>Automatic connection management in thread_safe_signals
+    <para>Automatic connection management in Signals2
       depends on the use of <classname>boost::shared_ptr</classname> to
       manage the lifetimes of tracked objects.  This is differs from
-      the original Boost.Signals library, which instead relied on derivation
+      the original Boost.Signals2 library, which instead relied on derivation
       from the <code><classname>boost::trackable</classname></code> class.
-      The Boost.Signals library would be
+      The Boost.Signals2 library would be
       notified of an object's destruction by the
       <code><classname>trackable</classname></code> destructor.
     </para>
@@ -130,14 +130,14 @@
     proficient C++ programmer. Competing interface design generally
     required the combiners to be constructed to conform to an
     interface that would be customized for (and limited to) the
-    Signals library. While these interfaces are generally enable more
+    Signals2 library. While these interfaces are generally enable more
     straighforward implementation of the signals &amp; slots
     libraries, the combiners are unfortunately not reusable (either in
     other signals &amp; slots libraries or within other generic
     algorithms), and the learning curve is steepened slightly to learn
     the specific combiner interface.</para>
 
-    <para> The Signals formulation of combiners is based on the
+    <para> The Signals2 formulation of combiners is based on the
     combiner using the "pull" mode of communication, instead of the
     more complex "push" mechanism. With a "pull" mechanism, the
     combiner's state can be kept on the stack and in the program
@@ -240,7 +240,7 @@ private:
     even outside the context of a signals &amp; slots library.</para>
 
     <para> The cost of the "pull" combiner interface is paid in the
-    implementation of the Signals library itself. To correctly handle
+    implementation of the Signals2 library itself. To correctly handle
     slot disconnections during calls (e.g., when the dereference
     operator is invoked), one must construct the iterator to skip over
     disconnected slots. Additionally, the iterator must carry with it
@@ -258,7 +258,7 @@ private:
   <section>
     <title>Connection Interfaces: +=  operator</title>
 
-    <para> Boost.Signals supports a connection syntax with the form
+    <para> Boost.Signals2 supports a connection syntax with the form
     <code>sig.<methodname>connect</methodname>(slot)</code>, but a
     more terse syntax <code>sig += slot</code> has been suggested (and
     has been used by other signals &amp; slots implementations). There
@@ -268,7 +268,7 @@ private:
     <itemizedlist>
       <listitem>
         <para><emphasis role="bold">It's unnecessary</emphasis>: the
-        connection syntax supplied by Boost.Signals is no less
+        connection syntax supplied by Boost.Signals2 is no less
         powerful that that supplied by the <code>+=</code>
         operator. The savings in typing (<code>connect()</code>
         vs. <code>+=</code>) is essentially negligible. Furthermore,
@@ -317,9 +317,9 @@ private:
       an initiative to wrap the C interfaces to <ulink
       url="http://www.gtk.org">GTK</ulink> libraries in C++, and has
       grown to be a separate library maintained by Karl Nelson. There
-      are many similarities between libsigc++ and Boost.Signals, and
-      indeed Boost.Signals was strongly influenced by Karl Nelson and
-      libsigc++. A cursory inspection of each library will find a
+      are many similarities between libsigc++ and Boost.Signals2, and
+      indeed the original Boost.Signals was strongly influenced by
+      Karl Nelson and libsigc++. A cursory inspection of each library will find a
       similar syntax for the construction of signals and in the use of
       connections. There
       are some major differences in design that separate these
@@ -333,12 +333,12 @@ private:
           objects (as part of the library), explicit adaptation from
           the argument and return types of the signal to the argument
           and return types of the slot (libsigc++ is, by default, more
-          strict about types than Boost.Signals).</para>
+          strict about types than Boost.Signals2).</para>
         </listitem>
 
         <listitem>
           <para><emphasis role="bold">Combiner/Marshaller
-          interface</emphasis>: the equivalent to Boost.Signals
+          interface</emphasis>: the equivalent to Boost.Signals2
           combiners in libsigc++ are the marshallers. Marshallers are
           similar to the "push" interface described in Combiner
           Interface, and a proper treatment of the topic is given
