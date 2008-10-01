@@ -190,7 +190,7 @@ namespace boost
 
       boost::weak_ptr<detail::connection_body_base> _weak_connection_body;
     };
-    void swap(connection &conn1, connection &conn2)
+    inline void swap(connection &conn1, connection &conn2)
     {
       conn1.swap(conn2);
     }
