@@ -60,7 +60,15 @@ namespace boost {
         dereference() const
         {
           if (!(*cache)) {
-            cache->reset(f(*iter));
+            try
+            {
+              cache->reset(f(*iter));
+            }
+            catch(expired_slot &)
+            {
+              (*iter)->disconnect();
+              throw;
+            }
           }
           return cache->get();
         }

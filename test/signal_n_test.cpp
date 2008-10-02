@@ -206,6 +206,20 @@ static void test_default_combiner()
   BOOST_CHECK(*result == 1);
 }
 
+static void disconnecting_slot()
+{
+  throw boost::signals2::expired_slot();
+}
+
+static void test_slot_expired_disconnect()
+{
+  boost::signals2::signal0<void> sig;
+  sig.connect(&disconnecting_slot);
+  BOOST_CHECK(sig.num_slots() == 1);
+  sig();
+  BOOST_CHECK(sig.num_slots() == 0);
+}
+
 int
 test_main(int, char* [])
 {
@@ -214,5 +228,6 @@ test_main(int, char* [])
   test_signal_signal_connect();
   test_ref();
   test_default_combiner();
+  test_slot_expired_disconnect();
   return 0;
 }

@@ -15,6 +15,8 @@
 
 namespace boost {
   namespace signals2 {
+    class expired_slot;
+    
     template<typename T>
       class optional_last_value
     {
@@ -27,7 +29,11 @@ namespace boost {
         optional<T> value;
         while (first != last)
         {
-          value = *first;
+          try
+          {
+            value = *first;
+          }
+          catch(const expired_slot &) {}
           ++first;
         }
         return value;
@@ -50,7 +56,11 @@ namespace boost {
       {
         while (first != last)
         {
-          *first;
+          try
+          {
+            *first;
+          }
+          catch(const expired_slot &) {}
           ++first;
         }
         return result_type();
