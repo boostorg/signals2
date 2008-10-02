@@ -41,7 +41,7 @@ namespace boost {
 
       // Determine if the given type T is a signal
       template<typename T>
-      class is_signal: public mpl::bool_<is_convertible<T*, signal_base*>::value>
+      class is_signal: public mpl::bool_<is_base_of<signal_base, T>::value>
       {};
 
       // A slot can be a signal, a reference to a function object, or a
