@@ -8,6 +8,7 @@
 // For more information, see http://www.boost.org
 
 #include <boost/optional.hpp>
+#include <boost/ref.hpp>
 #include <boost/test/minimal.hpp>
 #include <boost/signals2.hpp>
 #include <functional>
@@ -150,6 +151,19 @@ test_signal_signal_connect()
   {
     signal_type s2;
     s1.connect(s2);
+    s2.connect(std::bind1st(std::multiplies<int>(), 2));
+    s2.connect(std::bind1st(std::multiplies<int>(), -3));
+
+    BOOST_CHECK(s2(-3) == 9);
+    BOOST_CHECK(s1(3) == 6);
+  } // s2 goes out of scope and disconnects
+
+  BOOST_CHECK(s1(3) == -3);
+
+  // test auto-track of signal wrapped in a reference_wrapper
+  {
+    signal_type s2;
+    s1.connect(boost::cref(s2));
     s2.connect(std::bind1st(std::multiplies<int>(), 2));
     s2.connect(std::bind1st(std::multiplies<int>(), -3));
 
