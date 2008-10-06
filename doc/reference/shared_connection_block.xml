@@ -38,7 +38,7 @@
 
       <constructor>
           <parameter name="conn">
-            <paramtype>boost::signals2::connection &amp;</paramtype>
+            <paramtype>const boost::signals2::connection &amp;</paramtype>
           </parameter>
 
           <effects>

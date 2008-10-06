@@ -108,6 +108,22 @@ test_remove_self()
   s0(); std::cout << std::endl;
   BOOST_CHECK(test_output == "123");
 
+  std::cout << "Blocking 1 through const connection" << std::endl;
+
+  {
+    const boost::signals2::connection conn = connections[1];
+    boost::signals2::shared_connection_block block(conn);
+    test_output = "";
+    s0(); std::cout << std::endl;
+    BOOST_CHECK(test_output == "23");
+  }
+
+  std::cout << "Unblocking 1" << std::endl;
+
+  test_output = "";
+  s0(); std::cout << std::endl;
+  BOOST_CHECK(test_output == "123");
+
   s0.disconnect_all_slots();
   BOOST_CHECK(s0.empty());
 
