@@ -22,7 +22,7 @@ namespace boost
     class shared_connection_block
     {
     public:
-      shared_connection_block(connection &conn):
+      shared_connection_block(const connection &conn):
         _weak_connection_body(conn._weak_connection_body)
       {
         block();

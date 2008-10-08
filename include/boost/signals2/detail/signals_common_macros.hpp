@@ -12,7 +12,7 @@
 #define BOOST_SIGNALS_COMMON_MACROS_HEADER
 
 #ifndef BOOST_SIGNALS_MAX_ARGS
-#define BOOST_SIGNALS_MAX_ARGS 10
+#define BOOST_SIGNALS_MAX_ARGS 9
 #endif
 
 // argn
@@ -40,6 +40,13 @@
 // functionN<R, T1, T2, ..., TN>
 #define BOOST_FUNCTION_N_DECL(arity) BOOST_PP_CAT(function, arity)<\
   BOOST_SIGNAL_SIGNATURE_TEMPLATE_INSTANTIATION(arity) >
+// R, const boost::signals2::connection&, T1, T2, ..., TN
+#define BOOST_SIGNALS2_EXT_SLOT_TEMPLATE_INSTANTIATION(arity) \
+  R, const boost::signals2::connection&  BOOST_PP_COMMA_IF(arity) \
+  BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(arity), T)
+// functionN<R, const boost::signals2::connection &, T1, T2, ..., TN>
+#define BOOST_SIGNALS2_EXT_FUNCTION_N_DECL(arity) BOOST_PP_CAT(function, BOOST_PP_INC(arity))<\
+  BOOST_SIGNALS2_EXT_SLOT_TEMPLATE_INSTANTIATION(arity) >
 // slotN
 #define BOOST_SLOT_CLASS_NAME(arity) BOOST_PP_CAT(slot, arity)
 // typename function_traits<Signature>::argn_type

@@ -220,18 +220,47 @@ static void test_default_combiner()
   BOOST_CHECK(*result == 1);
 }
 
-static void disconnecting_slot()
+template<typename ResultType>
+  ResultType disconnecting_slot(const boost::signals2::connection &conn, int)
 {
-  throw boost::signals2::expired_slot();
+  conn.disconnect();
+  return ResultType();
 }
 
-static void test_slot_expired_disconnect()
+template<typename ResultType>
+  void test_extended_slot()
 {
-  boost::signals2::signal0<void> sig;
-  sig.connect(&disconnecting_slot);
-  BOOST_CHECK(sig.num_slots() == 1);
-  sig();
-  BOOST_CHECK(sig.num_slots() == 0);
+  {
+    typedef boost::signals2::signal1<ResultType, int> signal_type;
+    typedef typename signal_type::extended_slot_type slot_type;
+    signal_type sig;
+    slot_type myslot(&disconnecting_slot<ResultType>);
+    sig.connect_extended(myslot);
+    BOOST_CHECK(sig.num_slots() == 1);
+    sig(0);
+    BOOST_CHECK(sig.num_slots() == 0);
+  }
+  { // test 0 arg signal
+    typedef boost::signals2::signal0<ResultType> signal_type;
+    typedef typename signal_type::extended_slot_type slot_type;
+    signal_type sig;
+    slot_type myslot(&disconnecting_slot<ResultType>, _1, 0);
+    sig.connect_extended(myslot);
+    BOOST_CHECK(sig.num_slots() == 1);
+    sig();
+    BOOST_CHECK(sig.num_slots() == 0);
+  }
+  // test disconnection by slot
+  {
+    typedef boost::signals2::signal1<ResultType, int> signal_type;
+    typedef typename signal_type::extended_slot_type slot_type;
+    signal_type sig;
+    slot_type myslot(&disconnecting_slot<ResultType>);
+    sig.connect_extended(myslot);
+    BOOST_CHECK(sig.num_slots() == 1);
+    sig.disconnect(&disconnecting_slot<ResultType>);
+    BOOST_CHECK(sig.num_slots() == 0);
+  }
 }
 
 int
@@ -242,6 +271,7 @@ test_main(int, char* [])
   test_signal_signal_connect();
   test_ref();
   test_default_combiner();
-  test_slot_expired_disconnect();
+  test_extended_slot<void>();
+  test_extended_slot<int>();
   return 0;
 }

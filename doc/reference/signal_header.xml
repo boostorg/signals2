@@ -29,6 +29,9 @@
           <template-type-parameter name="SlotFunction">
             <default><classname>functionN</classname>&lt;R, T1, T2, ..., TN&gt;</default>
           </template-type-parameter>
+          <template-type-parameter name="ExtendedSlotFunction">
+            <default><classname>function</classname>&lt;R (const <classname>connection</classname> &amp;, T1, T2, ..., TN)&gt;</default>
+          </template-type-parameter>
           <template-type-parameter name="Mutex">
             <default><classname>mutex</classname></default>
           </template-type-parameter>
@@ -58,6 +61,18 @@
         <typedef name="slot_function_type"><type>SlotFunction</type></typedef>
         <typedef name="slot_type">
           <type><classname>slotN</classname>&lt;R, T1, T2, ..., TN, SlotFunction&gt;</type>
+        </typedef>
+        <typedef name="extended_slot_function_type"><type>ExtendedSlotFunction</type></typedef>
+        <typedef name="extended_slot_type">
+          <type><classname>slotN</classname>&lt;R, const <classname>connection</classname> &amp;, T1, T2, ..., TN, ExtendedSlotFunction&gt;</type>
+          <description>
+            <para>Slots of the <code>extended_slot_type</code> may be connected to the signal using the
+              <methodname>connect_extended</methodname> methods.  The <code>extended_slot_type</code>
+              has an additional <classname>connection</classname> argument in its signature,
+              which gives slot functions access to their connection to the signal
+              invoking them.
+            </para>
+          </description>
         </typedef>
         <typedef name="slot_result_type">
           <type><emphasis>unspecified</emphasis></type>
@@ -164,6 +179,40 @@
             <notes><para>It is unspecified whether connecting a slot while the
             signal is calling will result in the slot being called
             immediately.</para></notes>
+          </overloaded-method>
+          <overloaded-method name="connect_extended">
+            <signature>
+              <type><classname>connection</classname></type>
+              <parameter name="slot">
+                <paramtype>const extended_slot_type&amp;</paramtype>
+              </parameter>
+              <parameter name="at">
+                <paramtype>connect_position</paramtype>
+                <default>at_back</default>
+              </parameter>
+            </signature>
+
+            <signature>
+              <type><classname>connection</classname></type>
+              <parameter name="group">
+                <paramtype>const group_type&amp;</paramtype>
+              </parameter>
+              <parameter name="slot">
+                <paramtype>const extended_slot_type&amp;</paramtype>
+              </parameter>
+              <parameter name="at">
+                <paramtype>connect_position</paramtype>
+                <default>at_back</default>
+              </parameter>
+            </signature>
+            <description>
+              <para>
+                The <code>connect_extended</code> methods work the same as the <methodname>connect</methodname>
+                methods, except they take slots of type <classname>extended_slot_type</classname>.
+                This is useful if a slot needs to access the connection between it and the
+                signal invoking it, for example if it wishes to disconnect or block the connection.
+              </para>
+            </description>
           </overloaded-method>
 
           <overloaded-method name="disconnect">
@@ -343,13 +392,16 @@
           <template-type-parameter name="SlotFunction">
             <default><classname>function</classname>&lt;Signature&gt;</default>
           </template-type-parameter>
+          <template-type-parameter name="ExtendedSlotFunction">
+            <default><classname>functionN</classname>&lt;R, const <classname>connection</classname> &amp;, T1, T2, ..., TN&gt;</default>
+          </template-type-parameter>
           <template-type-parameter name="Mutex">
             <default><classname>mutex</classname></default>
           </template-type-parameter>
         </template>
 
         <inherit access="public">
-          <type><classname>signalN</classname>&lt;R, T1, T2, ..., TN, Combiner, Group, GroupCompare, SlotFunction, Mutex&gt;</type>
+          <type><classname>signalN</classname>&lt;R, T1, T2, ..., TN, Combiner, Group, GroupCompare, SlotFunction, ExtendedSlotFunction, Mutex&gt;</type>
         </inherit>
         <purpose>Safe multicast callback.</purpose>
 

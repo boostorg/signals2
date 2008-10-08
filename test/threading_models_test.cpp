@@ -52,10 +52,10 @@ void simple_test()
 int test_main(int, char*[])
 {
   typedef boost::signals2::signal<void (), slot_counter, int, std::less<int>, boost::function<void ()>,
-    boost::mutex> sig0_mt_type;
+    boost::function<void (const boost::signals2::connection &)>, boost::mutex> sig0_mt_type;
   simple_test<sig0_mt_type>();
   typedef boost::signals2::signal<void (), slot_counter, int, std::less<int>, boost::function<void ()>,
-    boost::signals2::dummy_mutex> sig0_st_type;
+    boost::function<void (const boost::signals2::connection &)>, boost::signals2::dummy_mutex> sig0_st_type;
   simple_test<sig0_st_type>();
   return 0;
 }
