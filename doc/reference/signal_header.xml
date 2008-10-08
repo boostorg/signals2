@@ -18,7 +18,7 @@
           <template-varargs/>
           <template-type-parameter name="TN"/>
           <template-type-parameter name="Combiner">
-            <default><classname>last_value</classname>&lt;R&gt;</default>
+            <default><classname>optional_last_value</classname>&lt;R&gt;</default>
           </template-type-parameter>
           <template-type-parameter name="Group">
             <default>int</default>
@@ -381,7 +381,7 @@
             <purpose>Function type R (T1, T2, ..., TN)</purpose>
           </template-type-parameter>
           <template-type-parameter name="Combiner">
-            <default><classname>last_value</classname>&lt;R&gt;</default>
+            <default><classname>optional_last_value</classname>&lt;R&gt;</default>
           </template-type-parameter>
           <template-type-parameter name="Group">
             <default>int</default>
