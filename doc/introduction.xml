@@ -47,11 +47,11 @@
       The files for Signals2 are located in the <code>sandbox/thread_safe_signals</code>
       subdirectory and may be <ulink url="http://svn.boost.org/trac/boost/browser/sandbox/thread_safe_signals">
       browsed online</ulink> or the trunk checked out with the following command:
-      <programlisting>svn co http://svn.boost.org/svn/boost/sandbox/thread_safe_signals/trunk thread_safe_signals</programlisting>
+      <programlisting>svn co http://svn.boost.org/svn/boost/sandbox/thread_safe_signals/trunk signals2</programlisting>
     </para>
     <para>
       The current version of this document should be available
-      <ulink url="http://www.comedi.org/projects/thread_safe_signals/libs/signals2/doc/html/index.html">online</ulink>.
+      <ulink url="http://www.comedi.org/projects/signals2/libs/signals2/doc/html/index.html">online</ulink>.
     </para>
   </section>
 </section>
