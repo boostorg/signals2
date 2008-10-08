@@ -69,9 +69,23 @@
           </listitem>
           <listitem>
             <para>
+              The <classname>signal</classname> class has an additional typedef
+              <classname alt="signalN::extended_slot_type">signal::extended_slot_type</classname>
+              and new <methodname alt="signalN::connect_extended">signal::connect_extended</methodname>()
+              methods.  These allow connection of slots
+              which take an additional <classname>connection</classname> argument, giving them thread-safe
+              access to their signal/slot connection when they are invoked.  There is also an
+              additional ExtendedSlotFunction template parameter for specifying the underlying slot function
+              type for the new extended slots.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
               The <classname>signal</classname> class has an additional template parameter for specifying
               the mutex type used internally by the signal.
             </para>
+          </listitem>
+          <listitem>
             <para>The <code>signal::combiner()</code> method, which formerly returned a reference to the
               signal's combiner has been replaced by <methodname alt="signalN::combiner">signal::combiner</methodname>
               (which now returns the combiner by value) and <methodname alt="signalN::set_combiner">signal::set_combiner</methodname>.
