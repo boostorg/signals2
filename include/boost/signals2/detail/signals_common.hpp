@@ -20,25 +20,6 @@
 namespace boost {
   namespace signals2 {
     namespace detail {
-      // The unusable class is a placeholder for unused function arguments
-      // It is also completely unusable except that it constructable from
-      // anything. This helps compilers without partial specialization
-      // handle slots returning void.
-      struct unusable {
-        unusable() {}
-      };
-
-      // Determine the result type of a slot call
-      template<typename R>
-      struct slot_result_type_wrapper {
-        typedef R type;
-      };
-
-      template<>
-      struct slot_result_type_wrapper<void> {
-        typedef unusable type;
-      };
-
       // Determine if the given type T is a signal
       template<typename T>
       class is_signal: public mpl::bool_<is_base_of<signal_base, T>::value>

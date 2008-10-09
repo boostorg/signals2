@@ -19,14 +19,14 @@
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/function.hpp>
-#include <boost/signals2/optional_last_value.hpp>
 #include <boost/preprocessor/arithmetic.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/iteration.hpp>
 #include <boost/preprocessor/repetition.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2/detail/unique_lock.hpp>
-#include <boost/type_traits.hpp>
+#include <boost/signals2/optional_last_value.hpp>
+#include <boost/signals2/detail/result_type_wrapper.hpp>
 #include <boost/signals2/detail/signals_common.hpp>
 #include <boost/signals2/detail/signals_common_macros.hpp>
 #include <boost/signals2/detail/slot_groups.hpp>
@@ -35,6 +35,7 @@
 #include <boost/signals2/connection.hpp>
 #include <boost/signals2/shared_connection_block.hpp>
 #include <boost/signals2/slot.hpp>
+#include <boost/type_traits.hpp>
 #include <functional>
 
 namespace boost

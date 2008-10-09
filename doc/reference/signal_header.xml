@@ -76,6 +76,14 @@
         </typedef>
         <typedef name="slot_result_type">
           <type><emphasis>unspecified</emphasis></type>
+          <description>
+            <para>
+              This is the type returned when dereferencing the input iterators passed to the signal's
+              combiner.  It is usually <code>slot_function_type::result_type</code> unless that
+              type is <code>void</code>, in which case <code>slot_result_type</code> is
+              unspecified.
+            </para>
+          </description>
         </typedef>
         <typedef name="slot_call_iterator">
           <type><emphasis>unspecified</emphasis></type>

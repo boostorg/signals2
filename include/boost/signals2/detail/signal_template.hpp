@@ -63,10 +63,11 @@ namespace boost
 
 // bound_extended_slot_functionN
 #define BOOST_SIGNALS2_BOUND_EXTENDED_SLOT_FUNCTION_N BOOST_PP_CAT(bound_extended_slot_function, BOOST_SIGNALS_NUM_ARGS)
-      template<typename ExtendedSlotFunction, typename ResultType>
+      template<typename ExtendedSlotFunction>
         class BOOST_SIGNALS2_BOUND_EXTENDED_SLOT_FUNCTION_N
       {
       public:
+        typedef typename result_type_wrapper<typename ExtendedSlotFunction::result_type>::type result_type;
         BOOST_SIGNALS2_BOUND_EXTENDED_SLOT_FUNCTION_N(const ExtendedSlotFunction &fun):
           _fun(fun), _connection(new connection)
         {}
@@ -78,19 +79,21 @@ namespace boost
 #if BOOST_SIGNALS_NUM_ARGS > 0
         template<BOOST_SIGNALS2_MISC_TEMPLATE_DECL>
 #endif // BOOST_SIGNALS_NUM_ARGS > 0
-          ResultType operator()(BOOST_SIGNALS2_FULL_REF_ARGS(BOOST_SIGNALS_NUM_ARGS))
+          result_type operator()(BOOST_SIGNALS2_FULL_REF_ARGS(BOOST_SIGNALS_NUM_ARGS))
         {
-          return _fun(*_connection BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS)
-            BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
+          typename ExtendedSlotFunction::result_type *resolver = 0;
+          return m_invoke(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS)
+            BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS) resolver);
         }
         // const overload
 #if BOOST_SIGNALS_NUM_ARGS > 0
         template<BOOST_SIGNALS2_MISC_TEMPLATE_DECL>
 #endif // BOOST_SIGNALS_NUM_ARGS > 0
-          ResultType operator()(BOOST_SIGNALS2_FULL_REF_ARGS(BOOST_SIGNALS_NUM_ARGS)) const
+          result_type operator()(BOOST_SIGNALS2_FULL_REF_ARGS(BOOST_SIGNALS_NUM_ARGS)) const
         {
-          return _fun(*_connection BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS)
-            BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
+          typename ExtendedSlotFunction::result_type *resolver = 0;
+          return m_invoke(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS)
+            BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS) resolver);
         }
         template<typename T>
           bool operator==(const T &other) const
@@ -100,48 +103,46 @@ namespace boost
       private:
         BOOST_SIGNALS2_BOUND_EXTENDED_SLOT_FUNCTION_N()
         {}
+#if BOOST_SIGNALS_NUM_ARGS > 0
+        template<BOOST_SIGNALS2_MISC_TEMPLATE_DECL>
+#endif // BOOST_SIGNALS_NUM_ARGS > 0
+          result_type m_invoke(BOOST_SIGNALS2_FULL_REF_ARGS(BOOST_SIGNALS_NUM_ARGS) BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS) ...)
+        {
+          return _fun(*_connection BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS)
+            BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
+        }
+#if BOOST_SIGNALS_NUM_ARGS > 0
+        template<BOOST_SIGNALS2_MISC_TEMPLATE_DECL>
+#endif // BOOST_SIGNALS_NUM_ARGS > 0
+          result_type m_invoke(BOOST_SIGNALS2_FULL_REF_ARGS(BOOST_SIGNALS_NUM_ARGS) BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS) const void*)
+        {
+          _fun(*_connection BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS)
+            BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
+          return result_type();
+        }
+        // const overloads
+#if BOOST_SIGNALS_NUM_ARGS > 0
+        template<BOOST_SIGNALS2_MISC_TEMPLATE_DECL>
+#endif // BOOST_SIGNALS_NUM_ARGS > 0
+          result_type m_invoke(BOOST_SIGNALS2_FULL_REF_ARGS(BOOST_SIGNALS_NUM_ARGS) BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS) ...) const
+        {
+          return _fun(*_connection BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS)
+            BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
+        }
+#if BOOST_SIGNALS_NUM_ARGS > 0
+        template<BOOST_SIGNALS2_MISC_TEMPLATE_DECL>
+#endif // BOOST_SIGNALS_NUM_ARGS > 0
+          result_type m_invoke(BOOST_SIGNALS2_FULL_REF_ARGS(BOOST_SIGNALS_NUM_ARGS) BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS) const void*) const
+        {
+          _fun(*_connection BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS)
+            BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
+          return result_type();
+        }
 
         ExtendedSlotFunction _fun;
         boost::shared_ptr<connection> _connection;
       };
-      // specialization for void return type
-      template<typename ExtendedSlotFunction>
-        class BOOST_SIGNALS2_BOUND_EXTENDED_SLOT_FUNCTION_N<ExtendedSlotFunction, void>
-      {
-      public:
-        BOOST_SIGNALS2_BOUND_EXTENDED_SLOT_FUNCTION_N(const ExtendedSlotFunction &fun):
-          _fun(fun), _connection(new connection)
-        {}
-        void set_connection(const connection &conn)
-        {
-          *_connection = conn;
-        }
-#if BOOST_SIGNALS_NUM_ARGS > 0
-        template<BOOST_SIGNALS2_MISC_TEMPLATE_DECL>
-#endif // BOOST_SIGNALS_NUM_ARGS > 0
-          void operator()(BOOST_SIGNALS2_FULL_REF_ARGS(BOOST_SIGNALS_NUM_ARGS))
-        {
-          _fun(*_connection BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS)
-            BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
-        }
-        // const overload
-#if BOOST_SIGNALS_NUM_ARGS > 0
-        template<BOOST_SIGNALS2_MISC_TEMPLATE_DECL>
-#endif // BOOST_SIGNALS_NUM_ARGS > 0
-          void operator()(BOOST_SIGNALS2_FULL_REF_ARGS(BOOST_SIGNALS_NUM_ARGS)) const
-        {
-          _fun(*_connection BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS)
-            BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
-        }
-        template<typename T>
-          bool operator==(const T &other) const
-        {
-          return _fun == other;
-        }
-      private:
-        ExtendedSlotFunction _fun;
-        boost::shared_ptr<connection> _connection;
-      };
+
 #undef BOOST_SIGNALS2_MISC_TEMPLATE_DECL
 #undef BOOST_SIGNALS2_FULL_REF_ARG
 #undef BOOST_SIGNALS2_FULL_REF_ARGS
@@ -164,10 +165,10 @@ namespace boost
         typedef typename group_key<Group>::type group_key_type;
         typedef shared_ptr<connection_body<group_key_type, slot_type, Mutex> > connection_body_type;
         typedef grouped_list<Group, GroupCompare, connection_body_type> connection_list_type;
-        typedef BOOST_SIGNALS2_BOUND_EXTENDED_SLOT_FUNCTION_N<extended_slot_function_type, typename extended_slot_function_type::result_type>
+        typedef BOOST_SIGNALS2_BOUND_EXTENDED_SLOT_FUNCTION_N<extended_slot_function_type>
           bound_extended_slot_function_type;
       public:
-        typedef typename slot_result_type_wrapper<typename slot_function_type::result_type>::type slot_result_type;
+        typedef typename nonvoid<typename slot_function_type::result_type>::type slot_result_type;
         typedef Combiner combiner_type;
         typedef typename combiner_type::result_type result_type;
         typedef Group group_type;
@@ -355,10 +356,10 @@ namespace boost
 #undef BOOST_SIGNAL_MISC_STATEMENT
         private:
           result_type m_invoke(const connection_body_type &connectionBody,
-            const unusable *) const
+            const void_type *) const
           {
             connectionBody->slot.slot_function()(BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS));
-            return unusable();
+            return void_type();
           }
           result_type m_invoke(const connection_body_type &connectionBody, ...) const
           {
@@ -634,7 +635,7 @@ namespace boost
       {
       public:
         typedef SlotFunction slot_function_type;
-        typedef typename slot_result_type_wrapper<typename slot_function_type::result_type>::type slot_result_type;
+        typedef typename nonvoid<typename slot_function_type::result_type>::type slot_result_type;
         typedef typename BOOST_SIGNAL_CLASS_NAME<BOOST_SIGNAL_TEMPLATE_INSTANTIATION>::result_type
           result_type;
 

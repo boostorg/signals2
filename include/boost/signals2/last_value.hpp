@@ -11,8 +11,8 @@
 #ifndef BOOST_SIGNALS2_LAST_VALUE_HPP
 #define BOOST_SIGNALS2_LAST_VALUE_HPP
 
-#include <cassert>
 #include <boost/optional.hpp>
+#include <boost/signals2/detail/result_type_wrapper.hpp>
 #include <stdexcept>
 
 namespace boost {
@@ -56,17 +56,10 @@ namespace boost {
 
     template<>
     class last_value<void> {
-  #ifdef BOOST_NO_VOID_RETURNS
-      struct unusable {};
     public:
-      typedef unusable result_type;
-  #else
-    public:
-      typedef void result_type;
-  #endif // BOOST_NO_VOID_RETURNS
+      typedef detail::result_type_wrapper<void>::type result_type;
       template<typename InputIterator>
-      result_type
-      operator()(InputIterator first, InputIterator last) const
+        result_type operator()(InputIterator first, InputIterator last) const
       {
         while (first != last)
         {
