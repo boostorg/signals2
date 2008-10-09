@@ -36,49 +36,10 @@ the compatibility form. The preferred form fits more closely with the
 C++ language and reduces the number of separate template parameters
 that need to be considered, often improving readability; however, the
 preferred form is not supported on all platforms due to compiler
-bugs. The compatible form will work on all compilers supported by
-Boost.Signals2. Consult the table below to determine which syntactic
-form to use for your compiler. Users of Boost.Function, please note
+bugs. Users of Boost.Function, please note
 that the preferred syntactic form in Signals2 is equivalent to that of
 Function's preferred syntactic form.</para>
 
-<para>If your compiler does not appear in this list, please try the
-preferred syntax and report your results to the Boost list so that
-we can keep this table up-to-date.</para>
-
-  <informaltable>
-    <tgroup cols="2" align="left">
-      <thead>
-        <row>
-          <entry>Preferred syntax</entry>
-          <entry>Portable syntax</entry>
-        </row>
-      </thead>
-      <tbody>
-        <row>
-          <entry>
-            <itemizedlist>
-              <listitem><para>GNU C++ 2.95.x, 3.0.x, 3.1.x, 4.1.x</para></listitem>
-              <listitem><para>Comeau C++ 4.2.45.2</para></listitem>
-              <listitem><para>SGI MIPSpro 7.3.0</para></listitem>
-              <listitem><para>Intel C++ 5.0, 6.0</para></listitem>
-              <listitem><para>Compaq's cxx 6.2</para></listitem>
-              <listitem><para>Microsoft Visual C++ 7.1</para></listitem>
-            </itemizedlist>
-          </entry>
-          <entry>
-            <itemizedlist>
-              <listitem><para><emphasis>Any compiler supporting the preferred syntax</emphasis></para></listitem>
-              <listitem><para>Microsoft Visual C++ 6.0, 7.0</para></listitem>
-              <listitem><para>Borland C++ 5.5.1</para></listitem>
-              <listitem><para>Sun WorkShop 6 update 2 C++ 5.3</para></listitem>
-              <listitem><para>Metrowerks CodeWarrior 8.1</para></listitem>
-            </itemizedlist>
-          </entry>
-        </row>
-      </tbody>
-    </tgroup>
-  </informaltable>
 </section>
 
 <section><title>Hello, World! (Beginner)</title>
