@@ -11,8 +11,8 @@
 
 // See http://www.boost.org/libs/signals2 for library home page.
 
-#ifndef BOOST_TSS_CONNECTION_HEADER
-#define BOOST_TSS_CONNECTION_HEADER
+#ifndef BOOST_SIGNALS2_CONNECTION_HPP
+#define BOOST_SIGNALS2_CONNECTION_HPP
 
 #include <boost/function.hpp>
 #include <boost/mpl/bool.hpp>
@@ -225,4 +225,4 @@ namespace boost
   }
 }
 
-#endif  // BOOST_TSS_CONNECTION_HEADER
+#endif  // BOOST_SIGNALS2_CONNECTION_HPP
