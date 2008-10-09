@@ -12,8 +12,8 @@
 
 // For more information, see http://www.boost.org
 
-#ifndef _THREAD_SAFE_SIGNAL_HPP
-#define _THREAD_SAFE_SIGNAL_HPP
+#ifndef BOOST_SIGNALS2_SIGNAL_HPP
+#define BOOST_SIGNALS2_SIGNAL_HPP
 
 #include <algorithm>
 #include <boost/assert.hpp>
@@ -89,4 +89,4 @@ namespace boost
   }
 }
 
-#endif	// _THREAD_SAFE_SIGNAL_HPP
+#endif	// BOOST_SIGNALS2_SIGNAL_HPP

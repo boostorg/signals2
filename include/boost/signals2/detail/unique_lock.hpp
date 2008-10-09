@@ -9,8 +9,8 @@
 
 // See http://www.boost.org/libs/signals2 for library home page.
 
-#ifndef BOOST_SIGNALS2_DETAIL_UNIQUE_LOCK_HEADER
-#define BOOST_SIGNALS2_DETAIL_UNIQUE_LOCK_HEADER
+#ifndef BOOST_SIGNALS2_UNIQUE_LOCK_HPP
+#define BOOST_SIGNALS2_UNIQUE_LOCK_HPP
 
 #include <boost/noncopyable.hpp>
 
@@ -39,4 +39,4 @@ namespace boost
   } // namespace signals2
 } // namespace boost
 
-#endif  // BOOST_SIGNALS2_DETAIL_UNIQUE_LOCK_HEADER
+#endif  // BOOST_SIGNALS2_UNIQUE_LOCK_HPP

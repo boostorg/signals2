@@ -10,8 +10,8 @@
 // 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_DECONSTRUCT_PTR_HEADER
-#define BOOST_DECONSTRUCT_PTR_HEADER
+#ifndef BOOST_SIGNALS2_DECONSTRUCT_PTR_HPP
+#define BOOST_SIGNALS2_DECONSTRUCT_PTR_HPP
 
 #include <boost/checked_delete.hpp>
 #include <boost/signals2/postconstructible.hpp>
@@ -71,4 +71,4 @@ namespace boost
   }
 }
 
-#endif
+#endif // BOOST_SIGNALS2_DECONSTRUCT_PTR_HPP

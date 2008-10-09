@@ -11,8 +11,8 @@
 // 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_PREDESTRUCTIBLE_HEADER
-#define BOOST_PREDESTRUCTIBLE_HEADER
+#ifndef BOOST_SIGNALS2_PREDESTRUCTIBLE_HPP
+#define BOOST_SIGNALS2_PREDESTRUCTIBLE_HPP
 
 namespace boost
 {
@@ -32,4 +32,4 @@ namespace boost
   }
 }
 
-#endif
+#endif // BOOST_SIGNALS2_PREDESTRUCTIBLE_HPP

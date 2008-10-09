@@ -8,8 +8,8 @@
 
 // For more information, see http://www.boost.org
 
-#ifndef BOOST_SHARED_CONNECTION_BLOCK_HEADER
-#define BOOST_SHARED_CONNECTION_BLOCK_HEADER
+#ifndef BOOST_SHARED_CONNECTION_BLOCK_HPP
+#define BOOST_SHARED_CONNECTION_BLOCK_HPP
 
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2/connection.hpp>
@@ -49,4 +49,4 @@ namespace boost
   }
 } // end namespace boost
 
-#endif // BOOST_SHARED_CONNECTION_BLOCK_HEADER
+#endif // BOOST_SHARED_CONNECTION_BLOCK_HPP

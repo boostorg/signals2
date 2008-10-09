@@ -8,8 +8,8 @@
 
 // For more information, see http://www.boost.org
 
-#ifndef BOOST_TSS_SLOT_GROUPS_HEADER
-#define BOOST_TSS_SLOT_GROUPS_HEADER
+#ifndef BOOST_SIGNALS2_SLOT_GROUPS_HPP
+#define BOOST_SIGNALS2_SLOT_GROUPS_HPP
 
 #include <boost/signals2/connection.hpp>
 #include <boost/optional.hpp>
@@ -226,4 +226,4 @@ namespace boost {
   } // end namespace signals2
 } // end namespace boost
 
-#endif // BOOST_TSS_SLOT_GROUPS_HEADER
+#endif // BOOST_SIGNALS2_SLOT_GROUPS_HPP

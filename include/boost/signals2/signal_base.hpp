@@ -1,6 +1,5 @@
 // Boost.Signals2 library
 
-// Copyright Douglas Gregor 2001-2004.
 // Copyright Frank Mori Hess 2007-2008.
 // Use, modification and
 // distribution is subject to the Boost Software License, Version
@@ -9,8 +8,8 @@
 
 // For more information, see http://www.boost.org
 
-#ifndef BOOST_TSS_SIGNALS_SIGNAL_BASE_HEADER
-#define BOOST_TSS_SIGNALS_SIGNAL_BASE_HEADER
+#ifndef BOOST_SIGNALS2_SIGNAL_BASE_HPP
+#define BOOST_SIGNALS2_SIGNAL_BASE_HPP
 
 #include <boost/noncopyable.hpp>
 
@@ -30,4 +29,4 @@ namespace boost {
   } // end namespace signals2
 } // end namespace boost
 
-#endif // BOOST_TSS_SIGNALS_SIGNAL_BASE_HEADER
+#endif // BOOST_SIGNALS2_SIGNAL_BASE_HPP

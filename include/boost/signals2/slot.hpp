@@ -9,8 +9,8 @@
 
 // For more information, see http://www.boost.org
 
-#ifndef BOOST_TSS_SIGNALS_SLOT_HEADER
-#define BOOST_TSS_SIGNALS_SLOT_HEADER
+#ifndef BOOST_SIGNALS2_SLOT_HPP
+#define BOOST_SIGNALS2_SLOT_HPP
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
@@ -121,4 +121,4 @@ namespace boost
   } // namespace signals2
 }
 
-#endif // BOOST_SIGNALS_SLOT_HEADER
+#endif // BOOST_SIGNALS2_SLOT_HPP

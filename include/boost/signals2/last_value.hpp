@@ -8,8 +8,8 @@
 
 // For more information, see http://www.boost.org
 
-#ifndef BOOST_LAST_VALUE_HPP
-#define BOOST_LAST_VALUE_HPP
+#ifndef BOOST_SIGNALS2_LAST_VALUE_HPP
+#define BOOST_SIGNALS2_LAST_VALUE_HPP
 
 #include <cassert>
 #include <boost/optional.hpp>
@@ -18,7 +18,7 @@
 namespace boost {
   namespace signals2 {
     class expired_slot;
-    
+
     // no_slots_error is thrown when we are unable to generate a return value
     // due to no slots being connected to the signal.
     class no_slots_error: public std::exception
@@ -82,4 +82,4 @@ namespace boost {
     };
   } // namespace signals2
 } // namespace boost
-#endif // BOOST_SIGNALS_LAST_VALUE_HPP
+#endif // BOOST_SIGNALS2_LAST_VALUE_HPP

@@ -8,8 +8,8 @@
 
 // For more information, see http://www.boost.org
 
-#ifndef BOOST_TSS_SIGNALS_COMMON_HEADER
-#define BOOST_TSS_SIGNALS_COMMON_HEADER
+#ifndef BOOST_SIGNALS2_SIGNALS_COMMON_HPP
+#define BOOST_SIGNALS2_SIGNALS_COMMON_HPP
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/if.hpp>
@@ -65,4 +65,4 @@ namespace boost {
   } // end namespace signals2
 } // end namespace boost
 
-#endif // BOOST_TSS_SIGNALS_COMMON_HEADER
+#endif // BOOST_SIGNALS2_SIGNALS_COMMON_HPP

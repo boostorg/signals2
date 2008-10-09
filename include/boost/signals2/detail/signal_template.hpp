@@ -40,8 +40,6 @@
 #define BOOST_SIGNAL_TEMPLATE_INSTANTIATION \
   BOOST_SIGNAL_SIGNATURE_TEMPLATE_INSTANTIATION(BOOST_SIGNALS_NUM_ARGS), \
   Combiner, Group, GroupCompare, SlotFunction, ExtendedSlotFunction, Mutex
-// bound_extended_slot_functionN
-#define BOOST_SIGNALS2_BOUND_EXTENDED_SLOT_FUNCTION_N BOOST_PP_CAT(bound_extended_slot_function, BOOST_SIGNALS_NUM_ARGS)
 
 namespace boost
 {
@@ -49,9 +47,22 @@ namespace boost
   {
     namespace detail
     {
+// typename T1, typename T2, ..., typename TN
+#define BOOST_SIGNALS2_MISC_TEMPLATE_DECL \
+  BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(BOOST_SIGNALS_NUM_ARGS), typename T)
+// Tn & argn
+#define BOOST_SIGNALS2_FULL_REF_ARG(z, n, data) \
+  BOOST_PP_CAT(T, BOOST_PP_INC(n)) & BOOST_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~)
+// T1 & arg1, T2 & arg2, ..., Tn & argn
+#define BOOST_SIGNALS2_FULL_REF_ARGS(arity) \
+  BOOST_PP_ENUM(arity, BOOST_SIGNALS2_FULL_REF_ARG, ~)
+
 // wrapper around an signalN::extended_slot_function which binds the
 // connection argument so it looks like a normal
 // signalN::slot_function
+
+// bound_extended_slot_functionN
+#define BOOST_SIGNALS2_BOUND_EXTENDED_SLOT_FUNCTION_N BOOST_PP_CAT(bound_extended_slot_function, BOOST_SIGNALS_NUM_ARGS)
       template<typename ExtendedSlotFunction, typename ResultType>
         class BOOST_SIGNALS2_BOUND_EXTENDED_SLOT_FUNCTION_N
       {
@@ -63,15 +74,6 @@ namespace boost
         {
           *_connection = conn;
         }
-// typename T1, typename T2, ..., typename TN
-#define BOOST_SIGNALS2_MISC_TEMPLATE_DECL \
-  BOOST_PP_ENUM_SHIFTED_PARAMS(BOOST_PP_INC(BOOST_SIGNALS_NUM_ARGS), typename T)
-// Tn & argn
-#define BOOST_SIGNALS2_FULL_REF_ARG(z, n, data) \
-  BOOST_PP_CAT(T, BOOST_PP_INC(n)) & BOOST_SIGNAL_SIGNATURE_ARG_NAME(~, n, ~)
-// T1 & arg1, T2 & arg2, ..., Tn & argn
-#define BOOST_SIGNALS2_FULL_REF_ARGS(arity) \
-  BOOST_PP_ENUM(arity, BOOST_SIGNALS2_FULL_REF_ARG, ~)
 
 #if BOOST_SIGNALS_NUM_ARGS > 0
         template<BOOST_SIGNALS2_MISC_TEMPLATE_DECL>

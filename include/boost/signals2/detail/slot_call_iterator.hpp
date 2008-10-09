@@ -9,8 +9,8 @@
 
 // For more information, see http://www.boost.org
 
-#ifndef BOOST_TS_SIGNALS_SLOT_CALL_ITERATOR
-#define BOOST_TS_SIGNALS_SLOT_CALL_ITERATOR
+#ifndef BOOST_SIGNALS2_SLOT_CALL_ITERATOR_HPP
+#define BOOST_SIGNALS2_SLOT_CALL_ITERATOR_HPP
 
 #include <boost/assert.hpp>
 #include <boost/aligned_storage.hpp>
@@ -121,4 +121,4 @@ namespace boost {
   } // end namespace BOOST_SIGNALS_NAMESPACE
 } // end namespace boost
 
-#endif // BOOST_TS_SIGNALS_SLOT_CALL_ITERATOR
+#endif // BOOST_SIGNALS2_SLOT_CALL_ITERATOR_HPP

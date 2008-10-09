@@ -9,8 +9,8 @@
 
 // For more information, see http://www.boost.org
 
-#ifndef BOOST_TSS_SIGNALS_SLOT_BASE_HEADER
-#define BOOST_TSS_SIGNALS_SLOT_BASE_HEADER
+#ifndef BOOST_SIGNALS2_SLOT_BASE_HPP
+#define BOOST_SIGNALS2_SLOT_BASE_HPP
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
@@ -74,4 +74,4 @@ namespace boost
   }
 } // end namespace boost
 
-#endif // BOOST_SIGNALS_SLOT_BASE_HEADER
+#endif // BOOST_SIGNALS2_SLOT_BASE_HPP

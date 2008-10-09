@@ -10,8 +10,8 @@
 
 // See http://www.boost.org/libs/signals2 for library home page.
 
-#ifndef BOOST_SIGNALS2_DUMMY_MUTEX_HEADER
-#define BOOST_SIGNALS2_DUMMY_MUTEX_HEADER
+#ifndef BOOST_SIGNALS2_DUMMY_MUTEX_HPP
+#define BOOST_SIGNALS2_DUMMY_MUTEX_HPP
 
 namespace boost {
   namespace signals2 {
@@ -25,5 +25,4 @@ namespace boost {
   } // end namespace signals2
 } // end namespace boost
 
-#endif // BOOST_SIGNALS2_DUMMY_MUTEX_HEADER
-
+#endif // BOOST_SIGNALS2_DUMMY_MUTEX_HPP

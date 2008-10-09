@@ -1,12 +1,3 @@
-#ifndef BOOST_SIGNALS2_LWM_WIN32_CS_HPP_INCLUDED
-#define BOOST_SIGNALS2_LWM_WIN32_CS_HPP_INCLUDED
-
-// MS compatible compilers support #pragma once
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
 //
 //  boost/signals2/detail/lwm_win32_cs.hpp
 //
@@ -17,6 +8,16 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
+
+#ifndef BOOST_SIGNALS2_LWM_WIN32_CS_HPP
+#define BOOST_SIGNALS2_LWM_WIN32_CS_HPP
+
+// MS compatible compilers support #pragma once
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif
+
 
 #ifdef BOOST_USE_WINDOWS_H
 #  include <windows.h>
@@ -96,4 +97,4 @@ public:
 
 } // namespace boost
 
-#endif // #ifndef BOOST_SIGNALS2_LWM_WIN32_CS_HPP_INCLUDED
+#endif // #ifndef BOOST_SIGNALS2_LWM_WIN32_CS_HPP

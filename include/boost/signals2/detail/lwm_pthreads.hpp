@@ -1,12 +1,3 @@
-#ifndef BOOST_SIGNALS2_LWM_PTHREADS_HPP_INCLUDED
-#define BOOST_SIGNALS2_LWM_PTHREADS_HPP_INCLUDED
-
-// MS compatible compilers support #pragma once
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
 //
 //  boost/signals2/detail/lwm_pthreads.hpp
 //
@@ -17,6 +8,16 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
+
+#ifndef BOOST_SIGNALS2_LWM_PTHREADS_HPP
+#define BOOST_SIGNALS2_LWM_PTHREADS_HPP
+
+// MS compatible compilers support #pragma once
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif
+
 
 #include <pthread.h>
 
@@ -74,4 +75,4 @@ public:
 
 } // namespace boost
 
-#endif // #ifndef BOOST_SIGNALS2_LWM_PTHREADS_HPP_INCLUDED
+#endif // #ifndef BOOST_SIGNALS2_LWM_PTHREADS_HPP

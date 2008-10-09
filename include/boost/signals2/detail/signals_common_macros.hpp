@@ -8,8 +8,8 @@
 // 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_SIGNALS_COMMON_MACROS_HEADER
-#define BOOST_SIGNALS_COMMON_MACROS_HEADER
+#ifndef BOOST_SIGNALS2_SIGNALS_COMMON_MACROS_HPP
+#define BOOST_SIGNALS2_SIGNALS_COMMON_MACROS_HPP
 
 #ifndef BOOST_SIGNALS_MAX_ARGS
 #define BOOST_SIGNALS_MAX_ARGS 9
@@ -61,4 +61,4 @@
   typename function_traits<Signature>::result_type \
   BOOST_PP_COMMA_IF(arity) BOOST_PP_ENUM(arity, BOOST_SIGNAL_SIGNATURE_TO_ARGN_TYPE, Signature)
 
-#endif	// BOOST_SIGNALS_COMMON_MACROS_HEADER
+#endif	// BOOST_SIGNALS2_SIGNALS_COMMON_MACROS_HPP
