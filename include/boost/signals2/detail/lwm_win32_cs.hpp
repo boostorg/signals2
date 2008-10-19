@@ -81,12 +81,13 @@ public:
     {
         EnterCriticalSection(&cs_);
     }
-
+// TryEnterCriticalSection only exists on Windows NT 4.0 and later
+#if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0400)
     bool try_lock()
     {
         return TryEnterCriticalSection(&cs_);
     }
-
+#endif
     void unlock()
     {
         LeaveCriticalSection(&cs_);
