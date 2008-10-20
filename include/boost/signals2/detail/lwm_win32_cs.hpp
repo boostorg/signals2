@@ -47,6 +47,7 @@ struct critical_section
 
 extern "C" __declspec(dllimport) void __stdcall InitializeCriticalSection(critical_section *);
 extern "C" __declspec(dllimport) void __stdcall EnterCriticalSection(critical_section *);
+extern "C" __declspec(dllimport) bool __stdcall TryEnterCriticalSection(critical_section *);
 extern "C" __declspec(dllimport) void __stdcall LeaveCriticalSection(critical_section *);
 extern "C" __declspec(dllimport) void __stdcall DeleteCriticalSection(critical_section *);
 
@@ -85,7 +86,7 @@ public:
 #if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0400)
     bool try_lock()
     {
-        return TryEnterCriticalSection(&cs_);
+        return TryEnterCriticalSection(&cs_) != 0;
     }
 #endif
     void unlock()
