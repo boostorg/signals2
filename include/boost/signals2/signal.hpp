@@ -61,7 +61,7 @@ namespace boost
 } // namespace boost
 
 
-#define BOOST_PP_ITERATION_LIMITS (0, BOOST_SIGNALS_MAX_ARGS)
+#define BOOST_PP_ITERATION_LIMITS (0, BOOST_SIGNALS2_MAX_ARGS)
 #define BOOST_PP_FILENAME_1 <boost/signals2/detail/signal_template.hpp>
 #include BOOST_PP_ITERATE()
 
