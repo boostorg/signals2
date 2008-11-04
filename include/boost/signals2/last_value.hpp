@@ -13,6 +13,7 @@
 
 #include <boost/optional.hpp>
 #include <boost/signals2/detail/result_type_wrapper.hpp>
+#include <boost/throw_exception.hpp>
 #include <stdexcept>
 
 namespace boost {
@@ -24,7 +25,7 @@ namespace boost {
     class no_slots_error: public std::exception
     {
     public:
-      virtual const char* what() {return "boost::no_slots_error";}
+      virtual const char* what() {return "boost::signals2::no_slots_error";}
     };
 
     template<typename T>
@@ -37,7 +38,7 @@ namespace boost {
         T * resolver = 0;
         if(first == last)
         {
-          throw no_slots_error();
+          boost::throw_exception(no_slots_error());
         }
         optional<T> value;
         while (first != last)
@@ -50,7 +51,7 @@ namespace boost {
           ++first;
         }
         if(value) return value.get();
-        throw no_slots_error();
+        boost::throw_exception(no_slots_error());
       }
     };
 

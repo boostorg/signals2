@@ -15,6 +15,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 #include <boost/signals2/signal_base.hpp>
+#include <boost/throw_exception.hpp>
 #include <vector>
 
 namespace boost
@@ -49,7 +50,7 @@ namespace boost
           }
           catch(const bad_weak_ptr &)
           {
-            throw expired_slot();
+            boost::throw_exception(expired_slot());
           }
         }
         return locked_objects;
