@@ -688,12 +688,14 @@ namespace boost
       {
       public:
 // typename function_traits<Signature>::result_type (
+// const boost::signals2::connection &,
 // typename function_traits<Signature>::arg1_type,
 // typename function_traits<Signature>::arg2_type,
 // ...,
 // typename function_traits<Signature>::argn_type)
 #define BOOST_SIGNALS2_EXT_SIGNATURE(arity, Signature) \
   typename function_traits<Signature>::result_type ( \
+  const boost::signals2::connection & BOOST_PP_COMMA_IF(BOOST_SIGNALS_NUM_ARGS) \
   BOOST_PP_ENUM(arity, BOOST_SIGNAL_SIGNATURE_TO_ARGN_TYPE, Signature) )
         typedef function<BOOST_SIGNALS2_EXT_SIGNATURE(BOOST_SIGNALS_NUM_ARGS, Signature)> function_type;
 #undef BOOST_SIGNALS2_EXT_SIGNATURE
