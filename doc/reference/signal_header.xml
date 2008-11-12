@@ -354,14 +354,7 @@
             non-<computeroutput>const</computeroutput> version will
             invoke the combiner as
             non-<computeroutput>const</computeroutput>.</para>
-
-            <para>Calling the function call operator may throw an
-            exception if no slots are connected to the signal, depending
-            on the combiner used. The default combiner will not throw
-            for zero slots when the return type is <code>void</code> or
-            <classname>optional</classname>&lt;T&gt;,
-            but will throw when the return type is any other type (because there is no
-            way to synthesize a return value).</para></notes>
+			</notes>
           </overloaded-method>
         </method-group>
 
