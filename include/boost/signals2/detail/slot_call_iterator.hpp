@@ -27,13 +27,17 @@
 namespace boost {
   namespace signals2 {
     namespace detail {
-      template<typename ResultType>
+      template<typename ResultType, typename Function>
         class slot_call_iterator_cache
       {
       public:
+        slot_call_iterator_cache(const Function &f):
+          f(f)
+        {}
         optional<ResultType> result;
         typedef stack_vector<boost::shared_ptr<void>, 10> tracked_ptrs_type;
         tracked_ptrs_type tracked_ptrs;
+        Function f;
       };
 
       // Generates a slot call iterator. Essentially, this is an iterator that:
@@ -58,9 +62,9 @@ namespace boost {
         friend class boost::iterator_core_access;
 
       public:
-        slot_call_iterator_t(Iterator iter_in, Iterator end_in, Function f,
-          slot_call_iterator_cache<result_type> &c):
-          iter(iter_in), end(end_in), f(f),
+        slot_call_iterator_t(Iterator iter_in, Iterator end_in,
+          slot_call_iterator_cache<result_type, Function> &c):
+          iter(iter_in), end(end_in),
           cache(&c), callable_iter(end_in)
         {
           lock_next_callable();
@@ -72,7 +76,7 @@ namespace boost {
           if (!cache->result) {
             try
             {
-              cache->result.reset(f(*iter));
+              cache->result.reset(cache->f(*iter));
             }
             catch(expired_slot &)
             {
@@ -123,8 +127,7 @@ namespace boost {
 
         mutable Iterator iter;
         Iterator end;
-        Function f;
-        slot_call_iterator_cache<result_type> *cache;
+        slot_call_iterator_cache<result_type, Function> *cache;
         mutable Iterator callable_iter;
       };
     } // end namespace detail

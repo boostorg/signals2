@@ -262,10 +262,10 @@ namespace boost
           }
           slot_invoker invoker BOOST_PP_IF(BOOST_SIGNALS_NUM_ARGS, \
             (BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS)), );
-          slot_call_iterator_cache<slot_result_type> cache;
+          slot_call_iterator_cache<slot_result_type, slot_invoker> cache(invoker);
           return local_state->combiner(
-            slot_call_iterator(local_state->connection_bodies.begin(), local_state->connection_bodies.end(), invoker, cache),
-            slot_call_iterator(local_state->connection_bodies.end(), local_state->connection_bodies.end(), invoker, cache));
+            slot_call_iterator(local_state->connection_bodies.begin(), local_state->connection_bodies.end(), cache),
+            slot_call_iterator(local_state->connection_bodies.end(), local_state->connection_bodies.end(), cache));
         }
         result_type operator ()(BOOST_SIGNAL_SIGNATURE_FULL_ARGS(BOOST_SIGNALS_NUM_ARGS)) const
         {
@@ -283,10 +283,10 @@ namespace boost
           }
           slot_invoker invoker BOOST_PP_IF(BOOST_SIGNALS_NUM_ARGS, \
             (BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS)), );
-          slot_call_iterator_cache<slot_result_type> cache;
+          slot_call_iterator_cache<slot_result_type, slot_invoker> cache(invoker);
           return const_cast<const combiner_type&>(local_state->combiner)(
-            slot_call_iterator(local_state->connection_bodies.begin(), local_state->connection_bodies.end(), invoker, cache),
-            slot_call_iterator(local_state->connection_bodies.end(), local_state->connection_bodies.end(), invoker, cache));
+            slot_call_iterator(local_state->connection_bodies.begin(), local_state->connection_bodies.end(), cache),
+            slot_call_iterator(local_state->connection_bodies.end(), local_state->connection_bodies.end(), cache));
         }
         std::size_t num_slots() const
         {
