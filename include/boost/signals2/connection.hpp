@@ -18,12 +18,12 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/signals2/slot.hpp>
+#include <boost/signals2/detail/null_output_iterator.hpp>
 #include <boost/signals2/detail/unique_lock.hpp>
+#include <boost/signals2/slot.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/visit_each.hpp>
 #include <boost/weak_ptr.hpp>
-#include <vector>
 
 namespace boost
 {
@@ -93,7 +93,7 @@ namespace boost
         virtual bool connected() const
         {
           unique_lock<mutex_type> lock(_mutex);
-          nolock_grab_tracked_objects();
+          nolock_grab_tracked_objects(detail::null_output_iterator());
           return nolock_nograb_connected();
         }
         const GroupKey& group_key() const {return _group_key;}
@@ -107,19 +107,22 @@ namespace boost
           }
           return expired;
         }
-        typename slot_base::locked_container_type nolock_grab_tracked_objects() const
+        template<typename OutputIterator>
+          void nolock_grab_tracked_objects(OutputIterator inserter) const
         {
-          slot_base::locked_container_type locked_objects;
-          try
-          {
-            locked_objects = slot.lock();
+            slot_base::tracked_container_type::const_iterator it;
+            for(it = slot.tracked_objects().begin();
+              it != slot.tracked_objects().end();
+              ++it)
+            {
+              boost::shared_ptr<void> locked_object = it->lock();
+              if(!locked_object)
+              {
+                _connected = false;
+                return;
+              }
+              *inserter++ = it->lock();
           }
-          catch(const expired_slot &)
-          {
-            _connected = false;
-            return locked_objects;
-          }
-          return locked_objects;
         }
         // expose Lockable concept of mutex
         virtual void lock()

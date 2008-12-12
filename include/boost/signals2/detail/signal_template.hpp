@@ -262,7 +262,7 @@ namespace boost
           }
           slot_invoker invoker BOOST_PP_IF(BOOST_SIGNALS_NUM_ARGS, \
             (BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS)), );
-          optional<slot_result_type> cache;
+          slot_call_iterator_cache<slot_result_type> cache;
           return local_state->combiner(
             slot_call_iterator(local_state->connection_bodies.begin(), local_state->connection_bodies.end(), invoker, cache),
             slot_call_iterator(local_state->connection_bodies.end(), local_state->connection_bodies.end(), invoker, cache));
@@ -283,7 +283,7 @@ namespace boost
           }
           slot_invoker invoker BOOST_PP_IF(BOOST_SIGNALS_NUM_ARGS, \
             (BOOST_SIGNAL_SIGNATURE_ARG_NAMES(BOOST_SIGNALS_NUM_ARGS)), );
-          optional<slot_result_type> cache;
+          slot_call_iterator_cache<slot_result_type> cache;
           return const_cast<const combiner_type&>(local_state->combiner)(
             slot_call_iterator(local_state->connection_bodies.begin(), local_state->connection_bodies.end(), invoker, cache),
             slot_call_iterator(local_state->connection_bodies.end(), local_state->connection_bodies.end(), invoker, cache));

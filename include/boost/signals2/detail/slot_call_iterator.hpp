@@ -19,6 +19,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/signals2/connection.hpp>
 #include <boost/signals2/slot_base.hpp>
+#include <boost/signals2/detail/stack_vector.hpp>
 #include <boost/signals2/detail/unique_lock.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/weak_ptr.hpp>
@@ -26,6 +27,15 @@
 namespace boost {
   namespace signals2 {
     namespace detail {
+      template<typename ResultType>
+        class slot_call_iterator_cache
+      {
+      public:
+        optional<ResultType> result;
+        typedef stack_vector<boost::shared_ptr<void>, 10> tracked_ptrs_type;
+        tracked_ptrs_type tracked_ptrs;
+      };
+
       // Generates a slot call iterator. Essentially, this is an iterator that:
       //   - skips over disconnected slots in the underlying list
       //   - calls the connected slots when dereferenced
@@ -49,7 +59,7 @@ namespace boost {
 
       public:
         slot_call_iterator_t(Iterator iter_in, Iterator end_in, Function f,
-          boost::optional<result_type> &c):
+          slot_call_iterator_cache<result_type> &c):
           iter(iter_in), end(end_in), f(f),
           cache(&c), callable_iter(end_in)
         {
@@ -59,10 +69,10 @@ namespace boost {
         typename inherited::reference
         dereference() const
         {
-          if (!(*cache)) {
+          if (!cache->result) {
             try
             {
-              cache->reset(f(*iter));
+              cache->result.reset(f(*iter));
             }
             catch(expired_slot &)
             {
@@ -70,14 +80,14 @@ namespace boost {
               throw;
             }
           }
-          return cache->get();
+          return cache->result.get();
         }
 
         void increment()
         {
           ++iter;
           lock_next_callable();
-          cache->reset();
+          cache->result.reset();
         }
 
         bool equal(const slot_call_iterator_t& other) const
@@ -97,7 +107,8 @@ namespace boost {
           for(;iter != end; ++iter)
           {
             lock_type lock(**iter);
-            tracked_ptrs = (*iter)->nolock_grab_tracked_objects();
+            cache->tracked_ptrs.clear();
+            (*iter)->nolock_grab_tracked_objects(std::back_inserter(cache->tracked_ptrs));
             if((*iter)->nolock_nograb_blocked() == false)
             {
               callable_iter = iter;
@@ -113,9 +124,8 @@ namespace boost {
         mutable Iterator iter;
         Iterator end;
         Function f;
-        optional<result_type>* cache;
+        slot_call_iterator_cache<result_type> *cache;
         mutable Iterator callable_iter;
-        mutable typename slot_base::locked_container_type tracked_ptrs;
       };
     } // end namespace detail
   } // end namespace BOOST_SIGNALS_NAMESPACE
