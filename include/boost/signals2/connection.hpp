@@ -54,7 +54,7 @@ namespace boost
         {
           unique_lock<connection_body_base> lock(*this);
           shared_ptr<void> blocker = _weak_blocker.lock();
-          if(blocker == 0)
+          if(blocker == shared_ptr<void>())
           {
             blocker.reset(this, &null_deleter);
             _weak_blocker = blocker;
