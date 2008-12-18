@@ -116,12 +116,13 @@ namespace boost
               ++it)
             {
               boost::shared_ptr<void> locked_object = it->lock();
-              if(!locked_object)
+              boost::shared_ptr<void> empty;
+              if(!(empty < locked_object) && !(locked_object < empty))
               {
                 _connected = false;
                 return;
               }
-              *inserter++ = it->lock();
+              *inserter++ = locked_object;
           }
         }
         // expose Lockable concept of mutex
