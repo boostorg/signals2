@@ -100,5 +100,14 @@ int test_main(int, char*[])
     BOOST_CHECK(s1(4) == 4);
   }
   BOOST_CHECK(s1(4) == 0);
+
+  // Test tracking of null but not empty shared_ptr
+  BOOST_CHECK(s1(2) == 0);
+  {
+    boost::shared_ptr<int> shorty((int*)(0));
+    s1.connect(sig_type::slot_type(swallow(), shorty.get(), _1).track(shorty));
+    BOOST_CHECK(s1(2) == 2);
+  }
+  BOOST_CHECK(s1(2) == 0);
   return 0;
 }
