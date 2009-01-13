@@ -236,8 +236,12 @@ struct test_lock_exclusion
                 BOOST_CHECK(!done_cond.timed_wait(lk, boost::posix_time::seconds(1),
                                                  boost::bind(&this_type::is_done,this)));
             }
-
             lock.unlock();
+            {
+                boost::mutex::scoped_lock lk(done_mutex);
+                BOOST_CHECK(done_cond.timed_wait(lk, boost::posix_time::seconds(1),
+                                                 boost::bind(&this_type::is_done,this)));
+            }
             t.join();
             BOOST_CHECK(locked);
         }
