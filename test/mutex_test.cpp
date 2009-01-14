@@ -12,6 +12,7 @@
 // added to test boost::signals2::mutex.
 // For more information, see http://www.boost.org
 
+#include <boost/signals2/dummy_mutex.hpp>
 #include <boost/signals2/mutex.hpp>
 #include <boost/test/minimal.hpp>
 #include <boost/thread/locks.hpp>
@@ -276,9 +277,21 @@ void test_mutex()
     timed_test(&do_test_mutex, 3);
 }
 
+void do_test_dummy_mutex()
+{
+    test_lock<boost::signals2::dummy_mutex>()();
+    test_trylock<boost::signals2::dummy_mutex>()();
+}
+
+void test_dummy_mutex()
+{
+    timed_test(&do_test_dummy_mutex, 2);
+}
+
 int test_main(int, char*[])
 {
     test_mutex();
+    test_dummy_mutex();
 
     return 0;
 }
