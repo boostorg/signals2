@@ -116,13 +116,12 @@ test_remove_self()
     test_output = "";
     s0(); std::cout << std::endl;
     BOOST_CHECK(test_output == "23");
+    std::cout << "Unblocking 1" << std::endl;
+    block.unblock();
+    test_output = "";
+    s0(); std::cout << std::endl;
+    BOOST_CHECK(test_output == "123");
   }
-
-  std::cout << "Unblocking 1" << std::endl;
-
-  test_output = "";
-  s0(); std::cout << std::endl;
-  BOOST_CHECK(test_output == "123");
 
   s0.disconnect_all_slots();
   BOOST_CHECK(s0.empty());
