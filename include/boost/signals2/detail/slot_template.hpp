@@ -44,9 +44,9 @@ namespace boost
       BOOST_STATIC_CONSTANT(int, arity = BOOST_SIGNALS2_NUM_ARGS);
 
       template<typename F>
-      BOOST_SIGNALS2_SLOT_CLASS_NAME(BOOST_SIGNALS2_NUM_ARGS)(const F& f): _slot_function(detail::get_invocable_slot(f, detail::tag_type(f)))
+      BOOST_SIGNALS2_SLOT_CLASS_NAME(BOOST_SIGNALS2_NUM_ARGS)(const F& f)
       {
-        detail::auto_tracker<typename detail::get_slot_tag<typename unwrap_reference<F>::type>::type> at(this, f);
+        init_slot_function(f);
       }
       // copy constructors
       template<BOOST_SIGNALS2_PREFIXED_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS2_NUM_ARGS, Other), typename OtherSlotFunction>
@@ -67,9 +67,10 @@ namespace boost
 // template<typename Func, typename ArgType0, typename ArgType1, ..., typename ArgTypen-1> slotN(...
 #define BOOST_SIGNALS2_SLOT_BINDING_CONSTRUCTOR(z, n, data) \
       template<typename Func, BOOST_PP_ENUM_PARAMS(n, typename ArgType)> \
-      BOOST_SIGNALS2_SLOT_CLASS_NAME(BOOST_SIGNALS2_NUM_ARGS)(const Func &func,  BOOST_PP_ENUM(n, BOOST_SIGNALS2_SLOT_BINDING_ARG_DECL, ~)): \
-        _slot_function(bind(func, BOOST_PP_ENUM_PARAMS(n, arg))) \
-      {}
+      BOOST_SIGNALS2_SLOT_CLASS_NAME(BOOST_SIGNALS2_NUM_ARGS)(const Func &func,  BOOST_PP_ENUM(n, BOOST_SIGNALS2_SLOT_BINDING_ARG_DECL, ~)) \
+      { \
+        init_slot_function(bind(func, BOOST_PP_ENUM_PARAMS(n, arg))); \
+      }
 #define BOOST_SIGNALS2_SLOT_MAX_BINDING_ARGS 10
       BOOST_PP_REPEAT_FROM_TO(1, BOOST_SIGNALS2_SLOT_MAX_BINDING_ARGS, BOOST_SIGNALS2_SLOT_BINDING_CONSTRUCTOR, ~)
 #undef BOOST_SIGNALS2_SLOT_MAX_BINDING_ARGS
@@ -110,6 +111,14 @@ namespace boost
       const slot_function_type& slot_function() const {return _slot_function;}
       slot_function_type& slot_function() {return _slot_function;}
     private:
+      template<typename F>
+      void init_slot_function(const F& f)
+      {
+        _slot_function = detail::get_invocable_slot(f, detail::tag_type(f));
+        signals2::detail::tracked_objects_visitor visitor(this);
+        boost::visit_each(visitor, f);
+      }
+
       SlotFunction _slot_function;
     };
 

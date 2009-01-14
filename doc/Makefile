@@ -24,8 +24,8 @@ XML_SRCS=\
 	reference/signal_base.xml \
 	reference/signal_header.xml \
 	reference/slot_base.xml \
-	reference/slot.xml
-#	reference/trackable.xml \
+	reference/slot.xml \
+	reference/trackable.xml \
 #	reference/visit_each.xml
 
 .PHONY: all

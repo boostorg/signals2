@@ -22,7 +22,6 @@
 #include <boost/signals2/detail/unique_lock.hpp>
 #include <boost/signals2/slot.hpp>
 #include <boost/type_traits.hpp>
-#include <boost/visit_each.hpp>
 #include <boost/weak_ptr.hpp>
 
 namespace boost

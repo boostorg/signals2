@@ -23,4 +23,5 @@
   <xi:include href="signal_base.xml"/>
   <xi:include href="slot.xml"/>
   <xi:include href="slot_base.xml"/>
+  <xi:include href="trackable.xml"/>
 </library-reference>

@@ -22,6 +22,11 @@ namespace boost
 {
   namespace signals2
   {
+    namespace detail
+    {
+      class tracked_objects_visitor;
+    }
+
     class expired_slot: public bad_weak_ptr
     {
     public:
@@ -65,6 +70,8 @@ namespace boost
         return false;
       }
     protected:
+      friend class detail::tracked_objects_visitor;
+
       void track_signal(const signal_base &signal)
       {
         _tracked_objects.push_back(signal.lock_pimpl());

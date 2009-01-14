@@ -14,16 +14,15 @@
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/repetition.hpp>
 #include <boost/ref.hpp>
 #include <boost/signals2/detail/signals_common.hpp>
 #include <boost/signals2/detail/signals_common_macros.hpp>
+#include <boost/signals2/detail/tracked_objects_visitor.hpp>
 #include <boost/signals2/slot_base.hpp>
 #include <boost/type_traits.hpp>
-#include <boost/utility/addressof.hpp>
+#include <boost/visit_each.hpp>
 #include <boost/weak_ptr.hpp>
-#include <vector>
 
 namespace boost
 {
@@ -58,26 +57,6 @@ namespace boost
         the_tag_type tag = the_tag_type();
         return tag;
       }
-
-      // used to automatically track signal objects that are passed directly to slots
-      template<typename SlotTag>
-      class auto_tracker
-      {
-      public:
-        template<typename Slot, typename F>
-          auto_tracker(Slot *slot, const F &f)
-        {}
-      };
-      template<>
-      class auto_tracker<signal_tag>
-      {
-      public:
-        template<typename Slot, typename F>
-          auto_tracker(Slot *slot, const F &f)
-        {
-          slot->track(f);
-        }
-      };
     }
   }
 } // end namespace boost

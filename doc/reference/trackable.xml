@@ -1,17 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE header PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
-<header name="boost/signals/trackable.hpp">
+<header name="boost/signals2/trackable.hpp">
   <namespace name="boost">
-    <namespace name="signals">
+    <namespace name="signals2">
       <class name="trackable">
-        <purpose><emphasis role="bold">DEPRECATED</emphasis>.  Enables safe use of multicast callbacks.</purpose>
+        <purpose>Provided to ease porting for code using the boost::signals::trackable class from
+          the original Boost.Signals library.</purpose>
 
         <description>
-          <para>The <code>trackable</code> class has
-          been deprecated in favor of <code>shared_ptr</code>s and
-          <functionname>track</functionname> because <code>trackable</code>
-          cannot be made thread-safe.</para>
+          <para>Use of the <code>trackable</code> class is not recommended
+          for new code.  The <code>trackable</code> class is not thread-safe
+          since <code>trackable</code> objects disconnect their associated
+          connections in the <code>trackable</code> destructor.
+          The <code>trackable</code> destructor is not run until
+          after the destructors of any derived classes have completed,
+          which leaves a window where a partially destructed
+          object can still have active connections.
+          </para>
+
+          <para>
+          The preferred method of automatic connection management
+          with Boost.Signals2 is to manage the lifetime of
+          tracked objects with <code>shared_ptr</code>s and
+          to use the <methodname alt="slotN::track">slot::track</methodname>
+          method to track their lifetimes.</para>
 
           <para>The <code>trackable</code> class provides automatic
           disconnection of signals and slots when objects bound in
@@ -28,6 +41,7 @@
           <functionname>visit_each</functionname> overloads for any
           type that may contain pointers or references to trackable
           objects.</para>
+
         </description>
 
         <constructor>
