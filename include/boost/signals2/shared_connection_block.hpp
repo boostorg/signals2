@@ -29,10 +29,16 @@ namespace boost
       }
       void block()
       {
-        if(_blocker) return;
-        boost::shared_ptr<detail::connection_body_base> connectionBody(_weak_connection_body.lock());
-        if(connectionBody == 0) return;
-        _blocker = connectionBody->get_blocker();
+        if(blocking()) return;
+        boost::shared_ptr<detail::connection_body_base> connection_body(_weak_connection_body.lock());
+        if(connection_body == 0)
+        {
+          // Make _blocker non-empty so the blocking() method still returns the correct value
+          // after the connection has expired.
+          _blocker.reset(static_cast<int*>(0));
+          return;
+        }
+        _blocker = connection_body->get_blocker();
       }
       void unblock()
       {
@@ -40,7 +46,8 @@ namespace boost
       }
       bool blocking() const
       {
-        return _blocker != 0;
+        shared_ptr<void> empty;
+        return _blocker < empty || empty < _blocker;
       }
     private:
       boost::weak_ptr<detail::connection_body_base> _weak_connection_body;
