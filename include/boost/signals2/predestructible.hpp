@@ -23,9 +23,8 @@ namespace boost
     class predestructible
     {
     protected:
-      template<typename T>
-        friend class predestructing_deleter;
       predestructible() {}
+    public:
       virtual ~predestructible() {}
       virtual void predestruct() {}
     };

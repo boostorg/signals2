@@ -13,6 +13,7 @@
 #ifndef BOOST_SIGNALS2_DECONSTRUCT_PTR_HPP
 #define BOOST_SIGNALS2_DECONSTRUCT_PTR_HPP
 
+#include <boost/assert.hpp>
 #include <boost/checked_delete.hpp>
 #include <boost/signals2/postconstructible.hpp>
 #include <boost/signals2/predestructible.hpp>
@@ -32,23 +33,30 @@ namespace boost
       extern inline void do_postconstruct(...)
       {
       }
+      extern inline void do_predestruct(...)
+      {
+      }
+      extern inline void do_predestruct(const predestructible *ptr)
+      {
+        try
+        {
+          predestructible *nonconst_ptr = const_cast<predestructible*>(ptr);
+          nonconst_ptr->predestruct();
+        }
+        catch(...)
+        {
+          BOOST_ASSERT(false);
+        }
+      }
     }
+
     template<typename T> class predestructing_deleter
     {
     public:
       void operator()(const T *ptr) const
       {
-        m_predestruct(ptr);
+        detail::do_predestruct(ptr);
         checked_delete(ptr);
-      }
-    private:
-      static void m_predestruct(...)
-      {
-      }
-      static void m_predestruct(const predestructible *ptr)
-      {
-        predestructible *nonconst_ptr = const_cast<predestructible*>(ptr);
-        nonconst_ptr->predestruct();
       }
     };
 

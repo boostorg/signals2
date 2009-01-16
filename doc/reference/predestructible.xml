@@ -9,6 +9,9 @@
         <purpose>A base class for classes with predestructors, used in conjunction with <functionname>deconstruct_ptr</functionname>().
         </purpose>
         <access name="protected">
+          <constructor/>
+        </access>
+        <access name="public">
           <destructor specifiers="virtual"/>
           <method name="predestruct" specifiers="virtual">
             <type>void</type>
