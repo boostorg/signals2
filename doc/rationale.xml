@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE section PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
   "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
-<section last-revision="$Date: 2007-06-12 14:01:23 -0400 (Tue, 12 Jun 2007) $">
+<section last-revision="$Date: 2007-06-12 14:01:23 -0400 (Tue, 12 Jun 2007) $" id="signals2.rationale">
   <title>Design Rationale</title>
 
   <using-namespace name="boost"/>
@@ -91,17 +91,17 @@
     <para>Automatic connection management in Signals2
       depends on the use of <classname>boost::shared_ptr</classname> to
       manage the lifetimes of tracked objects.  This is differs from
-      the original Boost.Signals2 library, which instead relied on derivation
-      from the <code><classname>boost::trackable</classname></code> class.
-      The Boost.Signals2 library would be
+      the original Boost.Signals library, which instead relied on derivation
+      from the <code><classname>boost::signals::trackable</classname></code> class.
+      The library would be
       notified of an object's destruction by the
-      <code><classname>trackable</classname></code> destructor.
+      <code><classname>boost::signals::trackable</classname></code> destructor.
     </para>
-    <para>Unfortunately, the <code><classname>trackable</classname></code>
+    <para>Unfortunately, the <code><classname>boost::signals::trackable</classname></code>
       scheme cannot be made thread safe due
       to destructor ordering.  The destructor of an class derived from
-      <code><classname>trackable</classname></code> will always be
-      called before the destructor of the base <code><classname>trackable</classname></code>
+      <code><classname>boost::signals::trackable</classname></code> will always be
+      called before the destructor of the base <code><classname>boost::signals::trackable</classname></code>
       class.  However, for thread-safety the connection between the signal and object
       needs to be disconnected before the object runs its destructors.
       Otherwise, if an object being destroyed
@@ -116,7 +116,7 @@
       <classname>weak_ptr</classname>s expire.  Additionally, signals
       create their own temporary <classname>shared_ptr</classname>s to
       all of a slot's tracked objects prior to invoking the slot.  This
-      insures none of the tracked objects from destruct in mid-invocation.
+      insures none of the tracked objects destruct in mid-invocation.
     </para>
   </section>
 

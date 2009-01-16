@@ -758,7 +758,7 @@ sig.disconnect(&amp;foo);
 
 </section>
 
-<section><title>Automatic connection management (Intermediate)</title>
+<section id="signals2.tutorial.connection-management"><title>Automatic connection management (Intermediate)</title>
 <para>Boost.Signals2 can automatically track the lifetime of objects
 involved in signal/slot connections, including automatic
 disconnection of slots when objects involved in the slot call are

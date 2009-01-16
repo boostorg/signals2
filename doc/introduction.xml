@@ -26,7 +26,7 @@
   combined.</para>
 
   <section>
-    <title>Signals2 (formerly known as thread_safe_signals)</title>
+    <title>Signals2</title>
     <para>This documentation describes a thread-safe variant of the
     original Boost.Signals library.  There have been some changes to
     the interface to support thread-safety, mostly with respect to

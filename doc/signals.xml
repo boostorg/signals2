@@ -27,6 +27,7 @@
   <copyright>
     <year>2007</year>
     <year>2008</year>
+    <year>2009</year>
     <holder>Frank Mori Hess</holder>
   </copyright>
 
@@ -48,5 +49,6 @@
   <xi:include href="faq.xml"/>
   <xi:include href="design.xml"/>
   <xi:include href="rationale.xml"/>
+  <xi:include href="porting.xml"/>
   <xi:include href="tests.xml"/>
 </library>

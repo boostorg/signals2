@@ -7,6 +7,7 @@ XML_SRCS=\
 	design.xml \
 	faq.xml \
 	introduction.xml \
+	porting.xml \
 	rationale.xml \
 	signals.xml \
 	tests.xml \
