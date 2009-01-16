@@ -41,7 +41,7 @@ template< std::size_t N, std::size_t A > struct sp_aligned_storage
     };
 };
 
-template< class T > class sp_ms_deleter
+template< class T > class deconstruct_deleter
 {
 private:
 
@@ -65,11 +65,11 @@ private:
 
 public:
 
-    sp_ms_deleter(): initialized_( false )
+    deconstruct_deleter(): initialized_( false )
     {
     }
 
-    ~sp_ms_deleter()
+    ~deconstruct_deleter()
     {
         destroy();
     }
@@ -102,9 +102,9 @@ public:
     template< class T >
     static boost::shared_ptr< T > deconstruct()
     {
-        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
+        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::deconstruct_deleter< T >() );
 
-        detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
+        detail::deconstruct_deleter< T > * pd = boost::get_deleter< detail::deconstruct_deleter< T > >( pt );
 
         void * pv = pd->address();
 
@@ -123,9 +123,9 @@ public:
     template< class T, class... Args >
     static boost::shared_ptr< T > deconstruct( Args && ... args )
     {
-        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
+        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::deconstruct_deleter< T >() );
 
-        detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
+        detail::deconstruct_deleter< T > * pd = boost::get_deleter< detail::deconstruct_deleter< T > >( pt );
 
         void * pv = pd->address();
 
@@ -142,9 +142,9 @@ public:
     template< class T, class A1 >
     static boost::shared_ptr< T > deconstruct( A1 const & a1 )
     {
-        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
+        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::deconstruct_deleter< T >() );
 
-        detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
+        detail::deconstruct_deleter< T > * pd = boost::get_deleter< detail::deconstruct_deleter< T > >( pt );
 
         void * pv = pd->address();
 
@@ -159,9 +159,9 @@ public:
     template< class T, class A1, class A2 >
     static boost::shared_ptr< T > deconstruct( A1 const & a1, A2 const & a2 )
     {
-        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
+        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::deconstruct_deleter< T >() );
 
-        detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
+        detail::deconstruct_deleter< T > * pd = boost::get_deleter< detail::deconstruct_deleter< T > >( pt );
 
         void * pv = pd->address();
 
@@ -176,9 +176,9 @@ public:
     template< class T, class A1, class A2, class A3 >
     static boost::shared_ptr< T > deconstruct( A1 const & a1, A2 const & a2, A3 const & a3 )
     {
-        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
+        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::deconstruct_deleter< T >() );
 
-        detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
+        detail::deconstruct_deleter< T > * pd = boost::get_deleter< detail::deconstruct_deleter< T > >( pt );
 
         void * pv = pd->address();
 
@@ -193,9 +193,9 @@ public:
     template< class T, class A1, class A2, class A3, class A4 >
     static boost::shared_ptr< T > deconstruct( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4 )
     {
-        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
+        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::deconstruct_deleter< T >() );
 
-        detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
+        detail::deconstruct_deleter< T > * pd = boost::get_deleter< detail::deconstruct_deleter< T > >( pt );
 
         void * pv = pd->address();
 
@@ -210,9 +210,9 @@ public:
     template< class T, class A1, class A2, class A3, class A4, class A5 >
     static boost::shared_ptr< T > deconstruct( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5 )
     {
-        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
+        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::deconstruct_deleter< T >() );
 
-        detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
+        detail::deconstruct_deleter< T > * pd = boost::get_deleter< detail::deconstruct_deleter< T > >( pt );
 
         void * pv = pd->address();
 
@@ -227,9 +227,9 @@ public:
     template< class T, class A1, class A2, class A3, class A4, class A5, class A6 >
     static boost::shared_ptr< T > deconstruct( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6 )
     {
-        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
+        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::deconstruct_deleter< T >() );
 
-        detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
+        detail::deconstruct_deleter< T > * pd = boost::get_deleter< detail::deconstruct_deleter< T > >( pt );
 
         void * pv = pd->address();
 
@@ -244,9 +244,9 @@ public:
     template< class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7 >
     static boost::shared_ptr< T > deconstruct( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6, A7 const & a7 )
     {
-        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
+        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::deconstruct_deleter< T >() );
 
-        detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
+        detail::deconstruct_deleter< T > * pd = boost::get_deleter< detail::deconstruct_deleter< T > >( pt );
 
         void * pv = pd->address();
 
@@ -261,9 +261,9 @@ public:
     template< class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8 >
     static boost::shared_ptr< T > deconstruct( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6, A7 const & a7, A8 const & a8 )
     {
-        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
+        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::deconstruct_deleter< T >() );
 
-        detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
+        detail::deconstruct_deleter< T > * pd = boost::get_deleter< detail::deconstruct_deleter< T > >( pt );
 
         void * pv = pd->address();
 
@@ -278,9 +278,9 @@ public:
     template< class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9 >
     static boost::shared_ptr< T > deconstruct( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6, A7 const & a7, A8 const & a8, A9 const & a9 )
     {
-        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
+        boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::deconstruct_deleter< T >() );
 
-        detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
+        detail::deconstruct_deleter< T > * pd = boost::get_deleter< detail::deconstruct_deleter< T > >( pt );
 
         void * pv = pd->address();
 
