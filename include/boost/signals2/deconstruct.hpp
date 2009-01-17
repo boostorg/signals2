@@ -69,6 +69,12 @@ public:
     {
     }
 
+    // this copy constructor is an optimization: we don't need to copy the storage_ member,
+    // and shouldn't be copying anyways after initialized_ becomes true
+    deconstruct_deleter(const deconstruct_deleter &): initialized_( false )
+    {
+    }
+
     ~deconstruct_deleter()
     {
         destroy();
