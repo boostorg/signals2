@@ -12,32 +12,26 @@
     <title>User-level Connection Management</title>
 
     <para> Users need to have fine control over the connection of
-    signals to slots and their eventual disconnection. The approach
+    signals to slots and their eventual disconnection. The primary approach
     taken by Boost.Signals2 is to return a
     <code><classname>connection</classname></code> object that enables
     connected/disconnected query, manual disconnection, and an
-    automatic disconnection on destruction mode. Some other possible
-    interfaces include:</para>
+    automatic disconnection on destruction mode (<classname>scoped_connection</classname>).
+    In addition, two other interfaces are supported by the
+    <methodname alt="signalN::disconnect">signal::disconnect</methodname> overloaded method:</para>
 
     <itemizedlist>
       <listitem>
         <para><emphasis role="bold">Pass slot to
         disconnect</emphasis>: in this interface model, the
         disconnection of a slot connected with
-        <code>sig.<methodname>connect</methodname>(slot)</code> is
+        <code>sig.<methodname>connect</methodname>(typeof(sig)::slot_type(slot_func))</code> is
         performed via
-        <code>sig.<methodname>disconnect</methodname>(slot)</code>. Internally,
+        <code>sig.<methodname>disconnect</methodname>(slot_func)</code>. Internally,
         a linear search using slot comparison is performed and the
         slot, if found, is removed from the list. Unfortunately,
-        querying connectedness will generally also end up as
-        linear-time operations. This model also fails for
-        implementation reasons when slots become more complex than
-        simple function pointers, member function pointers and a
-        limited set of compositions and argument binders: to match the
-        slot given in the call to
-        <code><methodname>disconnect</methodname></code> with an
-        existing slot we would need to be able to compare arbitrary
-        function objects, which is not feasible.</para>
+        querying connectedness ends up as a
+        linear-time operation.</para>
       </listitem>
 
       <listitem>
@@ -45,7 +39,7 @@
         disconnect</emphasis>: this approach identifies slots with a
         token that is easily comparable (e.g., a string), enabling
         slots to be arbitrary function objects. While this approach is
-        essentially equivalent to the approach taken by Boost.Signals2,
+        essentially equivalent to the connection approach taken by Boost.Signals2,
         it is possibly more error-prone for several reasons:</para>
 
         <itemizedlist>
@@ -60,27 +54,18 @@
           </listitem>
 
           <listitem>
-            <para>Tokens must be unique, otherwise two slots will have
-            the same name and will be indistinguishable. In
+            <para>If tokens are not unique, two slots may have
+            the same name and be indistinguishable. In
             environments where many connections will be made
             dynamically, name generation becomes an additional task
-            for the user. Uniqueness of tokens also results in an
-            additional failure mode when attempting to connect a slot
-            using a token that has already been used.</para>
-          </listitem>
-
-          <listitem>
-            <para>More parameterization would be required, because the
-            token type must be user-defined. Additional
-            parameterization steepens the learning curver and
-            overcomplicates a simple interface.</para>
+            for the user.</para>
           </listitem>
         </itemizedlist>
 
         <para> This type of interface is supported in Boost.Signals2
-        via the slot grouping mechanism. It augments the
-        <code><classname>connection</classname></code> object-based
-        connection management scheme.</para>
+        via the slot grouping mechanism, and the overload of
+        <methodname alt="signalN::disconnect">signal::disconnect</methodname>
+        which takes an argument of the signal's <code>Group</code> type.</para>
       </listitem>
     </itemizedlist>
   </section>
