@@ -232,18 +232,26 @@
             </signature>
             <signature>
               <template>
-                <template-type-parameter name="Slot"/>
+                <template-type-parameter name="S"/>
               </template>
               <type>void</type>
-              <parameter name="slot">
-                <paramtype>const Slot&amp;</paramtype>
+              <parameter name="slot_func">
+                <paramtype>const S&amp;</paramtype>
               </parameter>
             </signature>
 
             <effects><para>If the parameter is (convertible to) a
             group name, any slots in the given group are
-            disconnected. Otherwise, any slots equal to the given slot
-            are disconnected.</para></effects>
+            disconnected. Otherwise, any slots equal to the
+            given slot function
+            are disconnected.
+            </para>
+            <para>Note, the <code>slot_func</code>
+            argument should not be an actual <classname alt="slotN">signals2::slot</classname>
+            object (which does not even support <code>operator==</code>), but rather
+            the functor you wrapped inside a <classname alt="slotN">signals2::slot</classname>
+            when you initially made the connection.
+            </para></effects>
 
             <throws><para>Will not throw unless a user destructor or
             equality operator <code>==</code> throws. If either throws,
