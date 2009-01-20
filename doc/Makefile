@@ -4,7 +4,6 @@ PROJECT_ROOT="../../../.."
 BOOSTBOOK_TOOL_DIR=$(BOOST_SRC_DIR)/tools/boostbook
 
 XML_SRCS=\
-	design.xml \
 	faq.xml \
 	introduction.xml \
 	porting.xml \
