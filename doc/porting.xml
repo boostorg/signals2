@@ -54,17 +54,45 @@
             </para>
             <para>
               If you do not intend to make your program multi-threaded, the easiest porting path is to simply replace
-              your uses of <code>boost::signals::trackable</code> as a base class with
-              <code>boost::signals2::trackable</code>.  Boost.Signals2 uses the same
+              your uses of <classname>boost::signals::trackable</classname> as a base class with
+              <classname>boost::signals2::trackable</classname>.  Boost.Signals2 uses the same
               <functionname>boost::visit_each</functionname> mechanism to discover
               <classname>trackable</classname> objects
               as used by the original Boost.Signals library.
             </para>
           </listitem>
           <listitem>
+            <para>Support for postconstructors (and predestructors) on objects managed by <classname>shared_ptr</classname>
+              has been added with
+              <classname>postconstructible</classname>, <classname>predestructible</classname>,
+              and the factory functions <functionname>deconstruct</functionname> and <functionname>deconstruct_ptr</functionname>.
+              This was motivated by the importance of
+              <code>shared_ptr</code> for the new connection tracking scheme, and the
+              inability to obtain a <code>shared_ptr</code> to an object in its constructor.
+              The use of these new additions is described in the
+              <link linkend="signals2.tutorial.deconstruct">tutorial</link>.
+            </para>
+            <para>
+              The use of these new classes is in no way required, they are only provided in the hope
+              they may be useful.  You may wish to use them if you are porting code where
+              a class creates connections to its own member functions in its constructor,
+              and you also
+              wish to use the new automatic connection management scheme.  You could then
+              move the connection creation from the constructor to to the class'
+              <methodname alt="postconstructible::postconstruct">postconstruct</methodname>
+              method, where <methodname>enable_shared_from_this::shared_from_this</methodname>
+              may be used successfully to obtain a <classname>shared_ptr</classname> for
+              passing to <methodname alt="slotN::track">slot::track</methodname>.
+              The <functionname>deconstruct</functionname> function could be used create objects
+              of the class and run their <code>postconstruct</code> method.  You can enforce use of <functionname>deconstruct</functionname> by
+              making the class' constructors private and declaring
+              <classname>deconstruct_access</classname> a friend.
+            </para>
+          </listitem>
+          <listitem>
             <para>
               The <classname>slot</classname> class takes a new <code>Signature</code> template parameter,
-              is useable as a function object, and is has some additional features to support the
+              is useable as a function object, and has some additional features to support the
               new Boost.Signals2 automatic connection management scheme.
             </para>
             <para>
@@ -78,7 +106,7 @@
           </listitem>
           <listitem>
             <para>
-              The <classname>optional_last_value</classname> has replaced <classname>last_value</classname>
+              The <classname>optional_last_value</classname> class has replaced <classname>last_value</classname>
               as the default combiner for signals.
             </para>
             <para>
@@ -95,7 +123,7 @@
               value returned from signal invocation, you will have to take into account that
               <classname>optional_last_value</classname> returns a
               <classname>boost::optional</classname> instead of a plain value.  One simple
-              way to do this is to use <code>boost::optional::operator*()</code> to access the
+              way to deal with this is to use <code>boost::optional::operator*()</code> to access the
               value wrapped inside the returned <classname>boost::optional</classname>.
             </para>
             <para>
@@ -116,7 +144,7 @@
             </para>
             <para>
               These additions should have no effect on porting unless you are also converting
-              your program from a single threaded program into a multi-threaded on.  In that case,
+              your program from a single threaded program into a multi-threaded one.  In that case,
               if you have slots which need access to their <classname>connection</classname>
               to the signal invoking them (for example to block or disconnect their connection)
               you may wish to connect the slots with
@@ -149,9 +177,10 @@
             <para>
               During porting it should be straightforward to replace uses of the old reference-returning
               <code>signal::combiner()</code>
-              function with the new "by-value" <code>combiner</code> and <code>set_combiner</code> functions.
-              However, it will require each call of the <code>combiner</code> method in your code
-              to be inspected manually, to determine if your program logic has been broken by the changed
+              function with the new "by-value" <methodname alt="signalN::combiner">signal::combiner</methodname>
+              and <methodname alt="signalN::set_combiner">signal::set_combiner</methodname> functions.
+              However, you will need to inspect each call of the <code>combiner</code> method in your code
+              to determine if your program logic has been broken by the changed
               return type.
             </para>
           </listitem>
@@ -187,15 +216,6 @@ bs2::connection my_connection;
   do_something();
 } // blocker goes out of scope here and releases its block on my_connection
 </programlisting>
-          </listitem>
-          <listitem>
-            <para>Support for postconstructors (and predestructors) on objects managed by <classname>shared_ptr</classname>
-              has been added with
-              <functionname>deconstruct_ptr</functionname>, <classname>postconstructible</classname>,
-              and <classname>predestructible</classname>.  This was motivated by the importance of
-              <code>shared_ptr</code> for the new connection tracking scheme, and the
-              inability to obtain a <code>shared_ptr</code> to an object in its constructor.
-            </para>
           </listitem>
         </itemizedlist>
 </section>
