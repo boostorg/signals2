@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE section PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
+  "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
+<section last-revision="$Date: 2007-06-12 14:01:23 -0400 (Tue, 12 Jun 2007) $" id="signals2.thread-safety">
+  <title>Thread-Safety</title>
+
+  <using-namespace name="boost"/>
+  <using-namespace name="boost::signals2"/>
+
+  <para>
+    The primary motivation for Boost.Signals2 is to provide a version of
+    the original Boost.Signals library which can be used safely in a
+    multi-threaded environment.
+    This is achieved primarily through two changes from the original Boost.Signals
+    API.  One is the introduction of a new automatic connection management scheme
+    relying on <classname>shared_ptr</classname> and <classname>weak_ptr</classname>,
+    as described in the <link linkend="signals2.tutorial.connection-management">tutorial</link>.
+    The second change was the introduction of a <code>Mutex</code> template type
+    parameter to the <classname>signal</classname> class.  This section details how
+    <code>Mutex</code> objects are used by a signal to protect its internal
+    state from concurrent access and modification.
+  </para>
+  <para>
+    Each signal object default-constructs a <code>Mutex</code> object to protect
+    its internal state.  Furthermore, a <code>Mutex</code> is created
+    for each slot which is connected to the signal, to protect the
+    associated signal-slot connection.
+  </para>
+  <para>
+    A signal's mutex is automatically locked whenever any of the
+    signal's methods are called.  The mutex is usually held until the
+    method completes, however there is one major exception to this rule.  When
+    a signal is invoked by calling
+    <methodname alt="signalN::operator()">signal::operator()</methodname>,
+    the invocation first acquires a lock on the signal's mutex.  Then
+    it obtains a handle to the signal's slot list and combiner.  Next
+    it releases the signal's mutex, before it invokes the combiner to
+    iterate through the slot list.  Thus no mutexes are held by the
+    signal while a slot is executing.  This design choice 
+    makes it impossible for user code running in a slot
+    to deadlock against any of the
+    mutexes used internally by the Boost.Signals2 library.
+    It also prevents slots from accidentally attempting to
+    recursively lock any of the library's internal mutexes.
+    Therefore, if you invoke a signal concurrently from multiple threads,
+    it is possible for the signal's combiner to be invoked concurrently
+    and thus the slots to execute concurrently.
+  </para>
+  <para>
+     During a signal invocation, the following steps are performed in order to
+     find the next callable slot while iterating through the slot list.
+  </para>
+  <itemizedlist>
+    <listitem>
+      <para>The <code>Mutex</code> associated with the connection to the
+        slot is locked.</para>
+    </listitem>
+    <listitem>
+      <para>All the tracked <classname>weak_ptr</classname> associated with the
+        slot are copied into temporary <classname>shared_ptr</classname> which
+        will be kept alive until we are done with the slot.  If this fails due
+        to any of the
+        <classname>weak_ptr</classname> having expired, the connection is
+        automatically disconnected.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The connection to the slot is checked to see if it is blocked
+        or disconnected, and then the mutex is unlocked.  If the connection
+        was either blocked or disconnected, we
+        start again from the beginning with the next slot in the slot list.
+        Otherwise, we will execute the slot when the combiner next
+        dereferences its slot call iterator (unless the combiner should increment
+        the iterator without ever dereferencing it).
+      </para>
+      <para>
+        Note that since we unlock the connection's mutex before executing
+        its associated slot, it is possible a slot will still be executing
+        after it has been disconnected by a
+        <code><methodname>connection::disconnect</methodname>()</code>, if
+        the disconnect was called concurrently with signal invocation.
+      </para>
+    </listitem>
+  </itemizedlist>
+</section>

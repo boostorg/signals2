@@ -10,6 +10,7 @@ XML_SRCS=\
 	rationale.xml \
 	signals.xml \
 	tests.xml \
+	thread_safety.xml \
 	tutorial.xml \
 	reference/connection.xml \
 	reference/deconstruct_ptr.xml \

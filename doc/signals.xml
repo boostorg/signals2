@@ -46,6 +46,7 @@
   <xi:include href="introduction.xml"/>
   <xi:include href="tutorial.xml"/>
   <xi:include href="reference/reference.xml"/>
+  <xi:include href="thread_safety.xml"/>
   <xi:include href="faq.xml"/>
   <xi:include href="rationale.xml"/>
   <xi:include href="porting.xml"/>
