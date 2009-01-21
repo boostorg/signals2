@@ -26,7 +26,7 @@ namespace boost
       predestructible() {}
     public:
       virtual ~predestructible() {}
-      virtual void predestruct() {}
+      virtual void predestruct() = 0;
     };
   }
 }

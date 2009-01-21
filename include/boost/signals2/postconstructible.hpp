@@ -31,7 +31,7 @@ namespace boost
     protected:
       postconstructible() {}
       virtual ~postconstructible() {}
-      virtual void postconstruct() {}
+      virtual void postconstruct() = 0;
     };
   }
 }
