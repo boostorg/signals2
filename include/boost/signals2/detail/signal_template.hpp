@@ -179,7 +179,7 @@ namespace boost
         BOOST_SIGNALS2_SIGNAL_IMPL_CLASS_NAME(const combiner_type &combiner,
           const group_compare_type &group_compare):
           _shared_state(new invocation_state(connection_list_type(group_compare), combiner)),
-          _garbage_collector_it(_shared_state->connection_bodies.end())
+          _garbage_collector_it(_shared_state->connection_bodies().end())
         {}
         // connect slot
         connection connect(const slot_type &slot, connect_position position = at_back)
@@ -219,8 +219,8 @@ namespace boost
           shared_ptr<invocation_state> local_state =
             get_readable_state();
           typename connection_list_type::iterator it;
-          for(it = local_state->connection_bodies.begin();
-            it != local_state->connection_bodies.end(); ++it)
+          for(it = local_state->connection_bodies().begin();
+            it != local_state->connection_bodies().end(); ++it)
           {
             (*it)->disconnect();
           }
@@ -232,8 +232,8 @@ namespace boost
           group_key_type group_key(grouped_slots, group);
           typename connection_list_type::iterator it;
           typename connection_list_type::iterator end_it =
-            local_state->connection_bodies.upper_bound(group_key);
-          for(it = local_state->connection_bodies.lower_bound(group_key);
+            local_state->connection_bodies().upper_bound(group_key);
+          for(it = local_state->connection_bodies().lower_bound(group_key);
             it != end_it; ++it)
           {
             (*it)->disconnect();
@@ -251,7 +251,7 @@ namespace boost
           shared_ptr<invocation_state> local_state;
           typename connection_list_type::iterator it;
           {
-            unique_lock<mutex_type> listLock(_mutex);
+            unique_lock<mutex_type> list_lock(_mutex);
             // only clean up if it is safe to do so
             if(_shared_state.unique())
               nolock_cleanup_connections(false);
@@ -263,16 +263,16 @@ namespace boost
           slot_invoker invoker BOOST_PP_IF(BOOST_SIGNALS2_NUM_ARGS, \
             (BOOST_SIGNALS2_SIGNATURE_ARG_NAMES(BOOST_SIGNALS2_NUM_ARGS)), );
           slot_call_iterator_cache<slot_result_type, slot_invoker> cache(invoker);
-          return local_state->combiner(
-            slot_call_iterator(local_state->connection_bodies.begin(), local_state->connection_bodies.end(), cache),
-            slot_call_iterator(local_state->connection_bodies.end(), local_state->connection_bodies.end(), cache));
+          return local_state->combiner()(
+            slot_call_iterator(local_state->connection_bodies().begin(), local_state->connection_bodies().end(), cache),
+            slot_call_iterator(local_state->connection_bodies().end(), local_state->connection_bodies().end(), cache));
         }
         result_type operator ()(BOOST_SIGNALS2_SIGNATURE_FULL_ARGS(BOOST_SIGNALS2_NUM_ARGS)) const
         {
           shared_ptr<invocation_state> local_state;
           typename connection_list_type::iterator it;
           {
-            unique_lock<mutex_type> listLock(_mutex);
+            unique_lock<mutex_type> list_lock(_mutex);
             // only clean up if it is safe to do so
             if(_shared_state.unique())
               nolock_cleanup_connections(false);
@@ -284,9 +284,9 @@ namespace boost
           slot_invoker invoker BOOST_PP_IF(BOOST_SIGNALS2_NUM_ARGS, \
             (BOOST_SIGNALS2_SIGNATURE_ARG_NAMES(BOOST_SIGNALS2_NUM_ARGS)), );
           slot_call_iterator_cache<slot_result_type, slot_invoker> cache(invoker);
-          return const_cast<const combiner_type&>(local_state->combiner)(
-            slot_call_iterator(local_state->connection_bodies.begin(), local_state->connection_bodies.end(), cache),
-            slot_call_iterator(local_state->connection_bodies.end(), local_state->connection_bodies.end(), cache));
+          return local_state->combiner()(
+            slot_call_iterator(local_state->connection_bodies().begin(), local_state->connection_bodies().end(), cache),
+            slot_call_iterator(local_state->connection_bodies().end(), local_state->connection_bodies().end(), cache));
         }
         std::size_t num_slots() const
         {
@@ -294,8 +294,8 @@ namespace boost
             get_readable_state();
           typename connection_list_type::iterator it;
           std::size_t count = 0;
-          for(it = local_state->connection_bodies.begin();
-            it != local_state->connection_bodies.end(); ++it)
+          for(it = local_state->connection_bodies().begin();
+            it != local_state->connection_bodies().end(); ++it)
           {
             if((*it)->connected()) ++count;
           }
@@ -306,8 +306,8 @@ namespace boost
           shared_ptr<invocation_state> local_state =
             get_readable_state();
           typename connection_list_type::iterator it;
-          for(it = local_state->connection_bodies.begin();
-            it != local_state->connection_bodies.end(); ++it)
+          for(it = local_state->connection_bodies().begin();
+            it != local_state->connection_bodies().end(); ++it)
           {
             if((*it)->connected()) return false;
           }
@@ -324,7 +324,7 @@ namespace boost
           if(_shared_state.unique())
             _shared_state->combiner = combiner;
           else
-            _shared_state.reset(new invocation_state(_shared_state->connection_bodies, combiner));
+            _shared_state.reset(new invocation_state(*_shared_state, combiner));
         }
       private:
         typedef Mutex mutex_type;
@@ -368,18 +368,30 @@ namespace boost
         };
         // a struct used to optimize (minimize) the number of shared_ptrs that need to be created
         // inside operator()
-        struct invocation_state
+        class invocation_state
         {
-          invocation_state(const connection_list_type &connections,
-            const combiner_type &combiner): connection_bodies(connections),
-            combiner(combiner)
+        public:
+          invocation_state(const connection_list_type &connections_in,
+            const combiner_type &combiner_in): _connection_bodies(new connection_list_type(connections_in)),
+            _combiner(new combiner_type(combiner_in))
           {}
-          invocation_state(const invocation_state &other):
-            connection_bodies(other.connection_bodies),
-            combiner(other.combiner)
+          invocation_state(const invocation_state &other, const connection_list_type &connections_in):
+            _connection_bodies(new connection_list_type(connections_in)),
+            _combiner(other._combiner)
           {}
-          connection_list_type connection_bodies;
-          combiner_type combiner;
+          invocation_state(const invocation_state &other, const combiner_type &combiner_in):
+            _connection_bodies(other._connection_bodies),
+            _combiner(new combiner_type(combiner_in))
+          {}
+          connection_list_type & connection_bodies() { return *_connection_bodies; }
+          const connection_list_type & connection_bodies() const { return *_connection_bodies; }
+          combiner_type & combiner() { return *_combiner; }
+          const combiner_type & combiner() const { return *_combiner; }
+        private:
+          invocation_state(const invocation_state &);
+
+          shared_ptr<connection_list_type> _connection_bodies;
+          shared_ptr<combiner_type> _combiner;
         };
 
         // clean up disconnected connections
@@ -388,7 +400,7 @@ namespace boost
         {
           BOOST_ASSERT(_shared_state.unique());
           typename connection_list_type::iterator it;
-          for(it = begin; it != _shared_state->connection_bodies.end();)
+          for(it = begin; it != _shared_state->connection_bodies().end();)
           {
             bool connected;
             {
@@ -399,7 +411,7 @@ namespace boost
             }// scoped lock destructs here, safe to erase now
             if(connected == false)
             {
-              it = _shared_state->connection_bodies.erase((*it)->group_key(), it);
+              it = _shared_state->connection_bodies().erase((*it)->group_key(), it);
             }else
             {
               ++it;
@@ -413,9 +425,9 @@ namespace boost
         {
           BOOST_ASSERT(_shared_state.unique());
           typename connection_list_type::iterator begin;
-          if(_garbage_collector_it == _shared_state->connection_bodies.end())
+          if(_garbage_collector_it == _shared_state->connection_bodies().end())
           {
-            begin = _shared_state->connection_bodies.begin();
+            begin = _shared_state->connection_bodies().begin();
           }else
           {
             begin = _garbage_collector_it;
@@ -428,8 +440,8 @@ namespace boost
         {
           if(_shared_state.unique() == false)
           {
-            _shared_state = shared_ptr<invocation_state>(new invocation_state(*_shared_state));
-            nolock_cleanup_connections(true, _shared_state->connection_bodies.begin());
+            _shared_state.reset(new invocation_state(*_shared_state, _shared_state->connection_bodies()));
+            nolock_cleanup_connections(true, _shared_state->connection_bodies().begin());
           }else
           {
             nolock_cleanup_connections(true);
@@ -437,7 +449,7 @@ namespace boost
         }
         shared_ptr<invocation_state> get_readable_state() const
         {
-          unique_lock<mutex_type> listLock(_mutex);
+          unique_lock<mutex_type> list_lock(_mutex);
           return _shared_state;
         }
         connection_body_type create_new_connection(const slot_type &slot)
@@ -455,8 +467,8 @@ namespace boost
           shared_ptr<invocation_state> local_state =
             get_readable_state();
           typename connection_list_type::iterator it;
-          for(it = local_state->connection_bodies.begin();
-            it != local_state->connection_bodies.end(); ++it)
+          for(it = local_state->connection_bodies().begin();
+            it != local_state->connection_bodies().end(); ++it)
           {
             unique_lock<connection_body_base> lock(**it);
             if((*it)->slot.slot_function() == slot)
@@ -483,11 +495,11 @@ namespace boost
           if(position == at_back)
           {
             group_key.first = back_ungrouped_slots;
-            _shared_state->connection_bodies.push_back(group_key, newConnectionBody);
+            _shared_state->connection_bodies().push_back(group_key, newConnectionBody);
           }else
           {
             group_key.first = front_ungrouped_slots;
-            _shared_state->connection_bodies.push_front(group_key, newConnectionBody);
+            _shared_state->connection_bodies().push_front(group_key, newConnectionBody);
           }
           newConnectionBody->set_group_key(group_key);
           return connection(newConnectionBody);
@@ -502,10 +514,10 @@ namespace boost
           newConnectionBody->set_group_key(group_key);
           if(position == at_back)
           {
-            _shared_state->connection_bodies.push_back(group_key, newConnectionBody);
+            _shared_state->connection_bodies().push_back(group_key, newConnectionBody);
           }else  // at_front
           {
-            _shared_state->connection_bodies.push_front(group_key, newConnectionBody);
+            _shared_state->connection_bodies().push_front(group_key, newConnectionBody);
           }
           return connection(newConnectionBody);
         }
