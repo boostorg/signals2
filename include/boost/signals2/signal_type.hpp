@@ -86,13 +86,13 @@ namespace boost
         args;
 
 #ifdef NAMED_SIGNATURE_PARAMETER
-      typedef typename parameter::binding<args, keywords::tag::signature_type>::type
+      typedef typename parameter::value_type<args, keywords::tag::signature_type>::type
         signature_type;
 #else
       typedef Signature signature_type;
 #endif
 
-      typedef typename parameter::binding
+      typedef typename parameter::value_type
         <
           args,
           keywords::tag::combiner_type,
@@ -103,18 +103,18 @@ namespace boost
         >::type combiner_type;
 
       typedef typename
-        parameter::binding<args, keywords::tag::group_type, int>::type group_type;
+        parameter::value_type<args, keywords::tag::group_type, int>::type group_type;
 
       typedef typename
-        parameter::binding<args, keywords::tag::group_compare_type, std::less<group_type> >::type
+        parameter::value_type<args, keywords::tag::group_compare_type, std::less<group_type> >::type
         group_compare_type;
 
       typedef typename
-        parameter::binding<args, keywords::tag::slot_function_type, function<signature_type> >::type
+        parameter::value_type<args, keywords::tag::slot_function_type, function<signature_type> >::type
         slot_function_type;
 
       typedef typename
-        parameter::binding
+        parameter::value_type
           <
             args,
             keywords::tag::extended_slot_function_type,
@@ -123,7 +123,7 @@ namespace boost
           extended_slot_function_type;
 
       typedef typename
-        parameter::binding<args, keywords::tag::mutex_type, mutex>::type mutex_type;
+        parameter::value_type<args, keywords::tag::mutex_type, mutex>::type mutex_type;
 
       typedef signal
         <
