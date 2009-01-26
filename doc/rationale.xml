@@ -103,6 +103,14 @@
       all of a slot's tracked objects prior to invoking the slot.  This
       insures none of the tracked objects destruct in mid-invocation.
     </para>
+    <para>The new connection management scheme has the advantage of being
+      non-intrusive.  Objects of any type may be tracked using the
+      <classname>shared_ptr/weak_ptr</classname> scheme.  The old
+      <code><classname>boost::signals::trackable</classname></code>
+      scheme requires the tracked objects to be derived from the <code>trackable</code>
+      base class, which is not always practical when interacting
+      with classes from 3rd party libraries.
+    </para>
   </section>
 
   <section>
