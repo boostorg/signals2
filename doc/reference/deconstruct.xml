@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE header PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"
+  "http://www.boost.org/tools/boostbook/dtd/boostbook.dtd">
+<header name="boost/signals2/deconstruct.hpp" last-revision="$Date: 2007-03-06 16:51:55 -0500 (Tue, 06 Mar 2007) $">
+  <using-namespace name="boost"/>
+  <using-namespace name="boost::signals2"/>
+  <namespace name="boost">
+    <namespace name="signals2">
+      <overloaded-function name="deconstruct">
+        <signature>
+          <template>
+            <template-type-parameter name="T"/>
+          </template>
+          <type>shared_ptr&lt;T&gt;</type>
+        </signature>
+        <signature>
+          <template>
+            <template-type-parameter name="T"/>
+            <template-type-parameter name="A1"/>
+          </template>
+          <type>shared_ptr&lt;T&gt;</type>
+          <parameter name="arg1"><paramtype>const A1 &amp;</paramtype></parameter>
+        </signature>
+        <signature>
+          <template>
+            <template-type-parameter name="T"/>
+            <template-type-parameter name="A1"/>
+            <template-type-parameter name="A2"/>
+          </template>
+          <type>shared_ptr&lt;T&gt;</type>
+          <parameter name="arg1"><paramtype>const A1 &amp;</paramtype></parameter>
+          <parameter name="arg2"><paramtype>const A2 &amp;</paramtype></parameter>
+        </signature>
+        <signature>
+          <template>
+            <template-type-parameter name="T"/>
+            <template-type-parameter name="A1"/>
+            <template-type-parameter name="A2, ..."/>
+            <template-type-parameter name="AN"/>
+          </template>
+          <type>shared_ptr&lt;T&gt;</type>
+          <parameter name="arg1"><paramtype>const A1 &amp;</paramtype></parameter>
+          <parameter name="arg2"><paramtype>const A2 &amp;</paramtype></parameter>
+          <parameter name=""><paramtype>...</paramtype></parameter>
+          <parameter name="argN"><paramtype>const AN &amp;</paramtype></parameter>
+          <purpose>this is my purpose</purpose>
+        </signature>
+
+        <purpose>Create a <code>shared_ptr</code> which supports post-constructors and pre-destructors.</purpose>
+
+        <effects>
+          <para>Creates a <code>shared_ptr&lt;T&gt;</code> and its owned object using only a single allocation,
+            in a manner similar
+            to that of <functionname>boost::make_shared()</functionname>.  In addition, <code>deconstruct</code>
+            supports postconstructors and predestructors for types derived from either the
+            <classname>postconstructible</classname> or <classname>predestructible</classname> base classes.
+            If <code>T</code> is derived from <classname>postconstructible</classname>
+            then <code>postconstruct()</code> will be called on the newly constructed object
+            after it is passed to its owning <code>shared_ptr</code>.
+            If <code>T</code> is derived from <classname>predestructible</classname>
+            then the deleter of the returned <classname>shared_ptr</classname> will call
+            <code>predestruct()</code> on the owned object prior to deleting it with
+            <functionname>checked_delete</functionname>.
+          </para>
+          <para>
+            Any arguments passed to a
+            <code>deconstruct()</code> call are forwarded to the matching constructor of the
+            template type
+            <code>T</code>.
+          </para>
+        </effects>
+        <notes>
+          <para>If your compiler supports the C++0x features of rvalue references
+            and variadic templates, then <code>deconstruct</code> will perform perfect
+            forwarding of arguments to the <code>T</code> constructor, using
+            a prototype of:
+          </para>
+          <programlisting>template&lt; typename T, typename... Args > boost::shared_ptr&lt; T &gt; deconstruct( Args &amp;&amp; ... args );</programlisting>
+          <para>Otherwise, argument forwarding is performed via const references, as specified in
+            the synopsis.  In order to pass non-const references to a constructor, you will need
+            to wrap them in reference wrappers using <functionname>boost::ref</functionname>.
+          </para>
+          <para>You may give all the <code>deconstruct</code> overloads access to your class'
+            private and protected constructors by
+            declaring <classname>deconstruct_access</classname> a friend.  Using private
+            constructors in conjunction with <classname>deconstruct_access</classname>
+            can be useful to
+            ensure <classname>postconstructible</classname> or <classname>predestructible</classname>
+            objects are always created
+            properly using <code>deconstruct</code>.
+          </para>
+          <para>
+            See also <functionname>deconstruct_ptr</functionname>, which is similar to <code>deconstruct</code>,
+            except it more closely resembles the constructors of <classname>shared_ptr</classname> rather
+            than the <functionname>boost::make_shared</functionname> factory function.
+          </para>
+        </notes>
+        <returns><para>A <code>shared_ptr&lt;T&gt;</code> owning a newly allocated object of
+            type <code>T</code>.</para>
+        </returns>
+      </overloaded-function>
+      <class name="deconstruct_access">
+        <purpose>Gives <functionname>deconstruct</functionname> access to private/protected constructors.</purpose>
+        <description>
+          <para>
+            Declaring <code>deconstruct_access</code> a friend to your class will give the
+            <functionname>deconstruct</functionname> factory function access to your class' private and
+            protected constructors.  Using private
+            constructors in conjunction with <code>deconstruct_access</code>
+            can be useful to
+            ensure <classname>postconstructible</classname> or <classname>predestructible</classname>
+            objects are always created
+            properly using <code>deconstruct</code>.
+          </para>
+        </description>
+      </class>
+    </namespace>
+  </namespace>
+</header>

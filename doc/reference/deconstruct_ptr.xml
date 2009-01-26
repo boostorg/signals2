@@ -26,13 +26,25 @@
 
         <purpose>Create a <code>shared_ptr</code> which supports post-constructors and pre-destructors.</purpose>
 
-        <effects><para>Creates a <code>shared_ptr&lt;T&gt;</code> by passing the <code>pointer</code> and
-        <code>deleter</code> parameters to the <code>shared_ptr</code> constructor.  If no
-        <code>deleter</code> is specified, then <classname>predestructing_deleter</classname> is
-        used as the default.  If <code>T</code> is derived from <classname>postconstructible</classname>
-        (and <code>pointer</code> is not a null pointer),
-        then <code>pointer->postconstruct()</code> will be called after the <code>shared_ptr</code> is constructed.</para>
+        <effects>
+          <para>Creates a <code>shared_ptr&lt;T&gt;</code> by passing the <code>pointer</code> and
+            <code>deleter</code> parameters to the <code>shared_ptr</code> constructor.  If no
+            <code>deleter</code> is specified, then <classname>predestructing_deleter</classname> is
+            used as the default.  If <code>T</code> is derived from <classname>postconstructible</classname>
+            (and <code>pointer</code> is not a null pointer),
+            then <code>pointer->postconstruct()</code> will be called after the <code>shared_ptr</code> is constructed.
+          </para>
         </effects>
+        <notes>
+          <para>
+            See also <functionname>deconstruct</functionname>, which is similar to <code>deconstruct_ptr</code>,
+            except it resembles the <functionname>boost::make_shared</functionname> factory function
+            rather than the constructors of <classname>shared_ptr</classname>.  The
+            <functionname>deconstruct</functionname> factory function creates the
+            <classname>shared_ptr</classname> and the object it owns efficiently with a single allocation,
+            and can be given access to private or protected constructors.
+          </para>
+        </notes>
         <returns><para>A <code>shared_ptr&lt;T&gt;</code> owning <code>pointer</code>.</para></returns>
       </overloaded-function>
 

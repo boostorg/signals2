@@ -11,6 +11,7 @@
   </header>
 
   <xi:include href="connection.xml"/>
+  <xi:include href="deconstruct.xml"/>
   <xi:include href="deconstruct_ptr.xml"/>
   <xi:include href="dummy_mutex.xml"/>
   <xi:include href="last_value.xml"/>

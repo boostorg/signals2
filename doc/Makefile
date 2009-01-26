@@ -13,6 +13,7 @@ XML_SRCS=\
 	thread_safety.xml \
 	tutorial.xml \
 	reference/connection.xml \
+	reference/deconstruct.xml \
 	reference/deconstruct_ptr.xml \
 	reference/dummy_mutex.xml \
 	reference/last_value.xml \
