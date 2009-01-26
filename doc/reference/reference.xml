@@ -22,6 +22,7 @@
   <xi:include href="shared_connection_block.xml"/>
   <xi:include href="signal_header.xml"/>
   <xi:include href="signal_base.xml"/>
+  <xi:include href="signal_type.xml"/>
   <xi:include href="slot.xml"/>
   <xi:include href="slot_base.xml"/>
   <xi:include href="trackable.xml"/>

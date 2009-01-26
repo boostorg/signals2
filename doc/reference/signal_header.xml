@@ -60,11 +60,11 @@
         <typedef name="group_compare_type"><type>GroupCompare</type></typedef>
         <typedef name="slot_function_type"><type>SlotFunction</type></typedef>
         <typedef name="slot_type">
-          <type><classname>slotN</classname>&lt;R, T1, T2, ..., TN, SlotFunction&gt;</type>
+          <type>typename <classname>slotN</classname>&lt;R, T1, T2, ..., TN, SlotFunction&gt;</type>
         </typedef>
         <typedef name="extended_slot_function_type"><type>ExtendedSlotFunction</type></typedef>
         <typedef name="extended_slot_type">
-          <type><classname>slotN</classname>&lt;R, const <classname>connection</classname> &amp;, T1, T2, ..., TN, ExtendedSlotFunction&gt;</type>
+          <type>typename <classname>slotN</classname>&lt;R, const <classname>connection</classname> &amp;, T1, ..., TN, ExtendedSlotFunction&gt;</type>
           <description>
             <para>Slots of the <code>extended_slot_type</code> may be connected to the signal using the
               <methodname>connect_extended</methodname> methods.  The <code>extended_slot_type</code>
@@ -75,7 +75,7 @@
           </description>
         </typedef>
         <typedef name="slot_result_type">
-          <type><emphasis>unspecified</emphasis></type>
+          <type><emphasis>implementation-detail</emphasis></type>
           <description>
             <para>
               This is the type returned when dereferencing the input iterators passed to the signal's
@@ -425,6 +425,14 @@
 
           <para>All functionality of this class template is in its base
           class <classname>signalN</classname>.</para>
+          <para>
+            The large number of template parameters for the <code>signal</code> class
+            can be an inconvenience.  The
+            the <classname>signal_type</classname> metafunction is provided to
+            overcome this problem.  It uses the Boost.Parameter library
+            to permit specification of the <code>signal</code> class' template type parameters
+            as named parameters.
+          </para>
         </description>
 
         <constructor>

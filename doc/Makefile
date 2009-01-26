@@ -25,6 +25,7 @@ XML_SRCS=\
 	reference/shared_connection_block.xml \
 	reference/signal_base.xml \
 	reference/signal_header.xml \
+	reference/signal_type.xml \
 	reference/slot_base.xml \
 	reference/slot.xml \
 	reference/trackable.xml \
