@@ -28,5 +28,13 @@ int test_main(int, char*[])
     bs2::signal<double (int), bs2::optional_last_value<double>, float, std::less<float> > mysig2;
     BOOST_CHECK(typeid(mysig) == typeid(mysig2));
   }
+#ifdef BOOST_SIGNALS2_NAMED_SIGNATURE_PARAMETER
+  {
+    using namespace bs2::keywords;
+    bs2::signal_type<signature_type<float (long*)> >::type mysig;
+    bs2::signal<float (long*)> mysig2;
+    BOOST_CHECK(typeid(mysig) == typeid(mysig2));
+  }
+#endif // BOOST_SIGNALS2_NAMED_SIGNATURE_PARAMETER
   return 0;
 }
