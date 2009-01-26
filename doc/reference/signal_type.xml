@@ -152,7 +152,7 @@
           <para>The <code>signal_type</code> metafunction employs the Boost.Parameter library to
             allow users to specify the template type parameters of a <classname>signal</classname>
             using named parameters.  The resulting signal type is provided through the
-            <classname>signal_type::type</classname> typedef.  Named template type parameters
+            <code>signal_type::type</code> typedef.  Named template type parameters
             can enhance readability of code, and provide convenience for specifying classes
             which have a large number of template parameters.
           </para>
@@ -169,7 +169,7 @@
             <classname>signal</classname> class.
           </para>
           <para>
-            Named template type parameters enhance are especially convenient when you only wish to change a
+            Named template type parameters are especially convenient when you only wish to change a
             few of a signal's template type parameters from their defaults, and the parameters
             you wish to change are near the end of the signal's template parameter list.
             For example, if you only wish to change the <code>Mutex</code> template type
