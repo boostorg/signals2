@@ -18,7 +18,7 @@
 #define BOOST_SIGNALS2_SIGNAL_TYPE_HPP
 
 // support for function types is currently broken in Boost.Parameter
-// #define NAMED_SIGNATURE_PARAMETER
+// #define BOOST_SIGNALS2_NAMED_SIGNATURE_PARAMETER
 
 #include <boost/signals2/signal.hpp>
 
@@ -31,13 +31,15 @@
 #endif // !defined(BOOST_PARAMETER_MAX_ARITY)
 #include <boost/parameter.hpp>
 
+#include <boost/type_traits/is_function.hpp>
+
 namespace boost
 {
   namespace signals2
   {
     namespace keywords
     {
-#ifdef NAMED_SIGNATURE_PARAMETER
+#ifdef BOOST_SIGNALS2_NAMED_SIGNATURE_PARAMETER
       BOOST_PARAMETER_TEMPLATE_KEYWORD(signature_type)
 #endif
       BOOST_PARAMETER_TEMPLATE_KEYWORD(combiner_type)
@@ -49,7 +51,7 @@ namespace boost
     } // namespace keywords
 
     template <
-#ifdef NAMED_SIGNATURE_PARAMETER
+#ifdef BOOST_SIGNALS2_NAMED_SIGNATURE_PARAMETER
         typename A0,
 #else
         typename Signature,
@@ -64,8 +66,8 @@ namespace boost
     class signal_type
     {
       typedef parameter::parameters<
-#ifdef NAMED_SIGNATURE_PARAMETER
-          parameter::required<keywords::tag::signature_type>,
+#ifdef BOOST_SIGNALS2_NAMED_SIGNATURE_PARAMETER
+          parameter::required<keywords::tag::signature_type, is_function<boost::mpl::_> >,
 #endif
           parameter::optional<keywords::tag::combiner_type>,
           parameter::optional<keywords::tag::group_type>,
@@ -79,13 +81,13 @@ namespace boost
       // ArgumentPack
       typedef typename
         parameter_spec::bind<
-#ifdef NAMED_SIGNATURE_PARAMETER
+#ifdef BOOST_SIGNALS2_NAMED_SIGNATURE_PARAMETER
         A0,
 #endif
         A1, A2, A3, A4, A5, A6>::type
         args;
 
-#ifdef NAMED_SIGNATURE_PARAMETER
+#ifdef BOOST_SIGNALS2_NAMED_SIGNATURE_PARAMETER
       typedef typename parameter::value_type<args, keywords::tag::signature_type>::type
         signature_type;
 #else
