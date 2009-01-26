@@ -113,8 +113,8 @@ sig();
     </informaltable>
 </section>
 
-<section><title>Calling multiple slots</title>
-<section><title>Connecting multiple slots (Beginner)</title>
+<section><title>Calling Multiple Slots</title>
+<section><title>Connecting Multiple Slots (Beginner)</title>
 <para>Calling a single slot from a signal isn't very interesting, so
 we can make the Hello, World program more interesting by splitting
 the work of printing "Hello, World!" into two completely separate
@@ -186,7 +186,7 @@ Hello, World!
 </programlisting>
 </section>
 
-<section><title>Ordering slot call groups (Intermediate)</title>
+<section><title>Ordering Slot Call Groups (Intermediate)</title>
 <para>Slots are free to have side effects, and that can mean that some
 slots will have to be called before others even if they are not connected in that order. The Boost.Signals2
 library allows slots to be placed into groups that are ordered in
@@ -262,7 +262,7 @@ Hello, World!
 </section>
 </section>
 
-<section><title>Passing values to and from slots</title>
+<section><title>Passing Values to and from Slots</title>
 <section><title>Slot Arguments (Beginner)</title>
 <para>Signals can propagate arguments to each of the slots they call.
 For instance, a signal that propagates mouse motion events might
@@ -672,7 +672,7 @@ sig(); <emphasis>// Prints "Hello, World!"</emphasis>
 
 </section>
 
-<section><title>Scoped connections (Intermediate)</title>
+<section><title>Scoped Connections (Intermediate)</title>
 <para>The <code>boost::signals2::scoped_connection</code> class
 references a signal/slot connection that will be disconnected when
 the <code>scoped_connection</code> class goes out of scope. This
@@ -705,7 +705,7 @@ c2 = sig.<methodname>connect</methodname>(ShortLived());
 </programlisting>
 </section>
 
-<section><title>Disconnecting equivalent slots (Intermediate)</title>
+<section><title>Disconnecting Equivalent Slots (Intermediate)</title>
 <para>One can disconnect slots that are equivalent to a given function
 object using a form of the
 <code><methodname alt="signalN::disconnect">signal::disconnect</methodname></code> method, so long as
@@ -758,7 +758,7 @@ sig.disconnect(&amp;foo);
 
 </section>
 
-<section id="signals2.tutorial.connection-management"><title>Automatic connection management (Intermediate)</title>
+<section id="signals2.tutorial.connection-management"><title>Automatic Connection Management (Intermediate)</title>
 <para>Boost.Signals2 can automatically track the lifetime of objects
 involved in signal/slot connections, including automatic
 disconnection of slots when objects involved in the slot call are
@@ -847,17 +847,42 @@ deliverNews.<methodname>connect</methodname>(signal_type::slot_type(&amp;NewsMes
 <classname alt="slotN">slot</classname> constructor is passed more than one
 argument, it will automatically pass all the arguments to <code>bind</code> and use the
 returned function object.</para>
-<para>One limitation of using <code>shared_ptr</code> for tracking is that
-an object cannot setup tracking of itself in its constructor.  However, it is
-possible to set up tracking in a post-constructor.  In a post-constructor,
-a <code>shared_ptr</code> to <code>this</code> can be obtained by using
-<classname>enable_shared_from_this</classname>.  You may also find
-<functionname>deconstruct_ptr</functionname> useful as a simple
-post-constructor/pre-destructor framework for your classes.
-</para>
 </section>
 
-<section><title>When can disconnections occur? (Intermediate)</title>
+  <section id="signals2.tutorial.deconstruct">
+    <title>Postconstructors and Predestructors (Advanced)</title>
+    <para>One limitation of using <code>shared_ptr</code> for tracking is that
+      an object cannot setup tracking of itself in its constructor.  However, it is
+      possible to set up tracking in a post-constructor.  In a post-constructor,
+      a <code>shared_ptr</code> to <code>this</code> can be obtained by using
+      <classname>enable_shared_from_this</classname>.  The Boost.Signals2
+      library provides support for post-constructors and pre-destructors
+      via the base classes <classname>postconstructible</classname>
+      and <classname>predestructible</classname>, and the related factory functions
+      <functionname>deconstruct()</functionname> and <functionname>deconstruct_ptr()</functionname>.
+    </para>
+    <para>
+      For most cases, the simplest and most robust way to setup postconstructors
+      for a class is to derive the class from <classname>postconstructible</classname>,
+      make its constructors private, and give <functionname>deconstruct</functionname>
+      access to the private constructors by declaring <classname>deconstruct_access</classname>
+      a friend.  This will ensure that objects of the class may only be created
+      through the <functionname>deconstruct()</functionname> function, and their
+      <code>postconstruct()</code> function will always be called.
+    </para>
+    <para>
+      Be aware that the postconstructor/predestructor support in Boost.Signals2
+      is in no way essential to the use of the library.  The use of
+      <functionname>deconstruct</functionname>, <classname>postconstructible</classname>,
+      etc. is purely optional.  One alternative is to
+      define static factory functions for your classes.  The
+      factory function can create an object, pass ownership of the object to
+      a <classname>shared_ptr</classname>, setup tracking for the object,
+      then return the <classname>shared_ptr</classname>.
+    </para>
+  </section>
+
+<section><title>When Can Disconnections Occur? (Intermediate)</title>
 <para>Signal/slot disconnections occur when any of these conditions
 occur:</para>
 <itemizedlist>
@@ -890,7 +915,7 @@ signal.</para>
 </para>
 </section>
 
-<section><title>Passing slots (Intermediate)</title>
+<section><title>Passing Slots (Intermediate)</title>
 <para>Slots in the Boost.Signals2 library are created from arbitrary
 function objects, and therefore have no fixed type. However, it is
 commonplace to require that slots be passed through interfaces that
@@ -1119,10 +1144,51 @@ public:
     url="../../libs/signals/example/doc_view.cpp"><code>libs/signals/example/doc_view.cpp</code></ulink>.</para>
 </section>
 
-<section>
-  <title>Linking against the Signals2 library</title>
-  <para>Boost.Signals2 is currently a header-only library.
-  </para>
-</section>
+  <section id="signals2.tutorial.extended-slot-type">
+    <title>Giving a Slot Access to its Connection (Advanced)</title>
+    <para>
+    </para>
+  </section>
+
+  <section id="signals2.tutorial.signal-mutex-template-parameter">
+    <title>Changing the <code>Mutex</code> Type of a Signal (Advanced).</title>
+    <para>
+      For most cases the default type of <classname>boost::signals2::mutex</classname> for
+      a <classname>signal</classname>'s <code>Mutex</code> template type parameter should
+      be fine.  If you wish to use an alternate mutex type, it must be default-constructible
+      and fulfill the <code>Lockable</code> concept defined by the Boost.Thread library.
+      That is, it must have <code>lock()</code> and <code>unlock()</code> methods
+      (the <code>Lockable</code> concept also includes a <code>try_lock()</code> method
+      but this library does not require try locking).
+    </para>
+    <para>
+      The Boost.Signals2 library provides one alternate mutex class for use with <classname>signal</classname>:
+      <classname>boost::signals2::dummy_mutex</classname>.  This is a fake mutex for
+      use in single-threaded programs, where locking a real mutex would be useless
+      overhead.  Other mutex types you could use with <classname>signal</classname> include
+      <classname>boost::mutex</classname> and the <code>std::mutex</code> from
+      C++0x.
+    </para>
+    <para>
+      Changing a signal's <code>Mutex</code> template type parameter can be tedious, due to
+      the large number of template parameters which precede it.  The
+      <classname>signal_type</classname> metafunction is particularly useful in this case,
+      since it enables named template type parameters for the <classname>signal</classname>
+      class.  For example, to declare a signal which takes an <code>int</code> as
+      an argument and uses a <classname>boost::signals2::dummy_mutex</classname>
+      for its <code>Mutex</code> types, you could write:
+    </para>
+<programlisting>namespace bs2 = boost::signals2;
+using bs2::keywords;
+bs2::signal_type&lt;void (int), mutex_type&lt;bs2::dummy_mutex&gt; &gt;::type sig;
+</programlisting>
+
+  </section>
+
+  <section>
+    <title>Linking against the Signals2 library</title>
+    <para>Unlike the original Boost.Signals library, Boost.Signals2 is currently header-only.
+    </para>
+  </section>
 
 </section>
