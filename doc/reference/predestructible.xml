@@ -17,8 +17,9 @@
             <type>void</type>
             <notes><para>Override <code>predestruct()</code> with your class' pre-destructor.
               It will be called automatically if you manage your objects with <code>shared_ptr</code>s
-              that use <classname>predestructing_deleter</classname> as their deleter, such as
-              those created with <functionname>deconstruct_ptr()</functionname></para>
+              that use <classname>predestructing_deleter</classname> or similar as their deleter, such as
+              <classname>shared_ptr</classname> created with <functionname>deconstruct()</functionname> or
+              <functionname>deconstruct_ptr()</functionname>.</para>
             </notes>
           </method>
         </access>

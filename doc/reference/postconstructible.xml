@@ -14,7 +14,8 @@
             <type>void</type>
             <notes><para>Override <code>postconstruct()</code> with your class's post-constructor.
             It will be called automatically if you manage your objects with <code>shared_ptr</code>s
-            created with <functionname>deconstruct_ptr()</functionname>.
+            created with <functionname>deconstruct()</functionname> or
+            <functionname>deconstruct_ptr()</functionname>.
             </para></notes>
           </method>
         </access>
