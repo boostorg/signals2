@@ -36,7 +36,6 @@ struct slot_counter {
 
 void myslot()
 {
-	std::cerr << __PRETTY_FUNCTION__ << std::endl;
 }
 
 template<typename signal_type>
