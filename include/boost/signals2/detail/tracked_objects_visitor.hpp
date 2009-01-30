@@ -51,7 +51,7 @@ namespace boost
         template<typename T>
         void m_visit_pointer(const T &t, const mpl::bool_<true> &) const
         {
-            m_visit_not_function_pointer(t, mpl::bool_<is_convertible<T, const void*>::value>());
+            m_visit_not_function_pointer(t, mpl::bool_<!is_function<typename remove_pointer<T>::type>::value>());
         }
         template<typename T>
         void m_visit_pointer(const T &t, const mpl::bool_<false> &) const
