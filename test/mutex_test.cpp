@@ -12,6 +12,7 @@
 // added to test boost::signals2::mutex.
 // For more information, see http://www.boost.org
 
+#include <boost/bind.hpp>
 #include <boost/signals2/dummy_mutex.hpp>
 #include <boost/signals2/mutex.hpp>
 #include <boost/test/minimal.hpp>
