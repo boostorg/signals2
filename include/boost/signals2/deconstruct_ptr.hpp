@@ -1,3 +1,5 @@
+// DEPRECATED in favor of adl_postconstruct and adl_predestruct with
+// deconstruct<T>().
 // A factory function for creating a shared_ptr that enhances the plain
 // shared_ptr constructors by adding support for postconstructors
 // and predestructors through the boost::signals2::postconstructible and

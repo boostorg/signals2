@@ -53,6 +53,7 @@ public:
   {
     BOOST_CHECK(_postconstructed);
   }
+  int value;
 protected:
   virtual void postconstruct()
   {
@@ -61,9 +62,57 @@ protected:
   bool _postconstructed;
 private:
   friend class boost::signals2::deconstruct_access;
-  by_deconstruct_only(int): _postconstructed(false)
+  by_deconstruct_only(int value_in):
+    value(value_in), _postconstructed(false)
   {}
 };
+
+namespace mytest
+{
+  class A
+  {
+  public:
+    template<typename T> friend
+      void adl_postconstruct(const boost::shared_ptr<T> &sp, A *p)
+    {
+      if(p)
+      {
+        p->_postconstructed = true;
+      }
+    }
+    template<typename T> friend
+      void adl_postconstruct(const boost::shared_ptr<T> &sp, A *p, int val)
+    {
+      if(p)
+      {
+        p->value = val;
+        p->_postconstructed = true;
+      }
+    }
+    friend void adl_predestruct(A *p)
+    {
+      if(p)
+      {
+        p->_predestructed = true;
+      }
+    }
+    ~A()
+    {
+      BOOST_CHECK(_postconstructed);
+      BOOST_CHECK(_predestructed);
+    }
+    int value;
+  private:
+    friend class boost::signals2::deconstruct_access;
+    A(int value_in):
+      value(value_in),
+      _postconstructed(false),
+      _predestructed(false)
+    {}
+    bool _postconstructed;
+    bool _predestructed;
+  };
+}
 
 void deconstruct_ptr_test()
 {
@@ -91,6 +140,19 @@ void deconstruct_test()
   }
   {
     boost::shared_ptr<by_deconstruct_only> a = boost::signals2::deconstruct<by_deconstruct_only>(1);
+    BOOST_CHECK(a->value == 1);
+  }
+  {
+    boost::shared_ptr<mytest::A> a = boost::signals2::deconstruct<mytest::A>(1);
+    BOOST_CHECK(a->value == 1);
+  }
+  {// deconstruct const type
+    boost::shared_ptr<const mytest::A> a = boost::signals2::deconstruct<const mytest::A>(3);
+    BOOST_CHECK(a->value == 3);
+  }
+  {// passing arguments to postconstructor
+    boost::shared_ptr<mytest::A> a = boost::signals2::deconstruct<mytest::A>(1).postconstruct(2);
+    BOOST_CHECK(a->value == 2);
   }
 }
 

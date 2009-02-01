@@ -1,3 +1,4 @@
+// DEPRECATED in favor of adl_predestruct with deconstruct<T>().
 // A simple framework for creating objects with predestructors.
 // The objects must inherit from boost::signals2::predestructible, and
 // have their lifetimes managed by
@@ -20,14 +21,25 @@ namespace boost
   {
     template<typename T> class predestructing_deleter;
 
-    class predestructible
+    namespace predestructible_adl_barrier
     {
-    protected:
-      predestructible() {}
-    public:
-      virtual ~predestructible() {}
-      virtual void predestruct() = 0;
-    };
+      class predestructible
+      {
+      protected:
+        predestructible() {}
+      public:
+        template<typename T>
+          friend void adl_postconstruct(const shared_ptr<T> &, ...)
+        {};
+        friend void adl_predestruct(predestructible *p)
+        {
+          p->predestruct();
+        }
+        virtual ~predestructible() {}
+        virtual void predestruct() = 0;
+      };
+    } // namespace predestructible_adl_barrier
+    using predestructible_adl_barrier::predestructible;
   }
 }
 

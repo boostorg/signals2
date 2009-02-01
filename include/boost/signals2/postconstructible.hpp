@@ -1,3 +1,4 @@
+// DEPRECATED in favor of adl_postconstruct with deconstruct<T>().
 // A simple framework for creating objects with postconstructors.
 // The objects must inherit from boost::signals2::postconstructible, and
 // have their lifetimes managed by
@@ -18,21 +19,34 @@ namespace boost
 {
   namespace signals2
   {
-    class postconstructible;
+    namespace postconstructible_adl_barrier
+    {
+      class postconstructible;
+    }
     namespace detail
     {
-      void do_postconstruct(const boost::signals2::postconstructible *ptr);
-    }
-
-    class postconstructible
+      void do_postconstruct(const boost::signals2::postconstructible_adl_barrier::postconstructible *ptr);
+    } // namespace detail
+    
+    namespace postconstructible_adl_barrier
     {
-    public:
-      friend void detail::do_postconstruct(const boost::signals2::postconstructible *ptr);
-    protected:
-      postconstructible() {}
-      virtual ~postconstructible() {}
-      virtual void postconstruct() = 0;
-    };
+      class postconstructible
+      {
+      public:
+        friend void detail::do_postconstruct(const postconstructible *ptr);
+        template<typename T>
+          friend void adl_postconstruct(const shared_ptr<T> &sp, postconstructible *p)
+        {
+          p->postconstruct();
+        }
+      protected:
+        postconstructible() {}
+        virtual ~postconstructible() {}
+        virtual void postconstruct() = 0;
+      };
+    } // namespace postconstructible_adl_barrier
+    using postconstructible_adl_barrier::postconstructible;
+    
   }
 }
 
