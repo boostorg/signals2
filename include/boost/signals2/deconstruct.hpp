@@ -52,9 +52,6 @@ template<typename T>
     class postconstructor_invoker
 {
 public:
-    postconstructor_invoker(const shared_ptr<T> & sp):
-        _sp(sp)
-    {}
     operator shared_ptr<T> () const
     {
         return postconstruct();
@@ -145,6 +142,10 @@ public:
     }
 #endif // else defined( BOOST_HAS_VARIADIC_TMPL ) && defined( BOOST_HAS_RVALUE_REFS )
 private:
+    friend class deconstruct_access;
+    postconstructor_invoker(const shared_ptr<T> & sp):
+        _sp(sp)
+    {}
     shared_ptr<T> _sp;
 };
 
