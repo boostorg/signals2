@@ -1,5 +1,6 @@
 // Document/View sample for Boost.Signals
 // Copyright Keith MacDonald 2005.
+// Copyright Frank Mori Hess 2009.
 //
 // Use, modification and
 // distribution is subject to the Boost Software License, Version
@@ -44,50 +45,42 @@ private:
     std::string m_text;
 };
 
-class View
+class TextView
 {
 public:
-    View(Document& m)
-        : m_document(m)
+    TextView(Document& doc): m_document(doc)
     {
-        m_connection = m_document.connect(boost::bind(&View::refresh, this));
+        m_connection = m_document.connect(boost::bind(&TextView::refresh, this));
     }
 
-    virtual ~View()
+    ~TextView()
     {
         m_connection.disconnect();
     }
 
-    virtual void refresh() const = 0;
-
-protected:
-    Document&               m_document;
-
-private:
-    boost::signals2::connection  m_connection;
-};
-
-class TextView : public View
-{
-public:
-    TextView(Document& doc)
-        : View(doc)
-    {}
-
-    virtual void refresh() const
+    void refresh() const
     {
         std::cout << "TextView: " << m_document.getText() << std::endl;
     }
+private:
+    Document&               m_document;
+    boost::signals2::connection  m_connection;
 };
 
-class HexView : public View
+class HexView
 {
 public:
-    HexView(Document& doc)
-        : View(doc)
-    {}
+    HexView(Document& doc): m_document(doc)
+    {
+        m_connection = m_document.connect(boost::bind(&HexView::refresh, this));
+    }
 
-    virtual void refresh() const
+    ~HexView()
+    {
+        m_connection.disconnect();
+    }
+
+    void refresh() const
     {
         const std::string&  s = m_document.getText();
 
@@ -98,6 +91,9 @@ public:
 
         std::cout << std::endl;
     }
+private:
+    Document&               m_document;
+    boost::signals2::connection  m_connection;
 };
 
 int main(int argc, char* argv[])
