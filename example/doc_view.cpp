@@ -1,5 +1,7 @@
 // Document/View sample for Boost.Signals
-// Copyright Keith MacDonald 2005. Use, modification and
+// Copyright Keith MacDonald 2005.
+//
+// Use, modification and
 // distribution is subject to the Boost Software License, Version
 // 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -7,33 +9,29 @@
 
 #include <iostream>
 #include <string>
-#include <boost/signals2.hpp>
+#include <boost/signals2/signal.hpp>
 #include <boost/bind.hpp>
 
 class Document
 {
 public:
-    typedef boost::signals2::signal<void (bool)>  signal_t;
-    typedef boost::signals2::connection  connection_t;
+    typedef boost::signals2::signal<void ()>  signal_t;
 
 public:
     Document()
     {}
 
-    connection_t connect(const signal_t::slot_type &subscriber)
+    /* Connect a slot to the signal which will be emitted whenever
+      text is appended to the document. */
+    boost::signals2::connection connect(const signal_t::slot_type &subscriber)
     {
         return m_sig.connect(subscriber);
-    }
-
-    void disconnect(connection_t subscriber)
-    {
-        subscriber.disconnect();
     }
 
     void append(const char* s)
     {
         m_text += s;
-        m_sig(true);
+        m_sig();
     }
 
     const std::string& getText() const
@@ -52,21 +50,21 @@ public:
     View(Document& m)
         : m_document(m)
     {
-        m_connection = m_document.connect(boost::bind(&View::refresh, this, _1));
+        m_connection = m_document.connect(boost::bind(&View::refresh, this));
     }
 
     virtual ~View()
     {
-        m_document.disconnect(m_connection);
+        m_connection.disconnect();
     }
 
-    virtual void refresh(bool bExtended) const = 0;
+    virtual void refresh() const = 0;
 
 protected:
     Document&               m_document;
 
 private:
-    Document::connection_t  m_connection;
+    boost::signals2::connection  m_connection;
 };
 
 class TextView : public View
@@ -76,7 +74,7 @@ public:
         : View(doc)
     {}
 
-    virtual void refresh(bool bExtended) const
+    virtual void refresh() const
     {
         std::cout << "TextView: " << m_document.getText() << std::endl;
     }
@@ -89,7 +87,7 @@ public:
         : View(doc)
     {}
 
-    virtual void refresh(bool bExtended) const
+    virtual void refresh() const
     {
         const std::string&  s = m_document.getText();
 
