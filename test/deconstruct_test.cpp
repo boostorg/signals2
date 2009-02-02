@@ -104,7 +104,7 @@ namespace mytest
     int value;
   private:
     friend class boost::signals2::deconstruct_access;
-    A(int value_in):
+    A(int value_in = 0):
       value(value_in),
       _postconstructed(false),
       _predestructed(false)
@@ -151,7 +151,7 @@ void deconstruct_test()
     BOOST_CHECK(a->value == 3);
   }
   {// passing arguments to postconstructor
-    boost::shared_ptr<mytest::A> a = boost::signals2::deconstruct<mytest::A>(1).postconstruct(2);
+    boost::shared_ptr<mytest::A> a = boost::signals2::deconstruct<mytest::A>().postconstruct(2);
     BOOST_CHECK(a->value == 2);
   }
 }

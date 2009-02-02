@@ -421,7 +421,7 @@ public:
 //
 // Used even when variadic templates are available because of the new T() vs new T issue
 
-template< class T > boost::shared_ptr< T > deconstruct()
+template< class T > postconstructor_invoker<T> deconstruct()
 {
 	return detail::deconstruct_access::deconstruct<T>();
 }
@@ -430,7 +430,7 @@ template< class T > boost::shared_ptr< T > deconstruct()
 
 // Variadic templates, rvalue reference
 
-template< class T, class... Args > boost::shared_ptr< T > deconstruct( Args && ... args )
+template< class T, class... Args > postconstructor_invoker< T > deconstruct( Args && ... args )
 {
     return detail::deconstruct_access::deconstruct( detail::forward<Args>( args )... );
 }
