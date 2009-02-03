@@ -17,6 +17,8 @@
 
 namespace boost
 {
+  template<typename T> class shared_ptr;
+
   namespace signals2
   {
     namespace postconstructible_adl_barrier
@@ -27,7 +29,7 @@ namespace boost
     {
       void do_postconstruct(const boost::signals2::postconstructible_adl_barrier::postconstructible *ptr);
     } // namespace detail
-    
+
     namespace postconstructible_adl_barrier
     {
       class postconstructible
@@ -46,7 +48,7 @@ namespace boost
       };
     } // namespace postconstructible_adl_barrier
     using postconstructible_adl_barrier::postconstructible;
-    
+
   }
 }
 
