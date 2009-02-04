@@ -853,28 +853,27 @@ returned function object.</para>
     <title>Postconstructors and Predestructors (Advanced)</title>
     <para>One limitation of using <code>shared_ptr</code> for tracking is that
       an object cannot setup tracking of itself in its constructor.  However, it is
-      possible to set up tracking in a post-constructor.  In a post-constructor,
-      a <code>shared_ptr</code> to <code>this</code> can be obtained by using
-      <classname>enable_shared_from_this</classname>.  The Boost.Signals2
+      possible to set up tracking in a post-constructor which is called after the
+      object has been created and passed to a <classname>shared_ptr</classname>.
+      The Boost.Signals2
       library provides support for post-constructors and pre-destructors
-      via the base classes <classname>postconstructible</classname>
-      and <classname>predestructible</classname>, and the related factory functions
-      <functionname>deconstruct()</functionname> and <functionname>deconstruct_ptr()</functionname>.
+      via the <functionname>deconstruct()</functionname> factory function.
     </para>
     <para>
       For most cases, the simplest and most robust way to setup postconstructors
-      for a class is to derive the class from <classname>postconstructible</classname>,
-      make its constructors private, and give <functionname>deconstruct</functionname>
+      for a class is to define an associated <code>adl_postconstruct</code> function
+      which can be found by <functionname>deconstruct()</functionname>,
+      make the class' constructors private, and give <functionname>deconstruct</functionname>
       access to the private constructors by declaring <classname>deconstruct_access</classname>
       a friend.  This will ensure that objects of the class may only be created
       through the <functionname>deconstruct()</functionname> function, and their
-      <code>postconstruct()</code> function will always be called.
+      associated <code>adl_postconstruct()</code> function will always be called.
     </para>
     <para>
       Be aware that the postconstructor/predestructor support in Boost.Signals2
       is in no way essential to the use of the library.  The use of
-      <functionname>deconstruct</functionname>, <classname>postconstructible</classname>,
-      etc. is purely optional.  One alternative is to
+      <functionname>deconstruct</functionname>
+      is purely optional.  One alternative is to
       define static factory functions for your classes.  The
       factory function can create an object, pass ownership of the object to
       a <classname>shared_ptr</classname>, setup tracking for the object,

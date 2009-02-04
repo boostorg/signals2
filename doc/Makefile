@@ -14,13 +14,10 @@ XML_SRCS=\
 	tutorial.xml \
 	reference/connection.xml \
 	reference/deconstruct.xml \
-	reference/deconstruct_ptr.xml \
 	reference/dummy_mutex.xml \
 	reference/last_value.xml \
 	reference/mutex.xml \
 	reference/optional_last_value.xml \
-	reference/postconstructible.xml \
-	reference/predestructible.xml \
 	reference/reference.xml \
 	reference/shared_connection_block.xml \
 	reference/signal_base.xml \

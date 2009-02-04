@@ -175,11 +175,6 @@
       a signal's slot list, they are protected by the mutex associated with
       each signal-slot connection.
     </para>
-    <para>
-      The <classname>postconstructible</classname> and <classname>predestructible</classname>
-      classes are simply abstract base classes which maintain no state.  Therefore they
-      are thread-safe.
-    </para>
     <para>The <classname>signals2::trackable</classname> class does NOT provide
       thread-safe automatic connection management.  In particular, it leaves open the
       possibility of a signal invocation calling into a partially destructed object

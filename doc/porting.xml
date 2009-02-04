@@ -64,27 +64,27 @@
           <listitem>
             <para>Support for postconstructors (and predestructors) on objects managed by <classname>shared_ptr</classname>
               has been added with
-              <classname>postconstructible</classname>, <classname>predestructible</classname>,
-              and the factory functions <functionname>deconstruct</functionname> and <functionname>deconstruct_ptr</functionname>.
+              the <functionname>deconstruct</functionname> factory function.
               This was motivated by the importance of
               <code>shared_ptr</code> for the new connection tracking scheme, and the
               inability to obtain a <code>shared_ptr</code> to an object in its constructor.
-              The use of these new additions is described in the
+              The use of <functionname>deconstruct</functionname> is described in the
               <link linkend="signals2.tutorial.deconstruct">tutorial</link>.
             </para>
             <para>
-              The use of these new classes is in no way required, they are only provided in the hope
-              they may be useful.  You may wish to use them if you are porting code where
+              The use of <functionname>deconstruct</functionname> is in no way required,
+              it is only provided in the hope
+              it may be useful.  You may wish to use it if you are porting code where
               a class creates connections to its own member functions in its constructor,
               and you also
               wish to use the new automatic connection management scheme.  You could then
-              move the connection creation from the constructor to to the class'
-              <methodname alt="postconstructible::postconstruct">postconstruct</methodname>
-              method, where <methodname>enable_shared_from_this::shared_from_this</methodname>
-              may be used successfully to obtain a <classname>shared_ptr</classname> for
+              move the connection creation from the constructor to to the an
+              <code>adl_postconstruct</code> function, where
+              a reference to the owning <classname>shared_ptr</classname> is available for
               passing to <methodname alt="slotN::track">slot::track</methodname>.
-              The <functionname>deconstruct</functionname> function could be used create objects
-              of the class and run their <code>postconstruct</code> method.  You can enforce use of <functionname>deconstruct</functionname> by
+              The <functionname>deconstruct</functionname> function would be used create objects
+              of the class and run their associated <code>adl_postconstruct</code> function.
+              You can enforce use of <functionname>deconstruct</functionname> by
               making the class' constructors private and declaring
               <classname>deconstruct_access</classname> a friend.
             </para>

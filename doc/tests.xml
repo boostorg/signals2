@@ -24,7 +24,7 @@ connect to the slot.</para>
     <lib>../../../libs/test/build/boost_test_exec_monitor</lib>
     <purpose>
       <para>Test postconstruction/predestruction functionality of
-        <functionname>boost::signals2::deconstruct_ptr</functionname> and friends.</para>
+        <functionname>boost::signals2::deconstruct</functionname>.</para>
     </purpose>
   </run-test>
 
