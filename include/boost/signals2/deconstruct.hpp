@@ -52,7 +52,7 @@ template<typename T>
     class postconstructor_invoker
 {
 public:
-    operator shared_ptr<T> () const
+    operator const shared_ptr<T> & () const
     {
         return postconstruct();
     }
