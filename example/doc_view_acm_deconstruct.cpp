@@ -1,4 +1,4 @@
-// Document/View sample for Boost.Signals.
+// Document/View sample for Boost.Signals2.
 // Expands on doc_view_acm.cpp example by using boost::signals2::deconstruct
 // as a post-constructing factory function.
 //

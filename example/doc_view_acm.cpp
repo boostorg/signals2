@@ -1,4 +1,4 @@
-// Document/View sample for Boost.Signals.
+// Document/View sample for Boost.Signals2.
 // Expands on doc_view.cpp example by using automatic
 // connection management.
 //

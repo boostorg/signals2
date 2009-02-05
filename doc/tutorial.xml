@@ -240,9 +240,16 @@ placed at the front or back of the slot list (by passing
 <code>boost::signals2::at_front</code> or <code>boost::signals2::at_back</code>
 as the last parameter to <code><methodname
 alt="boost::signals2::signalN::connect">connect</methodname></code>, respectively), and defaults to the end of the list. When
-a group is specified, the final parameter describes where the slot
-will be placed within the group ordering. If we add a new slot
-to our example like this:</para>
+a group is specified, the final <code>at_front</code> or <code>at_back</code>
+parameter describes where the slot
+will be placed within the group ordering.  Ungrouped slots connected with
+<code>at_front</code> will always precede all grouped slots.  Ungrouped
+slots connected with <code>at_back</code> will always succeed all
+grouped slots.
+</para>
+<para>
+  If we add a new slot to our example like this:
+</para>
 <programlisting>
 struct GoodMorning
 {
@@ -1006,7 +1013,7 @@ hidden in an implementation detail file.</para>
 </section>
 </section>
 
-<section>
+<section id="signals2.tutorial.document-view">
   <title>Example: Document-View</title>
 
   <para>Signals can be used to implement flexible Document-View
@@ -1139,8 +1146,8 @@ public:
 }</programlisting>
 
   <para>The complete example source, contributed by Keith MacDonald,
-    is available in <ulink
-    url="../../libs/signals/example/doc_view.cpp"><code>libs/signals/example/doc_view.cpp</code></ulink>.</para>
+    is available in the <link linkend="signals2.examples.document-view">examples</link> section.
+  </para>
 </section>
 
   <section id="signals2.tutorial.extended-slot-type">
