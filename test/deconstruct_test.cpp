@@ -23,6 +23,7 @@ public:
 protected:
   virtual void postconstruct()
   {
+    BOOST_CHECK(!_postconstructed);
     _postconstructed = true;
   }
   bool _postconstructed;
@@ -57,6 +58,7 @@ public:
 protected:
   virtual void postconstruct()
   {
+    BOOST_CHECK(!_postconstructed);
     _postconstructed = true;
   }
   bool _postconstructed;
@@ -75,26 +77,19 @@ namespace mytest
     template<typename T> friend
       void adl_postconstruct(const boost::shared_ptr<T> &sp, A *p)
     {
-      if(p)
-      {
-        p->_postconstructed = true;
-      }
+      BOOST_CHECK(!p->_postconstructed);
+      p->_postconstructed = true;
     }
     template<typename T> friend
       void adl_postconstruct(const boost::shared_ptr<T> &sp, A *p, int val)
     {
-      if(p)
-      {
-        p->value = val;
-        p->_postconstructed = true;
-      }
+      p->value = val;
+      BOOST_CHECK(!p->_postconstructed);
+      p->_postconstructed = true;
     }
     friend void adl_predestruct(A *p)
     {
-      if(p)
-      {
-        p->_predestructed = true;
-      }
+      p->_predestructed = true;
     }
     ~A()
     {
