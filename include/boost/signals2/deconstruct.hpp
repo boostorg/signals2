@@ -35,6 +35,18 @@
 
 namespace boost
 {
+  template<typename T> class enable_shared_from_this;
+
+  // fallback implementations of sp_accept_owner for older boost releases that don't support sp_accept_owner
+  template< class Y >
+    void sp_accept_owner( shared_ptr<Y> * ptr, ... )
+  {
+  }
+  template< class T, class Y >
+    void sp_accept_owner( shared_ptr<Y> * ptr, enable_shared_from_this<T> const * pe, ... /*pd*/ )
+  {
+    pe->_internal_weak_this = *ptr;
+  }
 
 namespace signals2
 {
@@ -233,7 +245,10 @@ public:
         new( pv ) T();
         pd->set_initialized();
 
-        return boost::shared_ptr< T >( pt, static_cast< T* >( pv ) );
+        boost::shared_ptr< T > retval( pt, static_cast< T* >( pv ) );
+        sp_accept_owner(&retval, retval.get(), pd);
+        return retval;
+
     }
 
 #if defined( BOOST_HAS_VARIADIC_TMPL ) && defined( BOOST_HAS_RVALUE_REFS )
@@ -252,7 +267,9 @@ public:
         new( pv ) T( detail::forward<Args>( args )... );
         pd->set_initialized();
 
-        return boost::shared_ptr< T >( pt, static_cast< T* >( pv ) );
+        boost::shared_ptr< T > retval( pt, static_cast< T* >( pv ) );
+        sp_accept_owner(&retval, retval.get(), pd);
+        return retval;
     }
 
 #else
@@ -269,7 +286,9 @@ public:
         new( pv ) T( a1 );
         pd->set_initialized();
 
-        return boost::shared_ptr< T >( pt, static_cast< T* >( pv ) );
+        boost::shared_ptr< T > retval( pt, static_cast< T* >( pv ) );
+        sp_accept_owner(&retval, retval.get(), pd);
+        return retval;
     }
 
     template< class T, class A1, class A2 >
@@ -284,7 +303,9 @@ public:
         new( pv ) T( a1, a2 );
         pd->set_initialized();
 
-        return boost::shared_ptr< T >( pt, static_cast< T* >( pv ) );
+        boost::shared_ptr< T > retval( pt, static_cast< T* >( pv ) );
+        sp_accept_owner(&retval, retval.get(), pd);
+        return retval;
     }
 
     template< class T, class A1, class A2, class A3 >
@@ -299,7 +320,9 @@ public:
         new( pv ) T( a1, a2, a3 );
         pd->set_initialized();
 
-        return boost::shared_ptr< T >( pt, static_cast< T* >( pv ) );
+        boost::shared_ptr< T > retval( pt, static_cast< T* >( pv ) );
+        sp_accept_owner(&retval, retval.get(), pd);
+        return retval;
     }
 
     template< class T, class A1, class A2, class A3, class A4 >
@@ -314,7 +337,9 @@ public:
         new( pv ) T( a1, a2, a3, a4 );
         pd->set_initialized();
 
-        return boost::shared_ptr< T >( pt, static_cast< T* >( pv ) );
+        boost::shared_ptr< T > retval( pt, static_cast< T* >( pv ) );
+        sp_accept_owner(&retval, retval.get(), pd);
+        return retval;
     }
 
     template< class T, class A1, class A2, class A3, class A4, class A5 >
@@ -329,7 +354,9 @@ public:
         new( pv ) T( a1, a2, a3, a4, a5 );
         pd->set_initialized();
 
-        return boost::shared_ptr< T >( pt, static_cast< T* >( pv ) );
+        boost::shared_ptr< T > retval( pt, static_cast< T* >( pv ) );
+        sp_accept_owner(&retval, retval.get(), pd);
+        return retval;
     }
 
     template< class T, class A1, class A2, class A3, class A4, class A5, class A6 >
@@ -344,7 +371,9 @@ public:
         new( pv ) T( a1, a2, a3, a4, a5, a6 );
         pd->set_initialized();
 
-        return boost::shared_ptr< T >( pt, static_cast< T* >( pv ) );
+        boost::shared_ptr< T > retval( pt, static_cast< T* >( pv ) );
+        sp_accept_owner(&retval, retval.get(), pd);
+        return retval;
     }
 
     template< class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7 >
@@ -359,7 +388,9 @@ public:
         new( pv ) T( a1, a2, a3, a4, a5, a6, a7 );
         pd->set_initialized();
 
-        return boost::shared_ptr< T >( pt, static_cast< T* >( pv ) );
+        boost::shared_ptr< T > retval( pt, static_cast< T* >( pv ) );
+        sp_accept_owner(&retval, retval.get(), pd);
+        return retval;
     }
 
     template< class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8 >
@@ -374,7 +405,9 @@ public:
         new( pv ) T( a1, a2, a3, a4, a5, a6, a7, a8 );
         pd->set_initialized();
 
-        return boost::shared_ptr< T >( pt, static_cast< T* >( pv ) );
+        boost::shared_ptr< T > retval( pt, static_cast< T* >( pv ) );
+        sp_accept_owner(&retval, retval.get(), pd);
+        return retval;
     }
 
     template< class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9 >
@@ -389,7 +422,9 @@ public:
         new( pv ) T( a1, a2, a3, a4, a5, a6, a7, a8, a9 );
         pd->set_initialized();
 
-        return boost::shared_ptr< T >( pt, static_cast< T* >( pv ) );
+        boost::shared_ptr< T > retval( pt, static_cast< T* >( pv ) );
+        sp_accept_owner(&retval, retval.get(), pd);
+        return retval;
     }
 
 #endif
@@ -477,7 +512,6 @@ using detail::deconstruct_access;
 #endif
 
 } // namespace signals2
-
 } // namespace boost
 
 #endif // #ifndef BOOST_SIGNALS2_DECONSTRUCT_HPP
