@@ -7,10 +7,11 @@
 
 // See http://www.boost.org/libs/signals2 for library home page.
 
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/test/minimal.hpp>
 #include <boost/signals2/deconstruct.hpp>
 #include <boost/signals2/deconstruct_ptr.hpp>
+#include <boost/test/minimal.hpp>
 
 class X: public boost::signals2::postconstructible {
 public:
@@ -122,6 +123,13 @@ void deconstruct_ptr_test()
   }
 }
 
+class deconstructed_esft : public boost::enable_shared_from_this<deconstructed_esft>
+{
+  friend void adl_postconstruct(boost::shared_ptr<void>, deconstructed_esft *)
+  {}
+  int x;
+};
+
 void deconstruct_test()
 {
   {
@@ -148,6 +156,10 @@ void deconstruct_test()
   {// passing arguments to postconstructor
     boost::shared_ptr<mytest::A> a = boost::signals2::deconstruct<mytest::A>().postconstruct(2);
     BOOST_CHECK(a->value == 2);
+  }
+  {// enable_shared_from_this with deconstruct
+      boost::shared_ptr<deconstructed_esft> a = boost::signals2::deconstruct<deconstructed_esft>();
+      BOOST_CHECK(!(a->shared_from_this() < a || a < a->shared_from_this()));
   }
 }
 
