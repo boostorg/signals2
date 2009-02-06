@@ -51,6 +51,8 @@ the <code>hello</code> function object to the signal using the
 <code>sig</code> like a function to call the slots, which in turns
 invokes <code>HelloWorld::operator()</code> to print "Hello,
 World!".</para>
+<programlisting><xi:include href="./snippets/hello_world_def_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
   <informaltable>
     <tgroup cols="2" align="left">
       <thead>
@@ -62,49 +64,19 @@ World!".</para>
       <tbody>
         <row>
           <entry>
-<programlisting>
-struct HelloWorld
-{
-  void operator()() const
-  {
-    std::cout &lt;&lt; "Hello, World!" &lt;&lt; std::endl;
-  }
-};
-
-// ...
-
-// Signal with no arguments and a void return value
-<classname>boost::signals2::signal</classname>&lt;void ()&gt; sig;
-
-// Connect a HelloWorld slot
-HelloWorld hello;
-sig.<methodname>connect</methodname>(hello);
-
-// Call all of the slots
-sig();
-</programlisting>
+<programlisting><xi:include href="./snippets/hello_world_single_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 </entry>
 <entry>
-<programlisting>
-struct HelloWorld
-{
-  void operator()() const
-  {
-    std::cout &lt;&lt; "Hello, World!" &lt;&lt; std::endl;
-  }
-};
+<programlisting>  // Signal with no arguments and a void return value
+  boost::signals2::signal0&lt;void&gt; sig;
 
-// ...
+  // Connect a HelloWorld slot
+  HelloWorld hello;
+  sig.connect(hello);
 
-// Signal with no arguments and a void return value
-<classname alt="boost::signals2::signalN">boost::signals2::signal0</classname>&lt;void&gt; sig;
-
-// Connect a HelloWorld slot
-HelloWorld hello;
-sig.<methodname>connect</methodname>(hello);
-
-// Call all of the slots
-sig();
+  // Call all of the slots
+  sig();
 </programlisting>
 </entry>
           </row>
@@ -120,26 +92,12 @@ we can make the Hello, World program more interesting by splitting
 the work of printing "Hello, World!" into two completely separate
 slots. The first slot will print "Hello" and may look like
 this:</para>
-<programlisting>
-struct Hello
-{
-  void operator()() const
-  {
-    std::cout &lt;&lt; "Hello";
-  }
-};
-</programlisting>
+<programlisting><xi:include href="./snippets/hello_def_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 <para>The second slot will print ", World!" and a newline, to complete
 the program. The second slot may look like this:</para>
-<programlisting>
-struct World
-{
-  void operator()() const
-  {
-    std::cout &lt;&lt; ", World!" &lt;&lt; std::endl;
-  }
-};
-</programlisting>
+<programlisting><xi:include href="./snippets/world_def_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 <para>Like in our previous example, we can create a signal
 <code>sig</code> that takes no arguments and has a
 <code>void</code> return value. This time, we connect both a
@@ -156,30 +114,23 @@ signal, and when we call the signal both slots will be called.</para>
       <tbody>
         <row>
           <entry>
-<programlisting>
-<classname>boost::signals2::signal</classname>&lt;void ()&gt; sig;
+<programlisting><xi:include href="./snippets/hello_world_multi_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
+          </entry>
+          <entry>
+<programlisting>  boost::signals2::signal0&lt;void&gt; sig;
 
-sig.<methodname>connect</methodname>(Hello());
-sig.<methodname>connect</methodname>(World());
+  sig.connect(Hello());
+  sig.connect(World());
 
-sig();
-</programlisting>
-</entry>
-<entry>
-<programlisting>
-<classname alt="boost::signals2::signalN">boost::signals2::signal0</classname>&lt;void&gt; sig;
-
-sig.<methodname>connect</methodname>(Hello());
-sig.<methodname>connect</methodname>(World());
-
-sig();
+  sig();
 </programlisting>
 </entry>
             </row>
           </tbody>
         </tgroup>
       </informaltable>
-<para>By default, slots are called in first-in first-out (FIFO) order,
+<para>By default, slots are pushed onto the back of the slot list,
 so the output of this program will be as expected:</para>
 <programlisting>
 Hello, World!
@@ -208,27 +159,21 @@ are, by default, <code>int</code>s, and are ordered by the integer
       <tbody>
         <row>
           <entry>
-<programlisting>
-<classname>boost::signals2::signal</classname>&lt;void ()&gt; sig;
-sig.<methodname>connect</methodname>(1, World());
-sig.<methodname>connect</methodname>(0, Hello());
-sig();
-</programlisting>
+<programlisting><xi:include href="./snippets/hello_world_ordered_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 </entry>
             <entry>
-<programlisting>
-<classname alt="boost::signals2::signalN">boost::signals2::signal0</classname>&lt;void&gt; sig;
-sig.<methodname>connect</methodname>(1, World());
-sig.<methodname>connect</methodname>(0, Hello());
-sig();
-</programlisting>
+<programlisting>  boost::signals2::signal0&lt;void&gt; sig;
+
+  sig.connect(1, World());  // connect with group 1
+  sig.connect(0, Hello());  // connect with group 0</programlisting>
 </entry>
             </row>
           </tbody>
         </tgroup>
       </informaltable>
 
-<para>This program will correctly print "Hello, World!", because the
+<para>Invoking the signal will correctly print "Hello, World!", because the
 <code>Hello</code> object is in group 0, which precedes group 1 where
 the <code>World</code> object resides. The group
 parameter is, in fact, optional. We omitted it in the first Hello,
@@ -239,7 +184,8 @@ that have been connected without specifying a group name) can be
 placed at the front or back of the slot list (by passing
 <code>boost::signals2::at_front</code> or <code>boost::signals2::at_back</code>
 as the last parameter to <code><methodname
-alt="boost::signals2::signalN::connect">connect</methodname></code>, respectively), and defaults to the end of the list. When
+alt="boost::signals2::signalN::connect">connect</methodname></code>, respectively),
+and default to the end of the list. When
 a group is specified, the final <code>at_front</code> or <code>at_back</code>
 parameter describes where the slot
 will be placed within the group ordering.  Ungrouped slots connected with
@@ -250,17 +196,10 @@ grouped slots.
 <para>
   If we add a new slot to our example like this:
 </para>
-<programlisting>
-struct GoodMorning
-{
-  void operator()() const
-  {
-    std::cout &lt;&lt; "... and good morning!" &lt;&lt; std::endl;
-  }
-};
-
-sig.<methodname>connect</methodname>(GoodMorning());
-</programlisting>
+<programlisting><xi:include href="./snippets/good_morning_def_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
+<programlisting><xi:include href="./snippets/hello_world_ordered_invoke_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 <para>... we will get the result we wanted:</para>
 <programlisting>
 Hello, World!

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <boost/signals2/signal.hpp>
 
+//[ hello_def_code_snippet
 struct Hello
 {
   void operator()() const
@@ -18,7 +19,9 @@ struct Hello
     std::cout << "Hello";
   }
 };
+//]
 
+//[ world_def_code_snippet
 struct World
 {
   void operator()() const
@@ -26,15 +29,18 @@ struct World
     std::cout << ", World!" << std::endl;
   }
 };
+//]
 
 int main()
 {
+//[ hello_world_multi_code_snippet
   boost::signals2::signal<void ()> sig;
 
   sig.connect(Hello());
   sig.connect(World());
 
   sig();
+//]
 
   return 0;
 };
