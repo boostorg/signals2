@@ -8,11 +8,11 @@
   <using-namespace name="boost::signals2"/>
 
   <section id="signals2.examples.misc">
-    <title>Miscellaneous</title>
+    <title>Miscellaneous Tutorial Examples</title>
     <section id="signals2.examples.tutorial.hello_world_slot">
       <title>hello_world_slot</title>
       <para>
-        This is a basic example of connecting a slot to a signal
+        This example is a basic example of connecting a slot to a signal
         and then invoking the signal.
       </para>
       <para>
@@ -23,7 +23,7 @@
     <section id="signals2.examples.tutorial.hello_world_multi_slot">
       <title>hello_world_multi_slot</title>
       <para>
-        This extends the hello_world_slot example slightly by connecting more than one
+        This example extends the hello_world_slot example slightly by connecting more than one
         slot to the signal before invoking it.
       </para>
       <para>
@@ -34,7 +34,7 @@
     <section id="signals2.examples.tutorial.ordering_slots">
       <title>ordering_slots</title>
       <para>
-        This extends the hello_world_multi_slot example slightly by
+        This example extends the hello_world_multi_slot example slightly by
         using slot groups to specify
         the order slots should be invoked.
       </para>
@@ -46,6 +46,7 @@
     <section id="signals2.examples.tutorial.slot_arguments">
       <title>slot_arguments</title>
       <para>
+        The slot_arguments program shows how to pass arguments from a signal invocation to slots.
       </para>
       <para>
   <!-- FIXME: url needs to have two "../" stripped from it to work once we are merged into main boost doc build -->
@@ -55,6 +56,8 @@
     <section id="signals2.examples.tutorial.signal_return_value">
       <title>signal_return_value</title>
       <para>
+        This example shows how to return a value from slots to the signal invocation.
+        It uses the default <classname>optional_last_value</classname> combiner.
       </para>
       <para>
   <!-- FIXME: url needs to have two "../" stripped from it to work once we are merged into main boost doc build -->
@@ -64,6 +67,8 @@
     <section id="signals2.examples.tutorial.custom_combiners">
       <title>custom_combiners</title>
       <para>
+        This example shows more returning of values from slots to the signal invocation.
+        This time, custom combiners are defined and used.
       </para>
       <para>
   <!-- FIXME: url needs to have two "../" stripped from it to work once we are merged into main boost doc build -->
@@ -73,6 +78,8 @@
     <section id="signals2.examples.tutorial.disconnect_and_block">
       <title>disconnect_and_block</title>
       <para>
+        This example demonstrates various means of manually disconnecting slots, as well as temporarily
+        blocking them via <classname>shared_connection_block</classname>.
       </para>
       <para>
   <!-- FIXME: url needs to have two "../" stripped from it to work once we are merged into main boost doc build -->
@@ -82,6 +89,8 @@
     <section id="signals2.examples.tutorial.passing_slots">
       <title>passing_slots</title>
       <para>
+        This example demonstrates the passing of slot functions to a private signal
+        through a non-template interface.
       </para>
       <para>
   <!-- FIXME: url needs to have two "../" stripped from it to work once we are merged into main boost doc build -->
