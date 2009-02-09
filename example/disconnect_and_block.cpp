@@ -25,7 +25,6 @@ void disconnect_example()
 
 //[ disconnect_code_snippet
   boost::signals2::connection c = sig.connect(HelloWorld());
-  // c is connected
   std::cout << "c is connected\n";
   sig(); // Prints "Hello, World!"
 
@@ -41,7 +40,6 @@ void block_example()
 
 //[ block_code_snippet
   boost::signals2::connection c = sig.connect(HelloWorld());
-  // connection is not blocked
   std::cout << "c is not blocked.\n";
   sig(); // Prints "Hello, World!"
 

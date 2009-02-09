@@ -1,5 +1,4 @@
   boost::signals2::connection c = sig.connect(HelloWorld());
-  // connection is not blocked
   std::cout << "c is not blocked.\n";
   sig(); // Prints "Hello, World!"
 

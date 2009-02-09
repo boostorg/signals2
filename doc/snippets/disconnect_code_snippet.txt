@@ -1,5 +1,4 @@
   boost::signals2::connection c = sig.connect(HelloWorld());
-  // c is connected
   std::cout << "c is connected\n";
   sig(); // Prints "Hello, World!"
 

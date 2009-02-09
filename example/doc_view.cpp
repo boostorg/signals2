@@ -13,6 +13,7 @@
 #include <boost/signals2/signal.hpp>
 #include <boost/bind.hpp>
 
+//[ document_def_code_snippet
 class Document
 {
 public:
@@ -44,7 +45,9 @@ private:
     signal_t    m_sig;
     std::string m_text;
 };
+//]
 
+//[ text_view_def_code_snippet
 class TextView
 {
 public:
@@ -66,7 +69,9 @@ private:
     Document&               m_document;
     boost::signals2::connection  m_connection;
 };
+//]
 
+//[ hex_view_def_code_snippet
 class HexView
 {
 public:
@@ -95,7 +100,9 @@ private:
     Document&               m_document;
     boost::signals2::connection  m_connection;
 };
+//]
 
+//[ document_view_main_code_snippet
 int main(int argc, char* argv[])
 {
     Document    doc;
@@ -105,3 +112,4 @@ int main(int argc, char* argv[])
     doc.append(argc == 2 ? argv[1] : "Hello world!");
     return 0;
 }
+//]
