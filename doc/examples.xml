@@ -97,6 +97,18 @@
         Download <ulink url="../../../../libs/signals2/example/passing_slots.cpp">passing_slots.cpp</ulink>.
       </para>
     </section>
+    <section id="signals2.examples.tutorial.extended_slot">
+      <title>extended_slot</title>
+      <para>
+        This example demonstrates connecting an extended slot to a signal.  An extended slot
+        accepts a reference to its invoking signal-slot connection as an additional argument,
+        permitting the slot to temporarily block or permanently disconnect itself.
+      </para>
+      <para>
+  <!-- FIXME: url needs to have two "../" stripped from it to work once we are merged into main boost doc build -->
+        Download <ulink url="../../../../libs/signals2/example/extended_slot.cpp">extended_slot.cpp</ulink>.
+      </para>
+    </section>
   </section>
   <section id="signals2.examples.document-view">
     <title>Document-View</title>

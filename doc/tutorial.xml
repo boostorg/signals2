@@ -788,6 +788,43 @@ hidden in an implementation detail file.</para>
   <section id="signals2.tutorial.extended-slot-type">
     <title>Giving a Slot Access to its Connection (Advanced)</title>
     <para>
+      You may encounter situations where you wish to disconnect or block a slot's
+      connection from within the slot itself.  For example, suppose you have a group
+      of asynchronous tasks, each of which emits a signal when it completes.
+      You wish to connect a slot to all the tasks to retrieve their results as
+      each completes.  Once a
+      given task completes and the slot is run, the slot no longer needs to be
+      connected to the completed task.
+      Therefore, you may wish to clean up old connections by having the slot
+      disconnect its invoking connection when it runs.
+    </para>
+    <para>
+      For a slot to disconnect (or block) its invoking connection, it must have
+      access to a <classname>connection</classname> object which references
+      the invoking signal-slot connection.  The difficulty is,
+      the <classname>connection</classname> object is returned by the
+      <methodname alt="signalN::connect">signal::connect</methodname>
+      method, and therefore is not available until after the slot is
+      already connected to the signal.  This can be particularly troublesome
+      in a multi-threaded environment where the signal may be invoked
+      concurrently by a different thread while the slot is being connected.
+    </para>
+    <para>
+      Therefore, the signal classes provide
+      <methodname alt="signalN::connect_extended">signal::connect_extended</methodname>
+      methods, which allow slots which take an extra argument to be connected to a signal.
+      The extra argument is a <classname>connection</classname> object which refers
+      to the signal-slot connection currently invoking the slot.
+      <methodname alt="signalN::connect_extended">signal::connect_extended</methodname>
+      uses slots of the type given by the
+      <classname alt="signalN::extended_slot_type">signal::extended_slot_type</classname>
+      typedef.
+    </para>
+    <para>
+      The examples section includes an
+      <link linkend="signals2.examples.tutorial.extended_slot">extended_slot</link>
+      program which demonstrates the syntax for using
+      <methodname alt="signalN::connect_extended">signal::connect_extended</methodname>.
     </para>
   </section>
 
