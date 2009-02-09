@@ -218,28 +218,8 @@ buttons are pressed.</para>
 <code>float</code> arguments to its slots. Then we'll create a few
 slots that print the results of various arithmetic operations on
 these values.</para>
-<programlisting>
-void print_sum(float x, float y)
-{
-  std::cout &lt;&lt; "The sum is " &lt;&lt; x+y &lt;&lt; std::endl;
-}
-
-void print_product(float x, float y)
-{
-  std::cout &lt;&lt; "The product is " &lt;&lt; x*y &lt;&lt; std::endl;
-}
-
-void print_difference(float x, float y)
-{
-  std::cout &lt;&lt; "The difference is " &lt;&lt; x-y &lt;&lt; std::endl;
-}
-
-void print_quotient(float x, float y)
-{
-  std::cout &lt;&lt; "The quotient is " &lt;&lt; x/y &lt;&lt; std::endl;
-}
-</programlisting>
-
+<programlisting><xi:include href="./snippets/slot_arguments_slot_defs_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
   <informaltable>
     <tgroup cols="2" align="left">
       <thead>
@@ -251,28 +231,19 @@ void print_quotient(float x, float y)
       <tbody>
         <row>
           <entry>
-<programlisting>
-<classname>boost::signals2::signal</classname>&lt;void (float, float)&gt; sig;
-
-sig.<methodname>connect</methodname>(&amp;print_sum);
-sig.<methodname>connect</methodname>(&amp;print_product);
-sig.<methodname>connect</methodname>(&amp;print_difference);
-sig.<methodname>connect</methodname>(&amp;print_quotient);
-
-sig(5, 3);
-</programlisting>
+<programlisting><xi:include href="./snippets/slot_arguments_main_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 </entry>
 <entry>
-<programlisting>
-<classname alt="boost::signals2::signalN">boost::signals2::signal2</classname>&lt;void, float, float&gt; sig;
+<programlisting>  boost::signals2::signal2&lt;void, float, float&gt; sig;
 
-sig.<methodname>connect</methodname>(&amp;print_sum);
-sig.<methodname>connect</methodname>(&amp;print_product);
-sig.<methodname>connect</methodname>(&amp;print_difference);
-sig.<methodname>connect</methodname>(&amp;print_quotient);
+  sig.connect(&amp;print_args);
+  sig.connect(&amp;print_sum);
+  sig.connect(&amp;print_product);
+  sig.connect(&amp;print_difference);
+  sig.connect(&amp;print_quotient);
 
-sig(5, 3);
-</programlisting>
+  sig(5, 3);</programlisting>
 </entry>
               </row>
             </tbody>
@@ -280,12 +251,11 @@ sig(5, 3);
         </informaltable>
 
 <para>This program will print out the following:</para>
-<programlisting>
+<programlisting>The arguments are 5 and 3
 The sum is 8
 The product is 15
 The difference is 2
-The quotient is 1.66667
-</programlisting>
+The quotient is 1.66667</programlisting>
 <para>So any values that are given to <code>sig</code> when it is
 called like a function are passed to each of the slots. We have to
 declare the types of these values up front when we create the
@@ -311,6 +281,8 @@ possibilities.</para>
 slightly so that the slots all return the results of computing the
 product, quotient, sum, or difference. Then the signal itself can
 return a value based on these results to be printed:</para>
+<programlisting><xi:include href="./snippets/signal_return_value_slot_defs_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
   <informaltable>
     <tgroup cols="2" align="left">
       <thead>
@@ -322,43 +294,17 @@ return a value based on these results to be printed:</para>
       <tbody>
         <row>
           <entry>
-<programlisting>
-float product(float x, float y) { return x*y; }
-float quotient(float x, float y) { return x/y; }
-float sum(float x, float y) { return x+y; }
-float difference(float x, float y) { return x-y; }
-
-<classname>boost::signals2::signal</classname>&lt;float (float x, float y)&gt; sig;
-
-sig.<methodname>connect</methodname>(&amp;product);
-sig.<methodname>connect</methodname>(&amp;quotient);
-sig.<methodname>connect</methodname>(&amp;sum);
-sig.<methodname>connect</methodname>(&amp;difference);
-
-std::cout &lt;&lt; *sig(5, 3) &lt;&lt; std::endl;
-</programlisting>
+<programlisting>boost::signals2::signal&lt;float (float, float)&gt; sig;</programlisting>
 </entry>
 <entry>
-<programlisting>
-float product(float x, float y) { return x*y; }
-float quotient(float x, float y) { return x/y; }
-float sum(float x, float y) { return x+y; }
-float difference(float x, float y) { return x-y; }
-
-<classname alt="boost::signals2::signalN">boost::signals2::signal2</classname>&lt;float, float, float&gt; sig;
-
-sig.<methodname>connect</methodname>(&amp;product);
-sig.<methodname>connect</methodname>(&amp;quotient);
-sig.<methodname>connect</methodname>(&amp;sum);
-sig.<methodname>connect</methodname>(&amp;difference);
-
-std::cout &lt;&lt; *sig(5, 3) &lt;&lt; std::endl;
-</programlisting>
+<programlisting>boost::signals2::signal2&lt;float, float, float&gt; sig;</programlisting>
 </entry>
             </row>
           </tbody>
         </tgroup>
       </informaltable>
+<programlisting><xi:include href="./snippets/signal_return_value_main_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 
 <para>This example program will output <code>2</code>. This is because the
 default behavior of a signal that has a return type
@@ -371,28 +317,8 @@ no side effects and the result is the last slot connected.</para>
 <para>A more interesting signal result would be the maximum of the
 values returned by any slot. To do this, we create a custom
 combiner that looks like this:</para>
-<programlisting>
-template&lt;typename T&gt;
-struct maximum
-{
-  typedef T result_type;
-
-  template&lt;typename InputIterator&gt;
-  T operator()(InputIterator first, InputIterator last) const
-  {
-    // If there are no slots to call, just return the
-    // default-constructed value
-    T max_value = T();
-    while (first != last) {
-      if (max_value &lt; *first)
-        max_value = *first;
-      ++first;
-    }
-
-    return max_value;
-  }
-};
-</programlisting>
+<programlisting><xi:include href="./snippets/custom_combiners_maximum_def_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 <para>The <code>maximum</code> class template acts as a function
 object. Its result type is given by its template parameter, and
 this is the type it expects to be computing the maximum based on
@@ -435,14 +361,8 @@ follows the signal's calling signature:</para>
 
 <para>Now we can connect slots that perform arithmetic functions and
 use the signal:</para>
-<programlisting>
-sig.<methodname>connect</methodname>(&amp;quotient);
-sig.<methodname>connect</methodname>(&amp;product);
-sig.<methodname>connect</methodname>(&amp;sum);
-sig.<methodname>connect</methodname>(&amp;difference);
-
-std::cout &lt;&lt; sig(5, 3) &lt;&lt; std::endl;
-</programlisting>
+<programlisting><xi:include href="./snippets/custom_combiners_maximum_usage_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 <para>The output of this program will be <code>15</code>, because
 regardless of the order in which the slots are connected, the product
 of 5 and 3 will be larger than the quotient, sum, or
@@ -450,25 +370,8 @@ difference.</para>
 <para>In other cases we might want to return all of the values
 computed by the slots together, in one large data structure. This
 is easily done with a different combiner:</para>
-<programlisting>
-template&lt;typename Container&gt;
-struct aggregate_values
-{
-  typedef Container result_type;
-
-  template&lt;typename InputIterator&gt;
-  Container operator()(InputIterator first, InputIterator last) const
-  {
-    Container values;
-
-    while(first != last) {
-      values.push_back(*first);
-      ++first;
-    }
-    return values;
-  }
-};
-</programlisting>
+<programlisting><xi:include href="./snippets/custom_combiners_aggregate_values_def_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 <para>
 Again, we can create a signal with this new combiner:
 </para>
@@ -485,38 +388,19 @@ Again, we can create a signal with this new combiner:
           <entry>
 <programlisting>
 <classname>boost::signals2::signal</classname>&lt;float (float, float),
-    aggregate_values&lt;std::vector&lt;float&gt; &gt; &gt; sig;
-
-sig.<methodname>connect</methodname>(&amp;quotient);
-sig.<methodname>connect</methodname>(&amp;product);
-sig.<methodname>connect</methodname>(&amp;sum);
-sig.<methodname>connect</methodname>(&amp;difference);
-
-std::vector&lt;float&gt; results = sig(5, 3);
-std::copy(results.begin(), results.end(),
-    std::ostream_iterator&lt;float&gt;(cout, " "));
-</programlisting>
+    aggregate_values&lt;std::vector&lt;float&gt; &gt; &gt; sig;</programlisting>
 </entry>
 <entry>
 <programlisting>
 <classname alt="boost::signals2::signalN">boost::signals2::signal2</classname>&lt;float, float, float,
-    aggregate_values&lt;std::vector&lt;float&gt; &gt; &gt; sig;
-
-sig.<methodname>connect</methodname>(&amp;quotient);
-sig.<methodname>connect</methodname>(&amp;product);
-sig.<methodname>connect</methodname>(&amp;sum);
-sig.<methodname>connect</methodname>(&amp;difference);
-
-std::vector&lt;float&gt; results = sig(5, 3);
-std::copy(results.begin(), results.end(),
-    std::ostream_iterator&lt;float&gt;(cout, " "));
-</programlisting>
+    aggregate_values&lt;std::vector&lt;float&gt; &gt; &gt; sig;</programlisting>
 </entry>
             </row>
           </tbody>
         </tgroup>
       </informaltable>
-
+<programlisting><xi:include href="./snippets/custom_combiners_aggregate_values_usage_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 <para>The output of this program will contain 15, 8, 1.6667, and 2. It
 is interesting here that
 the first template argument for the <code>signal</code> class,
@@ -574,18 +458,8 @@ disconnects the signal and slot if they are connected before it is
 called. Each call to the signal's <code>connect()</code> method
 returns a connection object, which can be used to determine if the
 connection still exists or to disconnect the signal and slot.</para>
-<programlisting>
-boost::signals2::connection c = sig.<methodname>connect</methodname>(HelloWorld());
-if (c.<methodname alt="connection::connected">connected</methodname>()) {
-<emphasis>// c is still connected to the signal</emphasis>
-  sig(); <emphasis>// Prints "Hello, World!"</emphasis>
-}
-
-c.<methodname alt="connection::disconnect">disconnect</methodname>(); <emphasis>// Disconnect the HelloWorld object</emphasis>
-assert(!c.<methodname alt="connection::connected">connected</methodname>()); <emphasis>// c isn't connected any more</emphasis>
-
-sig(); <emphasis>// Does nothing: there are no connected slots</emphasis>
-</programlisting>
+<programlisting><xi:include href="./snippets/disconnect_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 </section>
 
 <section><title>Blocking Slots (Beginner)</title>
@@ -604,33 +478,19 @@ on all the
 Here is an example of
 blocking/unblocking slots:</para>
 
-<programlisting>
-boost::signals2::connection c = sig.<methodname>connect</methodname>(HelloWorld());
-sig(); <emphasis>// Prints "Hello, World!"</emphasis>
-
-{
-  boost::signals2::shared_connection_block block(c); <emphasis>// block the slot</emphasis>
-  assert(c.<methodname alt="connection::blocked">blocked</methodname>());
-  sig(); <emphasis>// No output: the slot is blocked</emphasis>
-} <emphasis>// shared_connection_block going out of scope unblocks the slot</emphasis>
-sig(); <emphasis>// Prints "Hello, World!"</emphasis>
-</programlisting>
+<programlisting><xi:include href="./snippets/block_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 
 </section>
 
 <section><title>Scoped Connections (Intermediate)</title>
-<para>The <code>boost::signals2::scoped_connection</code> class
+<para>The <classname>boost::signals2::scoped_connection</classname> class
 references a signal/slot connection that will be disconnected when
 the <code>scoped_connection</code> class goes out of scope. This
 ability is useful when a connection need only be temporary,
 e.g.,</para>
-<programlisting>
-{
-  boost::signals2::scoped_connection c(sig.<methodname>connect</methodname>(ShortLived()));
-  sig(); <emphasis>// will call ShortLived function object</emphasis>
-}
-sig(); <emphasis>// ShortLived function object no longer connected to sig</emphasis>
-</programlisting>
+<programlisting><xi:include href="./snippets/scoped_connection_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 
 <para>
   Note, attempts to initialize a scoped_connection with the assignment syntax
@@ -659,6 +519,8 @@ the type of the function object has an accessible <code>==</code>
 operator. For instance:
 
 </para>
+<programlisting><xi:include href="./snippets/disconnect_by_slot_def_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
   <informaltable>
     <tgroup cols="2" align="left">
       <thead>
@@ -670,32 +532,10 @@ operator. For instance:
       <tbody>
         <row>
           <entry>
-<programlisting>
-void foo();
-void bar();
-
-boost::signals2::signal&lt;void()&gt; sig;
-
-sig.connect(&amp;foo);
-sig.connect(&amp;bar);
-
-// disconnects foo, but not bar
-sig.disconnect(&amp;foo);
-</programlisting>
+<programlisting><classname>boost::signals2::signal</classname>&lt;void ()&gt; sig;</programlisting>
 </entry>
 <entry>
-<programlisting>
-void foo();
-void bar();
-
-boost::signals2::signal0&lt;void&gt; sig;
-
-sig.connect(&amp;foo);
-sig.connect(&amp;bar);
-
-// disconnects foo, but not bar
-sig.disconnect(&amp;foo);
-</programlisting>
+<programlisting><classname alt="boost::signals2::signalN">boost::signals2::signal0</classname>&lt;void&gt; sig;</programlisting>
 </entry>
             </row>
           </tbody>
@@ -703,6 +543,8 @@ sig.disconnect(&amp;foo);
       </informaltable>
 
 </section>
+<programlisting><xi:include href="./snippets/disconnect_by_slot_usage_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 
 <section id="signals2.tutorial.connection-management"><title>Automatic Connection Management (Intermediate)</title>
 <para>Boost.Signals2 can automatically track the lifetime of objects
@@ -868,82 +710,11 @@ cannot be templates. Slots can be passed via the
 <code>slot_type</code> for each particular signal type and any
 function object compatible with the signature of the signal can be
 passed to a <code>slot_type</code> parameter. For instance:</para>
-  <informaltable>
-    <tgroup cols="2" align="left">
-      <thead>
-        <row>
-          <entry>Preferred syntax</entry>
-          <entry>Portable syntax</entry>
-        </row>
-      </thead>
-      <tbody>
-        <row>
-          <entry>
+<programlisting><xi:include href="./snippets/passing_slots_defs_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 <programlisting>
-class Button
-{
-  typedef <classname>boost::signals2::signal</classname>&lt;void (int x, int y)&gt; OnClick;
-
-public:
-  void doOnClick(const OnClick::slot_type&amp; slot);
-
-private:
-  OnClick onClick;
-};
-
-void Button::doOnClick(
-      const OnClick::slot_type&amp; slot
-    )
-{
-  onClick.<methodname>connect</methodname>(slot);
-}
-
-void printCoordinates(long x, long y)
-{
-  std::cout &lt;&lt; "(" &lt;&lt; x &lt;&lt; ", " &lt;&lt; y &lt;&lt; ")\n";
-}
-
-void f(Button&amp; button)
-{
-  button.doOnClick(&amp;printCoordinates);
-}
-</programlisting>
-</entry>
-<entry>
-<programlisting>
-class Button
-{
-  typedef <classname alt="boost::signals2::signalN">boost::signals2::signal2</classname>&lt;void,int,int&gt; OnClick;
-
-public:
-  void doOnClick(const OnClick::slot_type&amp; slot);
-
-private:
-  OnClick onClick;
-};
-
-void Button::doOnClick(
-      const OnClick::slot_type&amp; slot
-    )
-{
-  onClick.<methodname>connect</methodname>(slot);
-}
-
-void printCoordinates(long x, long y)
-{
-  std::cout &lt;&lt; "(" &lt;&lt; x &lt;&lt; ", " &lt;&lt; y &lt;&lt; ")\n";
-}
-
-void f(Button&amp; button)
-{
-  button.doOnClick(&amp;printCoordinates);
-}
-</programlisting>
-</entry>
-            </row>
-          </tbody>
-        </tgroup>
-      </informaltable>
+<xi:include href="./snippets/passing_slots_usage_code_snippet.txt"
+	xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/></programlisting>
 
 <para>The <code>doOnClick</code> method is now functionally equivalent
 to the <code>connect</code> method of the <code>onClick</code>
