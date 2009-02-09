@@ -109,9 +109,8 @@
             declaring <classname>deconstruct_access</classname> a friend.  Using private
             constructors in conjunction with <classname>deconstruct_access</classname>
             can be useful to
-            ensure <classname>postconstructible</classname> or <classname>predestructible</classname>
-            objects are always created
-            properly using <code>deconstruct</code>.
+            ensure your objects are only created by <code>deconstruct</code>, and thus
+            their postconstructors or predestructors will always be called.
           </para>
         </notes>
         <returns><para>A <code>postconstructor_invoker&lt;T&gt;</code> owning a newly allocated object of
