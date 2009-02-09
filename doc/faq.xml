@@ -38,6 +38,9 @@
           is NOT thread-safe, and is only provided to ease porting of single-threaded
           code from Boost.Signals to Boost.Signals2.
         </para>
+        <para>See the documentation section on <link linkend="signals2.thread-safety">thread-safety</link>
+          for more information.
+        </para>
       </answer>
     </qandaentry>
   </qandaset>

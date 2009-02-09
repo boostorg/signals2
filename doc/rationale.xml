@@ -114,6 +114,21 @@
   </section>
 
   <section>
+    <title><code>optional_last_value</code> as the Default Combiner</title>
+    <para>
+      The default combiner for Boost.Signals2 has changed from the <code>last_value</code>
+      combiner used as the default by the original Boost.Signals library.
+      This is because <code>last_value</code> requires that at least 1 slot be
+      connected to a signal when it is invoked (except for its void specialization).
+      In a multi-threaded environment where signal invocations and slot connections
+      and disconnections may be happening concurrently, it is difficult
+      to fulfill this requirement.  When using <classname>optional_last_value</classname>,
+      there is no requirement for any slots to be connected when a signal
+      is invoked, since in that case the combiner may simply return an empty
+      <classname>boost::optional</classname>.
+    </para>
+  </section>
+  <section>
     <title>Combiner Interface</title>
 
     <para> The Combiner interface was chosen to mimic a call to an
@@ -297,7 +312,25 @@ private:
       </listitem>
     </itemizedlist>
   </section>
-
+  <section>
+    <title>Signals2 Mutex Classes</title>
+    <para>
+      The Boost.Signals2 library provides 2 mutex classes: <classname>boost::signals2::mutex</classname>,
+      and <classname>boost::signals2::dummy_mutex</classname>.  The motivation for providing
+      <classname>boost::signals2::mutex</classname> is simply that the <classname>boost::mutex</classname>
+      class provided by the Boost.Thread library currently requires linking to libboost_thread.
+      The <classname>boost::signals2::mutex</classname> class allows Signals2 to remain
+      a header-only library.  In the future, <classname>boost::signals2::mutex</classname>
+      will probably be turned into a typedef to <classname>std::mutex</classname> when
+      compiling in C++0x mode.  You may still choose to use <classname>boost::mutex</classname>
+      if you wish, by specifying it as the <code>Mutex</code> template type for your signals.
+    </para>
+    <para>
+      The <classname>boost::signals2::dummy_mutex</classname> class is provided to allow
+      performance sensitive single-threaded applications to minimize overhead by avoiding unneeded
+      mutex locking.
+    </para>
+  </section>
   <section>
     <title>Comparison with other Signal/Slot implementations</title>
 
