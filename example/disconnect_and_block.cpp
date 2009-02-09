@@ -23,32 +23,36 @@ void disconnect_example()
 {
   boost::signals2::signal<void ()> sig;
 
+//[ disconnect_code_snippet
   boost::signals2::connection c = sig.connect(HelloWorld());
   // c is connected
-  std::cout << "c.connected() is " << c.connected() << ".\n";
+  std::cout << "c is connected\n";
   sig(); // Prints "Hello, World!"
 
   c.disconnect(); // Disconnect the HelloWorld object
-  std::cout << "c.connected() is " << c.connected() << ".\n";
+  std::cout << "c is disconnected\n";
   sig(); // Does nothing: there are no connected slots
+//]
 }
 
 void block_example()
 {
   boost::signals2::signal<void ()> sig;
 
+//[ block_code_snippet
   boost::signals2::connection c = sig.connect(HelloWorld());
   // connection is not blocked
-  std::cout << "c.blocked() is " << c.blocked() << ".\n";
+  std::cout << "c is not blocked.\n";
   sig(); // Prints "Hello, World!"
 
   {
     boost::signals2::shared_connection_block block(c); // block the slot
-    std::cout << "c.blocked() is " << c.blocked() << ".\n";
+    std::cout << "c is blocked.\n";
     sig(); // No output: the slot is blocked
   } // shared_connection_block going out of scope unblocks the slot
-  std::cout << "c.blocked() is " << c.blocked() << ".\n";
+  std::cout << "c is not blocked.\n";
   sig(); // Prints "Hello, World!"}
+//]
 }
 
 struct ShortLived
@@ -63,21 +67,26 @@ void scoped_connection_example()
 {
   boost::signals2::signal<void ()> sig;
 
+//[ scoped_connection_code_snippet
   {
     boost::signals2::scoped_connection c(sig.connect(ShortLived()));
     sig(); // will call ShortLived function object
   } // scoped_connection goes out of scope and disconnects
 
   sig(); // ShortLived function object no longer connected to sig
+//]
 }
 
+//[ disconnect_by_slot_def_code_snippet
 void foo() { std::cout << "foo"; }
 void bar() { std::cout << "bar\n"; }
+//]
 
 void disconnect_by_slot_example()
 {
   boost::signals2::signal<void()> sig;
 
+//[ disconnect_by_slot_usage_code_snippet
   sig.connect(&foo);
   sig.connect(&bar);
   sig();
@@ -85,6 +94,7 @@ void disconnect_by_slot_example()
   // disconnects foo, but not bar
   sig.disconnect(&foo);
   sig();
+//]
 }
 
 int main()

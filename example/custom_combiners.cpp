@@ -18,6 +18,7 @@ float quotient(float x, float y) { return x / y; }
 float sum(float x, float y) { return x + y; }
 float difference(float x, float y) { return x - y; }
 
+//[ custom_combiners_maximum_def_code_snippet
 // combiner which returns the maximum value returned by all slots
 template<typename T>
 struct maximum
@@ -40,12 +41,14 @@ struct maximum
     return max_value;
   }
 };
+//]
 
 void maximum_combiner_example()
 {
   // signal which uses our custom "maximum" combiner
   boost::signals2::signal<float (float x, float y), maximum<float> > sig;
 
+//[ custom_combiners_maximum_usage_code_snippet
   sig.connect(&product);
   sig.connect(&quotient);
   sig.connect(&sum);
@@ -54,8 +57,10 @@ void maximum_combiner_example()
   // Outputs the maximum value returned by the connected slots, in this case
   // 15 from the product function.
   std::cout << "maximum: " << sig(5, 3) << std::endl;
+//]
 }
 
+//[ custom_combiners_aggregate_values_def_code_snippet
 // aggregate_values is a combiner which places all the values returned
 // from slots into a container
 template<typename Container>
@@ -75,6 +80,7 @@ struct aggregate_values
     return values;
   }
 };
+//]
 
 void aggregate_values_example()
 {
@@ -82,6 +88,7 @@ void aggregate_values_example()
   boost::signals2::signal<float (float, float),
     aggregate_values<std::vector<float> > > sig;
 
+//[ custom_combiners_aggregate_values_usage_code_snippet
   sig.connect(&quotient);
   sig.connect(&product);
   sig.connect(&sum);
@@ -92,6 +99,7 @@ void aggregate_values_example()
   std::copy(results.begin(), results.end(),
     std::ostream_iterator<float>(std::cout, " "));
   std::cout << "\n";
+//]
 }
 
 int main()

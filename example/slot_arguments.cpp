@@ -12,6 +12,7 @@
 #include <iostream>
 #include <boost/signals2/signal.hpp>
 
+//[ slot_arguments_slot_defs_code_snippet
 void print_args(float x, float y)
 {
   std::cout << "The arguments are " << x << " and " << y << std::endl;
@@ -36,9 +37,11 @@ void print_quotient(float x, float y)
 {
   std::cout << "The quotient is " << x / y << std::endl;
 }
+//]
 
 int main()
 {
+//[ slot_arguments_main_code_snippet
   boost::signals2::signal<void (float, float)> sig;
 
   sig.connect(&print_args);
@@ -48,5 +51,6 @@ int main()
   sig.connect(&print_quotient);
 
   sig(5., 3.);
+//]
   return 0;
 };

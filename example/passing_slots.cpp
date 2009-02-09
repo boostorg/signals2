@@ -12,6 +12,7 @@
 #include <iostream>
 #include <boost/signals2/signal.hpp>
 
+//[ passing_slots_defs_code_snippet
 // a pretend GUI button
 class Button
 {
@@ -19,29 +20,36 @@ class Button
 public:
   typedef OnClick::slot_type OnClickSlotType;
   // forward slots through Button interface to its private signal
-  boost::signals2::connection doOnClick(const OnClickSlotType & slot)
-  {
-    return onClick.connect(slot);
-  }
+  boost::signals2::connection doOnClick(const OnClickSlotType & slot);
 
   // simulate user clicking on GUI button at coordinates 52, 38
-  void simulateClick()
-  {
-    onClick(52, 38);
-  }
+  void simulateClick();
 private:
   OnClick onClick;
 };
+
+boost::signals2::connection Button::doOnClick(const OnClickSlotType & slot)
+{
+  return onClick.connect(slot);
+}
+
+void Button::simulateClick()
+{
+  onClick(52, 38);
+}
 
 void printCoordinates(long x, long y)
 {
   std::cout << "(" << x << ", " << y << ")\n";
 }
+//]
 
 int main()
 {
+//[ passing_slots_usage_code_snippet
   Button button;
   button.doOnClick(&printCoordinates);
   button.simulateClick();
+//]
   return 0;
 }

@@ -12,15 +12,18 @@
 #include <iostream>
 #include <boost/signals2/signal.hpp>
 
+//[ signal_return_value_slot_defs_code_snippet
 float product(float x, float y) { return x * y; }
 float quotient(float x, float y) { return x / y; }
 float sum(float x, float y) { return x + y; }
 float difference(float x, float y) { return x - y; }
+//]
 
 int main()
 {
   boost::signals2::signal<float (float x, float y)> sig;
 
+//[ signal_return_value_main_code_snippet
   sig.connect(&product);
   sig.connect(&quotient);
   sig.connect(&sum);
@@ -30,4 +33,5 @@ int main()
   // value of the last slot in the slot list, in this case the
   // difference function.
   std::cout << *sig(5, 3) << std::endl;
+//]
 };
