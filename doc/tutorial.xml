@@ -631,10 +631,22 @@ boost::shared_ptr&lt;NewsMessageArea&gt; newsMessageArea(new NewsMessageArea(/* 
 deliverNews.<methodname>connect</methodname>(signal_type::slot_type(&amp;NewsMessageArea::displayNews,
   newsMessageArea.get(), _1).track(newsMessageArea));
 </programlisting>
-<para>Note there is no explicit call to bind() needed in the above example.  If the
-<classname alt="slotN">slot</classname> constructor is passed more than one
-argument, it will automatically pass all the arguments to <code>bind</code> and use the
-returned function object.</para>
+<para>
+  Note there is no explicit call to bind() needed in the above example.  If the
+  <classname alt="slotN">slot</classname> constructor is passed more than one
+  argument, it will automatically pass all the arguments to <code>bind</code> and use the
+  returned function object.
+</para>
+<para>Also note, we pass an ordinary pointer as the
+  second argument to the slot constructor, using <code>newsMessageArea.get()</code>
+  instead of passing the <code>shared_ptr</code> itself.  If we had passed the
+  <code>newsMessageArea</code> itself, a copy of the <code>shared_ptr</code> would
+  have been bound into the slot function, preventing the <code>shared_ptr</code>
+  from expiring.  However, the use of
+  <methodname alt="boost::signals2::slotN::track">slot::track</methodname>
+  implies we wish to allow the tracked object to expire, and automatically
+  disconnect the connection when this occurs.
+</para>
 </section>
 
   <section id="signals2.tutorial.deconstruct">
@@ -656,6 +668,11 @@ returned function object.</para>
       a friend.  This will ensure that objects of the class may only be created
       through the <functionname>deconstruct()</functionname> function, and their
       associated <code>adl_postconstruct()</code> function will always be called.
+    </para>
+    <para>The <link linkend="signals2.examples.deconstruct">examples</link> section
+      contains several examples of defining classes with postconstructors and
+      predestructors, and creating objects of these classes using
+      <functionname>deconstruct()</functionname>
     </para>
     <para>
       Be aware that the postconstructor/predestructor support in Boost.Signals2

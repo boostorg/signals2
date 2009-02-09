@@ -137,7 +137,7 @@
     </section>
   </section>
   <section id="signals2.examples.deconstruct">
-    <title>Postconstructors and Predestructors with <functionname>deconstruct()</functionname></title>
+    <title>Postconstructors and Predestructors with <code>deconstruct()</code></title>
     <section id="signals2.examples.deconstruct.postconstructor_ex1">
       <title>postconstructor_ex1</title>
       <para>
