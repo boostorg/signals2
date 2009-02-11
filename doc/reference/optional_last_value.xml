@@ -11,7 +11,17 @@
 
         <purpose>Evaluate an <conceptname>InputIterator</conceptname> sequence and return
           a boost::optional which contains the last value in the sequence, or an
-          empty boost::optional if the sequence was empty.</purpose>
+          empty <classname>boost::optional</classname> if the sequence was empty.</purpose>
+        <description>
+          <para>
+            <code>optional_last_value</code> is the default Combiner template type for signals in the
+            Boost.Signals2 library.  The advantage of <code>optional_last_value</code> over
+            <classname>last_value</classname> is that <code>optional_last_value</code>
+            can return an empty <classname>boost::optional</classname>. rather
+            than throwing an exception, when
+            its <code>InputIterator</code> sequence is empty.
+          </para>
+        </description>
 
         <typedef name="result_type"><type><classname>boost::optional</classname>&lt;T&gt;</type></typedef>
 
@@ -48,6 +58,15 @@
         </specialization>
 
         <purpose>Evaluate an InputIterator sequence.</purpose>
+        <description>
+          <para>This specialization of <classname>optional_last_value</classname> is provided
+            to cope with the fact that there is no such thing as an
+            <code><classname>optional</classname>&lt;void&gt;</code>, which
+            <classname>optional_last_value</classname> would otherwise try to
+            use as its <code>result_type</code>.  Therefore,
+            this specialization leaves the <code>result_type</code> unspecified.
+          </para>
+        </description>
 
         <typedef name="result_type">
           <type><emphasis>unspecified</emphasis></type>
