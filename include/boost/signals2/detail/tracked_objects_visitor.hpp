@@ -37,6 +37,11 @@ namespace boost
         {
             m_visit_reference_wrapper(t, mpl::bool_<is_reference_wrapper<T>::value>());
         }
+        template<typename T>
+        void operator()(const weak_ptr<T> & wp) const
+        {
+            m_visit_weak_ptr(wp, mpl::bool_<is_base_of<signals2::trackable, T>::value>());
+        }
       private:
         template<typename T>
         void m_visit_reference_wrapper(const reference_wrapper<T> &t, const mpl::bool_<true> &) const
@@ -83,6 +88,24 @@ namespace boost
             slot_->_tracked_objects.push_back(trackable->get_shared_ptr());
         }
         void add_if_trackable(const void *trackable) const {}
+        template<typename T>
+        void m_visit_weak_ptr(const weak_ptr<T> &wp, const mpl::bool_<true> &) const
+        {
+            slot_->_tracked_objects.push_back(wp);
+        }
+        template<typename T>
+        void m_visit_weak_ptr(const weak_ptr<T> &wp, const mpl::bool_<false> &) const
+        {
+        	m_visit_weak_ptr_to_signal(wp, mpl::bool_<is_signal<T>::value>());
+        }
+        template<typename T>
+        void m_visit_weak_ptr_to_signal(const weak_ptr<T> &wp, const mpl::bool_<true> &) const
+        {
+            slot_->_tracked_objects.push_back(wp);
+        }
+        template<typename T>
+        void m_visit_weak_ptr_to_signal(const weak_ptr<T> &wp, const mpl::bool_<false> &) const
+        {}
 
         mutable slot_base * slot_;
       };

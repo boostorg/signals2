@@ -13,6 +13,8 @@
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/trackable.hpp>
 #include <boost/bind.hpp>
+#include <boost/ref.hpp>
+#include <boost/weak_ptr.hpp>
 
 struct short_lived : public boost::signals2::trackable {
   ~short_lived() {}
@@ -21,6 +23,8 @@ struct short_lived : public boost::signals2::trackable {
 struct swallow {
   typedef int result_type;
   template<typename T> int operator()(const T*, int i) { return i; }
+  template<typename T> int operator()(T &, int i) { return i; }
+  template<typename T> int operator()(boost::weak_ptr<T>, int i) { return i; }
 };
 
 template<typename T>
@@ -53,13 +57,29 @@ int test_main(int, char*[])
     s1.connect(boost::bind<int>(swallow(), &shorty, _1));
     BOOST_CHECK(s1(5) == 5);
   }
-  // Test multiple arg slot constructor
   BOOST_CHECK(s1(5) == 0);
+  // Test auto-disconnection of trackable inside reference_wrapper
+  {
+    short_lived shorty;
+    s1.connect(boost::bind<int>(swallow(), boost::ref(shorty), _1));
+    BOOST_CHECK(s1(5) == 5);
+  }
+  BOOST_CHECK(s1(5) == 0);
+  // Test auto-disconnection of trackable in weak_ptr
+  {
+    boost::shared_ptr<short_lived> shorty(new short_lived);
+    s1.connect(boost::bind<int>(swallow(), boost::weak_ptr<short_lived>(shorty), _1));
+    BOOST_CHECK(s1(5) == 5);
+  }
+  BOOST_CHECK(s1(5) == 0);
+  
+  // Test multiple arg slot constructor
   {
     short_lived shorty;
     s1.connect(sig_type::slot_type(swallow(), &shorty, _1));
     BOOST_CHECK(s1(5) == 5);
   }
+  BOOST_CHECK(s1(5) == 0);
 
   // Test auto-disconnection of slot before signal connection
   {
@@ -70,6 +90,5 @@ int test_main(int, char*[])
 
     BOOST_CHECK(s1(5) == 0);
   }
-
   return 0;
 }
