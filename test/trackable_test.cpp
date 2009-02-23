@@ -65,13 +65,6 @@ int test_main(int, char*[])
     BOOST_CHECK(s1(5) == 5);
   }
   BOOST_CHECK(s1(5) == 0);
-  // Test auto-disconnection of trackable in weak_ptr
-  {
-    boost::shared_ptr<short_lived> shorty(new short_lived);
-    s1.connect(boost::bind<int>(swallow(), boost::weak_ptr<short_lived>(shorty), _1));
-    BOOST_CHECK(s1(5) == 5);
-  }
-  BOOST_CHECK(s1(5) == 0);
   
   // Test multiple arg slot constructor
   {
