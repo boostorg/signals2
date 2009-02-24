@@ -448,6 +448,7 @@
           <effects><para>Initializes the base class with the given combiner
           and comparison objects.</para></effects>
         </constructor>
+        <typedef name="signature_type"><type>Signature</type></typedef>
       </class>
     </namespace>
   </namespace>
