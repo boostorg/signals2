@@ -50,6 +50,7 @@ namespace boost
 
 namespace signals2
 {
+  class deconstruct_access;
 
 namespace detail
 {
@@ -154,7 +155,7 @@ public:
     }
 #endif // else defined( BOOST_HAS_VARIADIC_TMPL ) && defined( BOOST_HAS_RVALUE_REFS )
 private:
-    friend class deconstruct_access;
+    friend class boost::signals2::deconstruct_access;
     postconstructor_invoker(const shared_ptr<T> & sp):
         _sp(sp)
     {}
@@ -228,6 +229,7 @@ public:
         initialized_ = true;
     }
 };
+}  // namespace detail
 
 class deconstruct_access
 {
@@ -429,7 +431,6 @@ public:
 
 #endif
 };
-}  // namespace detail
 
 // Zero-argument versions
 //
@@ -437,7 +438,7 @@ public:
 
 template< class T > postconstructor_invoker<T> deconstruct()
 {
-	return detail::deconstruct_access::deconstruct<T>();
+	return deconstruct_access::deconstruct<T>();
 }
 
 #if defined( BOOST_HAS_VARIADIC_TMPL ) && defined( BOOST_HAS_RVALUE_REFS )
@@ -446,7 +447,7 @@ template< class T > postconstructor_invoker<T> deconstruct()
 
 template< class T, class... Args > postconstructor_invoker< T > deconstruct( Args && ... args )
 {
-    return detail::deconstruct_access::deconstruct( detail::forward<Args>( args )... );
+    return deconstruct_access::deconstruct( detail::forward<Args>( args )... );
 }
 
 #else
@@ -456,58 +457,56 @@ template< class T, class... Args > postconstructor_invoker< T > deconstruct( Arg
 template< class T, class A1 >
 postconstructor_invoker<T> deconstruct( A1 const & a1 )
 {
-	return detail::deconstruct_access::deconstruct<T>(a1);
+	return deconstruct_access::deconstruct<T>(a1);
 }
 
 template< class T, class A1, class A2 >
 postconstructor_invoker<T> deconstruct( A1 const & a1, A2 const & a2 )
 {
-   return detail::deconstruct_access::deconstruct<T>(a1,a2);
+   return deconstruct_access::deconstruct<T>(a1,a2);
 }
 
 template< class T, class A1, class A2, class A3 >
 postconstructor_invoker<T> deconstruct( A1 const & a1, A2 const & a2, A3 const & a3 )
 {
-	return detail::deconstruct_access::deconstruct<T>(a1,a2,a3);
+	return deconstruct_access::deconstruct<T>(a1,a2,a3);
 }
 
 template< class T, class A1, class A2, class A3, class A4 >
 postconstructor_invoker<T> deconstruct( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4 )
 {
-    return detail::deconstruct_access::deconstruct<T>(a1,a2,a3,a4);
+    return deconstruct_access::deconstruct<T>(a1,a2,a3,a4);
 }
 
 template< class T, class A1, class A2, class A3, class A4, class A5 >
 postconstructor_invoker<T> deconstruct( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5 )
 {
-    return detail::deconstruct_access::deconstruct<T>(a1,a2,a3,a4,a5);
+    return deconstruct_access::deconstruct<T>(a1,a2,a3,a4,a5);
 }
 
 template< class T, class A1, class A2, class A3, class A4, class A5, class A6 >
 postconstructor_invoker<T> deconstruct( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6 )
 {
-    return detail::deconstruct_access::deconstruct<T>(a1,a2,a3,a4,a5,a6);
+    return deconstruct_access::deconstruct<T>(a1,a2,a3,a4,a5,a6);
 }
 
 template< class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7 >
 postconstructor_invoker<T> deconstruct( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6, A7 const & a7 )
 {
-    return detail::deconstruct_access::deconstruct<T>(a1,a2,a3,a4,a5,a6,a7);
+    return deconstruct_access::deconstruct<T>(a1,a2,a3,a4,a5,a6,a7);
 }
 
 template< class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8 >
 postconstructor_invoker<T> deconstruct( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6, A7 const & a7, A8 const & a8 )
 {
-    return detail::deconstruct_access::deconstruct<T>(a1,a2,a3,a4,a5,a6,a7,a8);
+    return deconstruct_access::deconstruct<T>(a1,a2,a3,a4,a5,a6,a7,a8);
 }
 
 template< class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9 >
 postconstructor_invoker<T> deconstruct( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6, A7 const & a7, A8 const & a8, A9 const & a9 )
 {
-    return detail::deconstruct_access::deconstruct<T>(a1,a2,a3,a4,a5,a6,a7,a8,a9);
+    return deconstruct_access::deconstruct<T>(a1,a2,a3,a4,a5,a6,a7,a8,a9);
 }
-
-using detail::deconstruct_access;
 
 #endif
 
