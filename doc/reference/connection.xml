@@ -67,25 +67,25 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
         </constructor>
 
         <copy-assignment>
-          <parameter name="other">
+          <parameter name="rhs">
             <paramtype>const <classname alt="signals2::connection">connection</classname>&amp;</paramtype>
           </parameter>
 
           <effects><para><computeroutput>this</computeroutput> references
           the connection referenced by
-          <computeroutput>other</computeroutput>.</para></effects>
+          <computeroutput>rhs</computeroutput>.</para></effects>
 
           <throws><para>Will not throw.</para></throws>
         </copy-assignment>
 
         <copy-assignment>
-          <parameter name="other">
+          <parameter name="rhs">
             <paramtype><classname alt="signals2::connection">connection</classname>&amp;&amp;</paramtype>
           </parameter>
           <description><para>Move assignment.</para></description>
           <effects><para><computeroutput>this</computeroutput> references
           the connection formerly referenced by
-          <computeroutput>other</computeroutput>.  The moved-from <computeroutput>other</computeroutput>
+          <computeroutput>rhs</computeroutput>.  The moved-from <computeroutput>rhs</computeroutput>
           no longer references any connection.</para></effects>
 
           <throws><para>Will not throw.</para></throws>
@@ -263,13 +263,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
           </constructor>
 
           <copy-assignment>
-            <parameter name="other">
+            <parameter name="rhs">
               <paramtype>const <classname alt="signals2::connection">connection</classname>&amp;</paramtype>
             </parameter>
             <description><para>Copy assignment from unscoped connection.</para></description>
             <effects><para><computeroutput>this</computeroutput> references
             the connection referenced by
-            <computeroutput>other</computeroutput>.  If <code>this</code> already references another
+            <computeroutput>rhs</computeroutput>.  If <code>this</code> already references another
                     connection, the old connection will be disconnected first.</para></effects>
             <postconditions>
               <para><code><methodname alt="connection::connected">connected</methodname>() == other.connected()</code></para>
@@ -279,13 +279,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
           </copy-assignment>
 
           <copy-assignment>
-            <parameter name="other">
+            <parameter name="rhs">
               <paramtype><classname alt="signals2::scoped_connection">scoped_connection</classname>&amp;&amp;</paramtype>
             </parameter>
             <description><para>Move assignment.</para></description>
             <effects><para><computeroutput>this</computeroutput> references
             the connection formerly referenced by
-            <computeroutput>other</computeroutput>.  The moved-from <computeroutput>other</computeroutput>
+            <computeroutput>rhs</computeroutput>.  The moved-from <computeroutput>rhs</computeroutput>
             no longer references any connection.  If <code>this</code> already references another
                     connection, the old connection will be disconnected first.</para></effects>
 
@@ -293,13 +293,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
           </copy-assignment>
 
           <copy-assignment>
-            <parameter name="other">
+            <parameter name="rhs">
               <paramtype><classname alt="signals2::connection">connection</classname>&amp;&amp;</paramtype>
             </parameter>
             <description><para>Move assignment.</para></description>
             <effects><para><computeroutput>this</computeroutput> references
             the connection formerly referenced by
-            <computeroutput>other</computeroutput>.  The moved-from <computeroutput>other</computeroutput>
+            <computeroutput>rhs</computeroutput>.  The moved-from <computeroutput>rhs</computeroutput>
             no longer references any connection.  If <code>this</code> already references another
                     connection, the old connection will be disconnected first.</para></effects>
 
