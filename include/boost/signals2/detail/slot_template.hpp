@@ -22,7 +22,9 @@ namespace boost
 {
   namespace signals2
   {
+#ifdef BOOST_NO_CXX11_VARIADIC_TEMPLATES
     template<typename Signature, typename SlotFunction> class slot;
+#endif // BOOST_NO_CXX11_VARIADIC_TEMPLATES
 
     // slot class template.
     template<BOOST_SIGNALS2_SIGNATURE_TEMPLATE_DECL(BOOST_SIGNALS2_NUM_ARGS),
