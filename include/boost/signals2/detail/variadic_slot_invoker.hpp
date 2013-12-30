@@ -115,7 +115,6 @@ namespace boost
           const void_type *) const
         {
           return call_with_tuple_args<result_type>()(connectionBody->slot.slot_function(), _args, mpl::size_t<sizeof...(Args)>());
-          return void_type();
         }
         template<typename ConnectionBodyType>
           result_type m_invoke(const ConnectionBodyType &connectionBody, ...) const
