@@ -15,6 +15,11 @@
 #ifndef BOOST_SIGNALS2_DETAIL_VARIADIC_SLOT_INVOKER_HPP
 #define BOOST_SIGNALS2_DETAIL_VARIADIC_SLOT_INVOKER_HPP
 
+#if defined(_MSVC_VER)
+# pragma warning(push)
+# pragma warning(disable:4100) // unreferenced formal parameter
+#endif
+
 #include <boost/mpl/size_t.hpp>
 #include <boost/signals2/detail/variadic_arg_type.hpp>
 
@@ -127,5 +132,8 @@ namespace boost
   } // namespace signals2
 } // namespace boost
 
+#if defined(_MSVC_VER)
+# pragma warning(pop)
+#endif
 
 #endif // BOOST_SIGNALS2_DETAIL_VARIADIC_SLOT_INVOKER_HPP
