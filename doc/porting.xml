@@ -275,7 +275,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
       </para>
       <para>Version 1.40 also introduces a variadic templates implementation of
         Signals2, which is used when Boost detects compiler support for variadic templates
-        (variadic templates are a new feature of C++0x).
+        (variadic templates are a new feature of C++11).
         This change is mostly transparent to the user, however it does introduce a few
         visible tweaks to the interface as described in the following.
       </para>

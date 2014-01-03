@@ -483,6 +483,7 @@ namespace boost
             list to grow without limit. */
             nolock_cleanup_connections(true, 2);
           }
+          nolock_cleanup_connections_from(false, _shared_state->connection_bodies().begin());
         }
         // force a full cleanup of the connection list
         void force_cleanup_connections(const connection_list_type *connection_bodies) const
@@ -658,6 +659,30 @@ namespace boost
       virtual ~BOOST_SIGNALS2_SIGNAL_CLASS_NAME(BOOST_SIGNALS2_NUM_ARGS)()
       {
       }
+      
+      //move support
+#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
+      BOOST_SIGNALS2_SIGNAL_CLASS_NAME(BOOST_SIGNALS2_NUM_ARGS)(
+        BOOST_SIGNALS2_SIGNAL_CLASS_NAME(BOOST_SIGNALS2_NUM_ARGS) && other)
+      {
+        using std::swap;
+        swap(_pimpl, other._pimpl);
+      };
+      
+      BOOST_SIGNALS2_SIGNAL_CLASS_NAME(BOOST_SIGNALS2_NUM_ARGS) & 
+        operator=(BOOST_SIGNALS2_SIGNAL_CLASS_NAME(BOOST_SIGNALS2_NUM_ARGS) && rhs)
+      {
+        if(this == &rhs)
+        {
+          return *this;
+        }
+        _pimpl.reset();
+        using std::swap;
+        swap(_pimpl, rhs._pimpl);
+        return *this;
+      }
+#endif // !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
+      
       connection connect(const slot_type &slot, connect_position position = at_back)
       {
         return (*_pimpl).connect(slot, position);
