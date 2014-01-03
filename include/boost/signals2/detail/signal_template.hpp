@@ -483,7 +483,6 @@ namespace boost
             list to grow without limit. */
             nolock_cleanup_connections(true, 2);
           }
-          nolock_cleanup_connections_from(false, _shared_state->connection_bodies().begin());
         }
         // force a full cleanup of the connection list
         void force_cleanup_connections(const connection_list_type *connection_bodies) const
