@@ -28,7 +28,7 @@ namespace boost
     template<typename Signature, typename SlotFunction = boost::function<Signature> >
       class slot;
 
-#if BOOST_WORKAROUND(BOOST_MSVC, == 1800)
+#if BOOST_WORKAROUND(BOOST_MSVC, <= 1900)
     template<typename Signature, typename SlotFunction> class slot{};
 #endif
 #endif // BOOST_NO_CXX11_VARIADIC_TEMPLATES
