@@ -97,6 +97,12 @@ namespace boost
           func(BOOST_SIGNALS2_GET<indices>(args)...);
           return R();
         }
+        template<typename Func>
+        R m_invoke(void *, Func &func, unsigned_meta_array<>, BOOST_SIGNALS2_TUPLE<> /*args*/) const
+        {
+          func();
+          return R();
+        }
       };
 
       template<typename R, typename ... Args>
