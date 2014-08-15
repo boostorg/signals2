@@ -44,7 +44,7 @@ namespace boost
         }
         // overload to prevent incrementing use count of shared_ptr associated
         // with signals2::trackable objects
-        result_type operator()(const weak_ptr<trackable_pointee> &wp) const
+        result_type operator()(const weak_ptr<trackable_pointee> &) const
         {
           return boost::shared_ptr<void>();
         }
