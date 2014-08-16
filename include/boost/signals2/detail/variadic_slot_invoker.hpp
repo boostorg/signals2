@@ -97,6 +97,16 @@ namespace boost
           func(BOOST_SIGNALS2_GET<indices>(args)...);
           return R();
         }
+        // This overload is redundant, as it is the same as the previous variadic method when
+        // it has zero "indices" or "Args" variadic template parameters.  This overload
+        // only exists to quiet some unused parameter warnings
+        // on certain compilers (some versions of gcc and msvc)
+        template<typename Func>
+        R m_invoke(void *, Func &func, unsigned_meta_array<>, BOOST_SIGNALS2_TUPLE<>) const
+        {
+          func();
+          return R();
+        }
       };
 
       template<typename R, typename ... Args>
