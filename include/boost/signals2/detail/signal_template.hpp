@@ -401,7 +401,7 @@ namespace boost
         };
         // Destructor of invocation_janitor does some cleanup when a signal invocation completes.
         // Code can't be put directly in signal's operator() due to complications from void return types.
-        class invocation_janitor
+        class invocation_janitor: noncopyable
         {
         public:
           typedef BOOST_SIGNALS2_SIGNAL_IMPL_CLASS_NAME(BOOST_SIGNALS2_NUM_ARGS) signal_type;
