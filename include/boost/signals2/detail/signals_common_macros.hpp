@@ -100,11 +100,11 @@
 #define BOOST_SIGNALS2_PREFIXED_FULL_REF_ARGS(arity, prefix) \
   BOOST_PP_ENUM(arity, BOOST_SIGNALS2_PREFIXED_FULL_REF_ARG, prefix)
 // Tn & argn
-#define BOOST_SIGNALS2_FULL_REF_ARG(z, n, data) \
-  BOOST_PP_CAT(T, BOOST_PP_INC(n)) & BOOST_SIGNALS2_SIGNATURE_ARG_NAME(~, n, ~)
-// T1 & arg1, T2 & arg2, ..., Tn & argn
+#define BOOST_SIGNALS2_FULL_CREF_ARG(z, n, data) \
+  const BOOST_PP_CAT(T, BOOST_PP_INC(n)) & BOOST_SIGNALS2_SIGNATURE_ARG_NAME(~, n, ~)
+// const T1 & arg1, const T2 & arg2, ..., const Tn & argn
 #define BOOST_SIGNALS2_FULL_FORWARD_ARGS(arity) \
-  BOOST_PP_ENUM(arity, BOOST_SIGNALS2_FULL_REF_ARG, ~)
+  BOOST_PP_ENUM(arity, BOOST_SIGNALS2_FULL_CREF_ARG, ~)
 #define BOOST_SIGNALS2_FORWARDED_ARGS(arity) \
   BOOST_SIGNALS2_SIGNATURE_ARG_NAMES(arity)
 // preprocessed_arg_typeN
