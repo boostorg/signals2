@@ -340,9 +340,7 @@ namespace boost
           {}
           result_type operator ()(const connection_body_type &connectionBody) const
           {
-            result_type *resolver = 0;
-            return m_invoke(connectionBody,
-              resolver);
+            return m_invoke<typename slot_type::result_type>(connectionBody);
           }
         private:
           // declare assignment operator private since this class might have reference or const members
@@ -357,13 +355,16 @@ namespace boost
 
 // m_arg1, m_arg2, ..., m_argn
 #define BOOST_SIGNALS2_M_ARG_NAMES(arity) BOOST_PP_ENUM(arity, BOOST_SIGNALS2_M_ARG_NAME, ~)
+          template<typename SlotResultType>
           result_type m_invoke(const connection_body_type &connectionBody,
-            const void_type *) const
+            typename boost::enable_if<boost::is_void<SlotResultType> >::type * = 0) const
           {
             connectionBody->slot.slot_function()(BOOST_SIGNALS2_M_ARG_NAMES(BOOST_SIGNALS2_NUM_ARGS));
             return void_type();
           }
-          result_type m_invoke(const connection_body_type &connectionBody, ...) const
+          template<typename SlotResultType>
+          result_type m_invoke(const connection_body_type &connectionBody, 
+            typename boost::disable_if<boost::is_void<SlotResultType> >::type * = 0) const
           {
             return connectionBody->slot.slot_function()(BOOST_SIGNALS2_M_ARG_NAMES(BOOST_SIGNALS2_NUM_ARGS));
           }
