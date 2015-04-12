@@ -83,14 +83,14 @@ namespace boost
       {
       public:
         typedef Mutex mutex_type;
-        connection_body(const SlotType &slot_in):
-          slot(slot_in)
+        connection_body(const SlotType &slot_in, const boost::shared_ptr<mutex_type> &signal_mutex):
+          slot(slot_in), _mutex(signal_mutex)
         {
         }
         virtual ~connection_body() {}
         virtual bool connected() const
         {
-          unique_lock<mutex_type> local_lock(_mutex);
+          unique_lock<mutex_type> local_lock(*_mutex);
           nolock_grab_tracked_objects(detail::null_output_iterator());
           return nolock_nograb_connected();
         }
@@ -132,15 +132,15 @@ namespace boost
         // expose Lockable concept of mutex
         virtual void lock()
         {
-          _mutex.lock();
+          _mutex->lock();
         }
         virtual void unlock()
         {
-          _mutex.unlock();
+          _mutex->unlock();
         }
         SlotType slot;
       private:
-        mutable mutex_type _mutex;
+        const boost::shared_ptr<mutex_type> _mutex;
         GroupKey _group_key;
       };
     }

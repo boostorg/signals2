@@ -154,24 +154,25 @@ namespace boost
         BOOST_SIGNALS2_SIGNAL_IMPL_CLASS_NAME(BOOST_SIGNALS2_NUM_ARGS)(const combiner_type &combiner_arg,
           const group_compare_type &group_compare):
           _shared_state(new invocation_state(connection_list_type(group_compare), combiner_arg)),
-          _garbage_collector_it(_shared_state->connection_bodies().end())
+          _garbage_collector_it(_shared_state->connection_bodies().end()),
+          _mutex(new mutex_type())
         {}
         // connect slot
         connection connect(const slot_type &slot, connect_position position = at_back)
         {
-          unique_lock<mutex_type> lock(_mutex);
+          unique_lock<mutex_type> lock(*_mutex);
           return nolock_connect(slot, position);
         }
         connection connect(const group_type &group,
           const slot_type &slot, connect_position position = at_back)
         {
-          unique_lock<Mutex> lock(_mutex);
+          unique_lock<Mutex> lock(*_mutex);
           return nolock_connect(group, slot, position);
         }
         // connect extended slot
         connection connect_extended(const extended_slot_type &ext_slot, connect_position position = at_back)
         {
-          unique_lock<mutex_type> lock(_mutex);
+          unique_lock<mutex_type> lock(*_mutex);
           bound_extended_slot_function_type bound_slot(ext_slot.slot_function());
           slot_type slot = replace_slot_function<slot_type>(ext_slot, bound_slot);
           connection conn = nolock_connect(slot, position);
@@ -181,7 +182,7 @@ namespace boost
         connection connect_extended(const group_type &group,
           const extended_slot_type &ext_slot, connect_position position = at_back)
         {
-          unique_lock<Mutex> lock(_mutex);
+          unique_lock<Mutex> lock(*_mutex);
           bound_extended_slot_function_type bound_slot(ext_slot.slot_function());
           slot_type slot = replace_slot_function<slot_type>(ext_slot, bound_slot);
           connection conn = nolock_connect(group, slot, position);
@@ -226,7 +227,7 @@ namespace boost
           shared_ptr<invocation_state> local_state;
           typename connection_list_type::iterator it;
           {
-            unique_lock<mutex_type> list_lock(_mutex);
+            unique_lock<mutex_type> list_lock(*_mutex);
             // only clean up if it is safe to do so
             if(_shared_state.unique())
               nolock_cleanup_connections(false, 1);
@@ -250,7 +251,7 @@ namespace boost
           shared_ptr<invocation_state> local_state;
           typename connection_list_type::iterator it;
           {
-            unique_lock<mutex_type> list_lock(_mutex);
+            unique_lock<mutex_type> list_lock(*_mutex);
             // only clean up if it is safe to do so
             if(_shared_state.unique())
               nolock_cleanup_connections(false, 1);
@@ -296,12 +297,12 @@ namespace boost
         }
         combiner_type combiner() const
         {
-          unique_lock<mutex_type> lock(_mutex);
+          unique_lock<mutex_type> lock(*_mutex);
           return _shared_state->combiner();
         }
         void set_combiner(const combiner_type &combiner_arg)
         {
-          unique_lock<mutex_type> lock(_mutex);
+          unique_lock<mutex_type> lock(*_mutex);
           if(_shared_state.unique())
             _shared_state->combiner() = combiner_arg;
           else
@@ -440,7 +441,6 @@ namespace boost
           {
             bool connected;
             {
-              unique_lock<connection_body_base> lock(**it);
               if(grab_tracked)
                 (*it)->nolock_slot_expired();
               connected = (*it)->nolock_nograb_connected();
@@ -488,7 +488,7 @@ namespace boost
         // force a full cleanup of the connection list
         void force_cleanup_connections(const connection_list_type *connection_bodies) const
         {
-          unique_lock<mutex_type> list_lock(_mutex);
+          unique_lock<mutex_type> list_lock(*_mutex);
           // if the connection list passed in as a parameter is no longer in use,
           // we don't need to do any cleanup.
           if(&_shared_state->connection_bodies() != connection_bodies)
@@ -503,13 +503,13 @@ namespace boost
         }
         shared_ptr<invocation_state> get_readable_state() const
         {
-          unique_lock<mutex_type> list_lock(_mutex);
+          unique_lock<mutex_type> list_lock(*_mutex);
           return _shared_state;
         }
         connection_body_type create_new_connection(const slot_type &slot)
         {
           nolock_force_unique_connection_list();
-          return connection_body_type(new connection_body<group_key_type, slot_type, Mutex>(slot));
+          return connection_body_type(new connection_body<group_key_type, slot_type, Mutex>(slot, _mutex));
         }
         void do_disconnect(const group_type &group, mpl::bool_<true> /* is_group */)
         {
@@ -581,7 +581,7 @@ namespace boost
         mutable typename connection_list_type::iterator _garbage_collector_it;
         // connection list mutex must never be locked when attempting a blocking lock on a slot,
         // or you could deadlock.
-        mutable mutex_type _mutex;
+        const boost::shared_ptr<mutex_type> _mutex;
       };
 
       template<BOOST_SIGNALS2_SIGNAL_TEMPLATE_DECL(BOOST_SIGNALS2_NUM_ARGS)>
