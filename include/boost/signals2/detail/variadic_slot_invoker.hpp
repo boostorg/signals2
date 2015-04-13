@@ -124,12 +124,12 @@ namespace boost
         result_type m_invoke(const ConnectionBodyType &connectionBody,
           const void_type *) const
         {
-          return call_with_tuple_args<result_type>()(connectionBody->slot.slot_function(), _args, mpl::size_t<sizeof...(Args)>());
+          return call_with_tuple_args<result_type>()(connectionBody->slot().slot_function(), _args, mpl::size_t<sizeof...(Args)>());
         }
         template<typename ConnectionBodyType>
           result_type m_invoke(const ConnectionBodyType &connectionBody, ...) const
         {
-          return call_with_tuple_args<result_type>()(connectionBody->slot.slot_function(), _args, mpl::size_t<sizeof...(Args)>());
+          return call_with_tuple_args<result_type>()(connectionBody->slot().slot_function(), _args, mpl::size_t<sizeof...(Args)>());
         }
         BOOST_SIGNALS2_TUPLE<Args& ...> _args;
       };
