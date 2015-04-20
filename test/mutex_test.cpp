@@ -90,7 +90,7 @@ private:
 template <typename F>
 void timed_test(F func, int secs)
 {
-    execution_monitor monitor(type, secs);
+    execution_monitor monitor(secs);
     indirect_adapter<F> ifunc(func, monitor);
     monitor.start();
     boost::thread thrd(ifunc);
