@@ -28,7 +28,7 @@ namespace boost
 {
   namespace signals2
   {
-    extern inline void null_deleter(const void*) {}
+    inline void null_deleter(const void*) {}
     namespace detail
     {
       // This lock maintains a list of shared_ptr<void>
