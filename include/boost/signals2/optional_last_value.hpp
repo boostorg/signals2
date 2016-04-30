@@ -29,11 +29,12 @@ namespace boost {
         optional<T> value;
         while (first != last)
         {
-          try
+          BOOST_TRY
           {
             value = *first;
           }
-          catch(const expired_slot &) {}
+          BOOST_CATCH(const expired_slot &) {}
+          BOOST_CATCH_END
           ++first;
         }
         return value;
@@ -50,11 +51,12 @@ namespace boost {
       {
         while (first != last)
         {
-          try
+          BOOST_TRY
           {
             *first;
           }
-          catch(const expired_slot &) {}
+          BOOST_CATCH(const expired_slot &) {}
+          BOOST_CATCH_END
           ++first;
         }
         return;
