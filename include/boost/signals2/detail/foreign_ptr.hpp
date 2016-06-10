@@ -61,7 +61,7 @@ namespace boost
       struct foreign_shared_ptr_impl_base
       {
         virtual ~foreign_shared_ptr_impl_base() {}
-        virtual void* get() const = 0;
+        virtual const void* get() const = 0;
         virtual foreign_shared_ptr_impl_base * clone() const = 0;
       };
 
@@ -71,7 +71,7 @@ namespace boost
       public:
         foreign_shared_ptr_impl(const FSP &p): _p(p)
         {}
-        virtual void * get() const
+        virtual const void * get() const
         {
           return _p.get();
         }
