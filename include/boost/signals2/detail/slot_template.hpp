@@ -103,12 +103,16 @@ namespace boost
       // invocation
       R operator()(BOOST_SIGNALS2_SIGNATURE_FULL_ARGS(BOOST_SIGNALS2_NUM_ARGS))
       {
+#ifndef BOOST_NO_EXCEPTIONS
         locked_container_type locked_objects = lock();
+#endif
         return _slot_function(BOOST_SIGNALS2_SIGNATURE_ARG_NAMES(BOOST_SIGNALS2_NUM_ARGS));
       }
       R operator()(BOOST_SIGNALS2_SIGNATURE_FULL_ARGS(BOOST_SIGNALS2_NUM_ARGS)) const
       {
+#ifndef BOOST_NO_EXCEPTIONS
         locked_container_type locked_objects = lock();
+#endif
         return _slot_function(BOOST_SIGNALS2_SIGNATURE_ARG_NAMES(BOOST_SIGNALS2_NUM_ARGS));
       }
       // tracking
