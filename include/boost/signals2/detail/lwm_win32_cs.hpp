@@ -22,7 +22,13 @@
 #include <boost/assert.hpp>
 
 #ifdef BOOST_USE_WINDOWS_H
-#  include <windows.h>
+
+#include <windows.h>
+
+#else
+
+struct _RTL_CRITICAL_SECTION;
+
 #endif
 
 #include <boost/predef/platform.h>
@@ -50,14 +56,14 @@ struct critical_section
 };
 
 #if BOOST_PLAT_WINDOWS_RUNTIME
-extern "C" __declspec(dllimport) void __stdcall InitializeCriticalSectionEx(critical_section *, unsigned long, unsigned long);
+extern "C" __declspec(dllimport) void __stdcall InitializeCriticalSectionEx(::_RTL_CRITICAL_SECTION *, unsigned long, unsigned long);
 #else
-extern "C" __declspec(dllimport) void __stdcall InitializeCriticalSection(critical_section *);
+extern "C" __declspec(dllimport) void __stdcall InitializeCriticalSection(::_RTL_CRITICAL_SECTION *);
 #endif
-extern "C" __declspec(dllimport) void __stdcall EnterCriticalSection(critical_section *);
-extern "C" __declspec(dllimport) int __stdcall TryEnterCriticalSection(critical_section *);
-extern "C" __declspec(dllimport) void __stdcall LeaveCriticalSection(critical_section *);
-extern "C" __declspec(dllimport) void __stdcall DeleteCriticalSection(critical_section *);
+extern "C" __declspec(dllimport) void __stdcall EnterCriticalSection(::_RTL_CRITICAL_SECTION *);
+extern "C" __declspec(dllimport) int __stdcall TryEnterCriticalSection(::_RTL_CRITICAL_SECTION *);
+extern "C" __declspec(dllimport) void __stdcall LeaveCriticalSection(::_RTL_CRITICAL_SECTION *);
+extern "C" __declspec(dllimport) void __stdcall DeleteCriticalSection(::_RTL_CRITICAL_SECTION *);
 
 #else
 
@@ -79,26 +85,26 @@ public:
     mutex()
     {
 #if BOOST_PLAT_WINDOWS_RUNTIME
-        InitializeCriticalSectionEx(&cs_, 4000, 0);
+        boost::signals2::InitializeCriticalSectionEx(reinterpret_cast< ::_RTL_CRITICAL_SECTION* >(&cs_), 4000, 0);
 #else
-        InitializeCriticalSection(&cs_);
+        boost::signals2::InitializeCriticalSection(reinterpret_cast< ::_RTL_CRITICAL_SECTION* >(&cs_)); 
 #endif
     }
 
     ~mutex()
     {
-        DeleteCriticalSection(&cs_);
+        boost::signals2::DeleteCriticalSection(reinterpret_cast< ::_RTL_CRITICAL_SECTION* >(&cs_)); 
     }
 
     void lock()
     {
-        EnterCriticalSection(&cs_);
+        boost::signals2::EnterCriticalSection(reinterpret_cast< ::_RTL_CRITICAL_SECTION* >(&cs_)); 
     }
 // TryEnterCriticalSection only exists on Windows NT 4.0 and later
 #if (defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0400))
     bool try_lock()
     {
-        return TryEnterCriticalSection(&cs_) != 0;
+        return boost::signals2::TryEnterCriticalSection(reinterpret_cast< ::_RTL_CRITICAL_SECTION* >(&cs_)) != 0;
     }
 #else
     bool try_lock()
@@ -109,7 +115,7 @@ public:
 #endif
     void unlock()
     {
-        LeaveCriticalSection(&cs_);
+        boost::signals2::LeaveCriticalSection(reinterpret_cast< ::_RTL_CRITICAL_SECTION* >(&cs_));
     }
 };
 
