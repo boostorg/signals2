@@ -106,18 +106,18 @@ public:
 
     ~mutex()
     {
-        boost::signals2::DeleteCriticalSection(reinterpret_cast< ::rtl_critical_section* >(&cs_)); 
+        boost::signals2::DeleteCriticalSection(reinterpret_cast< rtl_critical_section* >(&cs_)); 
     }
 
     void lock()
     {
-        boost::signals2::EnterCriticalSection(reinterpret_cast< ::rtl_critical_section* >(&cs_)); 
+        boost::signals2::EnterCriticalSection(reinterpret_cast< rtl_critical_section* >(&cs_)); 
     }
 // TryEnterCriticalSection only exists on Windows NT 4.0 and later
 #if (defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0400))
     bool try_lock()
     {
-        return boost::signals2::TryEnterCriticalSection(reinterpret_cast< ::rtl_critical_section* >(&cs_)) != 0;
+        return boost::signals2::TryEnterCriticalSection(reinterpret_cast< rtl_critical_section* >(&cs_)) != 0;
     }
 #else
     bool try_lock()
@@ -128,7 +128,7 @@ public:
 #endif
     void unlock()
     {
-        boost::signals2::LeaveCriticalSection(reinterpret_cast< ::rtl_critical_section* >(&cs_));
+        boost::signals2::LeaveCriticalSection(reinterpret_cast< rtl_critical_section* >(&cs_));
     }
 };
 
