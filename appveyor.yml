@@ -59,25 +59,18 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ARCH:    i686
       B2_ADDRESS_MODEL: address-model=32
-      SCRIPT:  ci\mingw.bat
+      SCRIPT:  ci\appveyor\mingw.bat
     - FLAVOR:  mingw64
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ARCH:    x86_64
       B2_ADDRESS_MODEL: address-model=64
-      SCRIPT:  ci\mingw.bat
+      SCRIPT:  ci\appveyor\mingw.bat
 
 install:
   - set SELF=%APPVEYOR_PROJECT_SLUG:-=_%
-  - cd ..
-  - git clone -b %APPVEYOR_REPO_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
-  - cd boost-root
-  - git submodule update -q --init tools/boostdep
-  - git submodule update -q --init tools/build
-  - git submodule update -q --init tools/inspect
-  - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% libs\%SELF%
-  - python tools/boostdep/depinst/depinst.py --include example --include tools %SELF%
-  - cmd /c bootstrap
-  - b2 headers
+  - git clone https://github.com/jeking3/boost-ci.git C:\boost-ci
+  - xcopy /s /e /q /i C:\boost-ci\ci .\ci
+  - ci\appveyor\install.bat
 
 build: off
 
@@ -85,3 +78,4 @@ test_script:
   - set SELF=%APPVEYOR_PROJECT_SLUG:-=_%
   - PATH=%ADDPATH%%PATH%
   - IF DEFINED SCRIPT (call libs\%SELF%\%SCRIPT%) ELSE (b2 libs/%SELF% toolset=%TOOLSET% cxxstd=%CXXSTD% %CXXFLAGS% %DEFINES% %THREADING% %B2_ADDRESS_MODEL% %B2_LINK% %B2_THREADING% %B2_VARIANT% -j3)
+
