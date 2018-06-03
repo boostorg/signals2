@@ -67,7 +67,7 @@ environment:
       SCRIPT:  ci\appveyor\mingw.bat
 
 install:
-  - set SELF=%APPVEYOR_PROJECT_SLUG:-=_%
+  - set SELF=%APPVEYOR_PROJECT_NAME:-=_%
   - git clone https://github.com/jeking3/boost-ci.git C:\boost-ci
   - xcopy /s /e /q /i C:\boost-ci\ci .\ci
   - ci\appveyor\install.bat
@@ -75,7 +75,7 @@ install:
 build: off
 
 test_script:
-  - set SELF=%APPVEYOR_PROJECT_SLUG:-=_%
+  - set SELF=%APPVEYOR_PROJECT_NAME:-=_%
   - PATH=%ADDPATH%%PATH%
   - IF DEFINED SCRIPT (call libs\%SELF%\%SCRIPT%) ELSE (b2 libs/%SELF% toolset=%TOOLSET% cxxstd=%CXXSTD% %CXXFLAGS% %DEFINES% %THREADING% %B2_ADDRESS_MODEL% %B2_LINK% %B2_THREADING% %B2_VARIANT% -j3)
 
