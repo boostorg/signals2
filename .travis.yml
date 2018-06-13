@@ -148,7 +148,7 @@ jobs:
 
     # Coverity Scan
     - os: linux
-      if: (env(COVERITY_SCAN_TOKEN) IS present) AND (branch IN (develop, master)) AND (type IN (cron, push))
+      if: (env(COVERITY_SCAN_NOTIFICATION_EMAIL) IS present) AND (branch IN (develop, master)) AND (type IN (cron, push))
       env:
         - COMMENT="Coverity Scan"
         - TOOLSET=gcc
