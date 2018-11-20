@@ -41,18 +41,18 @@ namespace boost
       public:
         typedef boost::function<R (const boost::signals2::connection &, Args...)> function_type;
       };
-      template<typename F>
-        class variadic_extended_signature<boost::function<F> >
+      template<typename R, typename ... Args>
+        class variadic_extended_signature<boost::function<R (Args...)> >
       {
       public:
-        typedef boost::function<F> function_type;
+        typedef boost::function<R (const boost::signals2::connection &, Args...)> function_type;
       };
 #if !defined(BOOST_NO_CXX11_HDR_FUNCTIONAL)
-      template<typename F>
-        class variadic_extended_signature<std::function<F> >
+      template<typename R, typename ... Args>
+        class variadic_extended_signature<std::function<R (Args...)> >
       {
       public:
-        typedef boost::function<F> function_type;
+        typedef boost::function<R (const boost::signals2::connection &, Args...)> function_type;
       };
 #endif
     } // namespace detail
