@@ -20,12 +20,8 @@
 #include <boost/signals2/detail/variadic_arg_type.hpp>
 #include <boost/signals2/detail/variadic_slot_invoker.hpp>
 #include <boost/type_traits/function_traits.hpp>
-#include <boost/type_traits/is_void.hpp>
+#include <boost/type_traits/is_void.hpp> 
 #include <boost/utility/enable_if.hpp>
-
-#if !defined(BOOST_NO_CXX11_HDR_FUNCTIONAL)
-#include <functional>
-#endif
 
 namespace boost
 {
@@ -41,20 +37,6 @@ namespace boost
       public:
         typedef boost::function<R (const boost::signals2::connection &, Args...)> function_type;
       };
-      template<typename R, typename ... Args>
-        class variadic_extended_signature<boost::function<R (Args...)> >
-      {
-      public:
-        typedef boost::function<R (const boost::signals2::connection &, Args...)> function_type;
-      };
-#if !defined(BOOST_NO_CXX11_HDR_FUNCTIONAL)
-      template<typename R, typename ... Args>
-        class variadic_extended_signature<std::function<R (Args...)> >
-      {
-      public:
-        typedef boost::function<R (const boost::signals2::connection &, Args...)> function_type;
-      };
-#endif
     } // namespace detail
   } // namespace signals2
 } // namespace boost

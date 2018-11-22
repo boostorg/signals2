@@ -23,76 +23,15 @@
 #error Define BOOST_PARAMETER_MAX_ARITY as 7 or greater.
 #endif
 
-#include <boost/function.hpp>
-
-#if !defined(BOOST_NO_CXX11_HDR_FUNCTIONAL)
-#include <functional>
-#endif
-
-namespace boost
-{
-  namespace signals2
-  {
-    namespace detail
-    {
-        template <typename T>
-        struct target_type
-        {
-          typedef T type;
-        };
-
-        template <typename T>
-        struct target_type< ::boost::function<T> >
-        {
-          typedef T type;
-        };
-
-#if !defined(BOOST_NO_CXX11_HDR_FUNCTIONAL)
-        template <typename T>
-        struct target_type< ::std::function<T> >
-        {
-          typedef T type;
-        };
-#endif
-    }
-  }
-}
-
-#include <boost/signals2/signal.hpp>
-#include <boost/parameter.hpp>
-#include <boost/mpl/placeholders.hpp>
+#include <boost/parameter/template_keyword.hpp>
+#include <boost/parameter/parameters.hpp>
+#include <boost/parameter/required.hpp>
+#include <boost/parameter/optional.hpp>
+#include <boost/parameter/value_type.hpp>
 #include <boost/type_traits/is_function.hpp>
 #include <boost/type_traits/function_traits.hpp>
-
-#ifdef BOOST_NO_CXX11_VARIADIC_TEMPLATES
-namespace boost
-{
-  namespace signals2
-  {
-    namespace detail
-    {
-        template <typename T>
-        struct signature_traits : ::boost::function_traits<T>
-        {
-        };
-
-        template <typename T>
-        struct signature_traits< ::boost::function<T> >
-          : ::boost::function_traits<T>
-        {
-        };
-
-#if !defined(BOOST_NO_CXX11_HDR_FUNCTIONAL)
-        template <typename T>
-        struct signature_traits< ::std::function<T> >
-          : ::boost::function_traits<T>
-        {
-        };
-#endif
-    }
-  }
-}
-#endif // BOOST_NO_CXX11_VARIADIC_TEMPLATES
+#include <boost/signals2/signal.hpp>
+#include <functional>
 
 namespace boost
 {
@@ -132,14 +71,10 @@ namespace boost
 
     public:
       // ArgumentPack
-      typedef typename
-        parameter_spec::bind<A0, A1, A2, A3, A4, A5, A6>::type
+      typedef typename parameter_spec::bind<A0, A1, A2, A3, A4, A5, A6>::type
         args;
 
-      typedef typename boost::signals2::detail::target_type
-        <
-          typename parameter::value_type<args, keywords::tag::signature_type>::type
-        >::type
+      typedef typename parameter::value_type<args, keywords::tag::signature_type>::type
         signature_type;
 
       typedef typename parameter::value_type
@@ -168,15 +103,7 @@ namespace boost
           <
             args,
             keywords::tag::extended_slot_function_type,
-#ifdef BOOST_NO_CXX11_VARIADIC_TEMPLATES
-            typename detail::extended_signature
-              <
-                detail::signature_traits<signature_type>::arity
-              , signature_type
-              >::function_type
-#else
-            typename detail::variadic_extended_signature<signature_type>::function_type
-#endif
+            typename detail::extended_signature<function_traits<signature_type>::arity, signature_type>::function_type
           >::type
           extended_slot_function_type;
 
