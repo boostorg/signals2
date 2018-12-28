@@ -17,21 +17,21 @@
 #ifndef BOOST_SIGNALS2_SIGNAL_TYPE_HPP
 #define BOOST_SIGNALS2_SIGNAL_TYPE_HPP
 
-#include <boost/parameter/config.hpp>
+// support for function types is currently broken in Boost.Parameter
+// #define BOOST_SIGNALS2_NAMED_SIGNATURE_PARAMETER
 
-#if BOOST_PARAMETER_MAX_ARITY < 7
-#error Define BOOST_PARAMETER_MAX_ARITY as 7 or greater.
-#endif
-
-#include <boost/parameter/template_keyword.hpp>
-#include <boost/parameter/parameters.hpp>
-#include <boost/parameter/required.hpp>
-#include <boost/parameter/optional.hpp>
-#include <boost/parameter/value_type.hpp>
-#include <boost/type_traits/is_function.hpp>
-#include <boost/type_traits/function_traits.hpp>
 #include <boost/signals2/signal.hpp>
-#include <functional>
+
+#if !defined(BOOST_PARAMETER_MAX_ARITY)
+#define BOOST_PARAMETER_MAX_ARITY 7
+#else
+#if BOOST_PARAMETER_MAX_ARITY < 7
+#error This header requires BOOST_PARAMETER_MAX_ARITY to be defined as 7 or greater prior to including Boost.Parameter headers
+#endif // BOOST_PARAMETER_MAX_ARITY < 7
+#endif // !defined(BOOST_PARAMETER_MAX_ARITY)
+#include <boost/parameter.hpp>
+
+#include <boost/type_traits/is_function.hpp>
 
 namespace boost
 {
@@ -39,7 +39,9 @@ namespace boost
   {
     namespace keywords
     {
+#ifdef BOOST_SIGNALS2_NAMED_SIGNATURE_PARAMETER
       BOOST_PARAMETER_TEMPLATE_KEYWORD(signature_type)
+#endif
       BOOST_PARAMETER_TEMPLATE_KEYWORD(combiner_type)
       BOOST_PARAMETER_TEMPLATE_KEYWORD(group_type)
       BOOST_PARAMETER_TEMPLATE_KEYWORD(group_compare_type)
@@ -49,7 +51,11 @@ namespace boost
     } // namespace keywords
 
     template <
+#ifdef BOOST_SIGNALS2_NAMED_SIGNATURE_PARAMETER
         typename A0,
+#else
+        typename Signature,
+#endif
         typename A1 = parameter::void_,
         typename A2 = parameter::void_,
         typename A3 = parameter::void_,
@@ -60,7 +66,9 @@ namespace boost
     class signal_type
     {
       typedef parameter::parameters<
+#ifdef BOOST_SIGNALS2_NAMED_SIGNATURE_PARAMETER
           parameter::required<keywords::tag::signature_type, is_function<boost::mpl::_> >,
+#endif
           parameter::optional<keywords::tag::combiner_type>,
           parameter::optional<keywords::tag::group_type>,
           parameter::optional<keywords::tag::group_compare_type>,
@@ -71,11 +79,20 @@ namespace boost
 
     public:
       // ArgumentPack
-      typedef typename parameter_spec::bind<A0, A1, A2, A3, A4, A5, A6>::type
+      typedef typename
+        parameter_spec::bind<
+#ifdef BOOST_SIGNALS2_NAMED_SIGNATURE_PARAMETER
+        A0,
+#endif
+        A1, A2, A3, A4, A5, A6>::type
         args;
 
+#ifdef BOOST_SIGNALS2_NAMED_SIGNATURE_PARAMETER
       typedef typename parameter::value_type<args, keywords::tag::signature_type>::type
         signature_type;
+#else
+      typedef Signature signature_type;
+#endif
 
       typedef typename parameter::value_type
         <
