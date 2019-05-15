@@ -33,6 +33,7 @@ rule thread-run ( sources )
     :
   [ run connection_test.cpp ]
   [ run dead_slot_test.cpp ]
+  [ run deadlock_regression_test.cpp ]
   [ run deconstruct_test.cpp ]
   [ run deletion_test.cpp ]
   [ thread-run mutex_test.cpp ]

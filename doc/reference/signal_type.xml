@@ -182,7 +182,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             parameter of a signal, you might write:
           </para>
 <programlisting>namespace bs2 = boost::signals2;
-using bs2::keywords;
+using namespace bs2::keywords;
 bs2::signal_type&lt;void (), mutex_type&lt;bs2::dummy_mutex&gt; &gt;::type sig;
 </programlisting>
           <para>For comparison, to specify the same type using the signal class directly looks like:</para>
