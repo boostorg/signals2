@@ -39,6 +39,7 @@ public:
 	{
 		if(m_locked) return false;
 		lock();
+		return true;
 	}
 	void unlock()
 	{
