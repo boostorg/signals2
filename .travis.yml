@@ -147,13 +147,6 @@ jobs:
 
     - os: linux
       env:
-        - COMMENT=cppcheck
-      script:
-        - cd $BOOST_ROOT/libs/$SELF
-        - ci/travis/cppcheck.sh
-
-    - os: linux
-      env:
         - COMMENT=ubsan
         - B2_VARIANT=variant=debug
         - B2_TOOLSET=gcc-8
