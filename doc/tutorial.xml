@@ -490,7 +490,7 @@ calling sequence. If a signal/slot connection is disconnected at
 any time during a signal's calling sequence, the calling sequence
 will still continue but will not invoke the disconnected slot.
 Additionally, a signal may be destroyed while it is in a calling
-sequence, and which case it will complete its slot call sequence
+sequence, in which case it will complete its slot call sequence
 but may not be accessed directly.</para>
 <para>Signals may be invoked recursively (e.g., a signal A calls a
 slot B that invokes signal A...). The disconnection behavior does
