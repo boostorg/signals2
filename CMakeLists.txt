@@ -5,7 +5,7 @@
 # NOTE: CMake support for Boost.Signals2 is currently experimental at best
 #       and the interface is likely to change in the future
 
-cmake_minimum_required( VERSION 3.10 )
+cmake_minimum_required( VERSION 3.10...3.16 )
 project( BoostSignals2 LANGUAGES CXX)
 
 option( BOOST_SIGNALS2_INCLUDE_EXAMPLES "Add boost signals2 examples" OFF )
