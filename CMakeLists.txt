@@ -5,9 +5,10 @@
 # NOTE: CMake support for Boost.Signals2 is currently experimental at best
 #       and the interface is likely to change in the future
 
-cmake_minimum_required( VERSION 3.5 )
+cmake_minimum_required( VERSION 3.10 )
 project( BoostSignals2 LANGUAGES CXX)
-option( BOOST_SIGNALS2_INCLUDE_TESTS "Add boost signals2 tests" OFF )
+
+option( BOOST_SIGNALS2_INCLUDE_EXAMPLES "Add boost signals2 examples" OFF )
 
 add_library( boost_signals2 INTERFACE )
 add_library( Boost::signals2 ALIAS boost_signals2 )
@@ -17,12 +18,12 @@ target_include_directories( boost_signals2 INTERFACE include )
 target_link_libraries( boost_signals2
     INTERFACE
         Boost::assert
+        Boost::bind
         Boost::config
         Boost::core
         Boost::function
         Boost::iterator
         Boost::mpl
-        Boost::multi_index
         Boost::optional
         Boost::parameter
         Boost::predef
@@ -34,10 +35,7 @@ target_link_libraries( boost_signals2
         Boost::variant
 )
 
-target_compile_features(boost_signals2 INTERFACE cxx_std_17 )
-
-if( BOOST_SIGNALS2_INCLUDE_TESTS )
-    enable_testing()
-    add_subdirectory( test )
+if( BOOST_SIGNALS2_INCLUDE_EXAMPLES )
+    add_subdirectory( example )
 endif()
 
