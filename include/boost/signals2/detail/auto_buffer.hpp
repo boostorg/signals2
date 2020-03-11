@@ -18,6 +18,7 @@
 #endif
 
 #include <boost/assert.hpp>
+#include <boost/config.hpp>
 #include <boost/iterator/reverse_iterator.hpp>
 #include <boost/iterator/iterator_traits.hpp>
 #include <boost/mpl/if.hpp>
