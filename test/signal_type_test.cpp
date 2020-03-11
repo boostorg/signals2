@@ -8,12 +8,12 @@
 // See http://www.boost.org/libs/signals2 for library home page.
 
 #include <boost/signals2.hpp>
-
-#include <boost/test/minimal.hpp>
+#define BOOST_TEST_MODULE signal_type_test
+#include <boost/test/included/unit_test.hpp>
 
 namespace bs2 = boost::signals2;
 
-int test_main(int, char*[])
+BOOST_AUTO_TEST_CASE(test_main)
 {
   {
     bs2::signal_type<void ()>::type mysig;
@@ -40,6 +40,4 @@ int test_main(int, char*[])
     bs2::signal<float (long*)> mysig2;
     BOOST_CHECK(typeid(mysig) == typeid(mysig2));
   }
-
-  return 0;
 }

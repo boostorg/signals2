@@ -9,8 +9,9 @@
 
 // For more information, see http://www.boost.org
 
-#include <boost/test/minimal.hpp>
 #include <boost/signals2/slot.hpp>
+#define BOOST_TEST_MODULE slot_compile_test
+#include <boost/test/included/unit_test.hpp>
 
 void myslot()
 {}
@@ -20,8 +21,7 @@ int myslot2(int)
   return 0;
 }
 
-int test_main(int, char*[])
+BOOST_AUTO_TEST_CASE(test_main)
 {
   boost::signals2::slot<void (void)> sl0(&myslot);
-  return 0;
 }

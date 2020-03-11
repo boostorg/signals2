@@ -8,8 +8,9 @@
 
 // For more information, see http://www.boost.org
 
-#include <boost/test/minimal.hpp>
 #include <boost/signals2.hpp>
+#define BOOST_TEST_MODULE deletion_test
+#include <boost/test/included/unit_test.hpp>
 #include <iostream>
 #include <string>
 
@@ -285,7 +286,7 @@ static void test_signal_deletion()
   BOOST_CHECK(tester.connection1.connected() == false);
 }
 
-int test_main(int, char* [])
+BOOST_AUTO_TEST_CASE(test_main)
 {
   test_remove_self();
   test_remove_prior();
@@ -293,5 +294,4 @@ int test_main(int, char* [])
   test_bloodbath();
   test_disconnect_equal();
   test_signal_deletion();
-  return 0;
 }

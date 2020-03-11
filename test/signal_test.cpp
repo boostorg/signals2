@@ -12,8 +12,9 @@
 
 #include <boost/bind.hpp>
 #include <boost/optional.hpp>
-#include <boost/test/minimal.hpp>
 #include <boost/signals2.hpp>
+#define BOOST_TEST_MODULE signal_test
+#include <boost/test/included/unit_test.hpp>
 #include <functional>
 #include <iostream>
 #include <typeinfo>
@@ -330,8 +331,7 @@ void test_move()
 #endif // !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
 }
 
-int
-test_main(int, char* [])
+BOOST_AUTO_TEST_CASE(test_main)
 {
   test_zero_args();
   test_one_arg();
@@ -343,5 +343,4 @@ test_main(int, char* [])
   test_set_combiner();
   test_swap();
   test_move();
-  return 0;
 }

@@ -16,8 +16,8 @@ project
     : source-location .
     : requirements
         <hardcode-dll-paths>true
-        <library>/boost/test//boost_unit_test_framework
-        <link>static
+#        <library>/boost/test//boost_unit_test_framework
+#        <link>static
     ;
 
 rule thread-run ( sources )
