@@ -15,7 +15,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/test/minimal.hpp>
 #include <boost/signals2.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
+
+using namespace boost::placeholders;
 
 struct swallow {
   typedef int result_type;

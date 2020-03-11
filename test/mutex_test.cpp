@@ -17,7 +17,7 @@
 // after boost/signals2/mutex.hpp.  Frank Hess 2009-03-07.
 #include <boost/test/minimal.hpp>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/signals2/dummy_mutex.hpp>
 #include <boost/signals2/mutex.hpp>
 #include <boost/thread/locks.hpp>
@@ -25,6 +25,8 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/thread_time.hpp>
 #include <boost/thread/condition.hpp>
+
+using namespace boost::placeholders;
 
 class execution_monitor
 {

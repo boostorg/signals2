@@ -12,9 +12,11 @@
 #include <boost/test/minimal.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/trackable.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/ref.hpp>
 #include <boost/weak_ptr.hpp>
+
+using namespace boost::placeholders;
 
 struct short_lived : public boost::signals2::trackable {
   ~short_lived() {}

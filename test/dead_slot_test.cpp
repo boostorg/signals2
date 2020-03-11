@@ -10,7 +10,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/test/minimal.hpp>
 #include <boost/signals2.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
+
+using namespace boost::placeholders;
 
 typedef boost::signals2::signal<int (int)> sig_type;
 
