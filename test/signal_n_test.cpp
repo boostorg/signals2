@@ -7,10 +7,12 @@
 
 // For more information, see http://www.boost.org
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/config.hpp>
 #define BOOST_TEST_MODULE signal_n_test
 #include <boost/test/included/unit_test.hpp>
+
+using namespace boost::placeholders;
 
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
 BOOST_AUTO_TEST_CASE(test_main)

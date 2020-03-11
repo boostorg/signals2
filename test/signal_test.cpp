@@ -10,7 +10,7 @@
 
 // For more information, see http://www.boost.org
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/optional.hpp>
 #include <boost/signals2.hpp>
 #define BOOST_TEST_MODULE signal_test
@@ -18,6 +18,8 @@
 #include <functional>
 #include <iostream>
 #include <typeinfo>
+
+using namespace boost::placeholders;
 
 template<typename T>
 struct max_or_default {
