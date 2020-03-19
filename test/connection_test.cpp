@@ -8,9 +8,9 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 // For more information, see http://www.boost.org
-
-#include <boost/test/minimal.hpp>
 #include <boost/signals2.hpp>
+#define BOOST_TEST_MODULE connection_test
+#include <boost/test/included/unit_test.hpp>
 
 namespace bs2 = boost::signals2;
 
@@ -122,10 +122,9 @@ void move_test()
 #endif // !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
 }
 
-int test_main(int, char*[])
+BOOST_AUTO_TEST_CASE(test_main)
 {
   release_test();
   swap_test();
   move_test();
-  return 0;
 }

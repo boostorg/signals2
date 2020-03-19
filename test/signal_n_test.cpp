@@ -7,14 +7,16 @@
 
 // For more information, see http://www.boost.org
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/config.hpp>
-#include <boost/test/minimal.hpp>
+#define BOOST_TEST_MODULE signal_n_test
+#include <boost/test/included/unit_test.hpp>
+
+using namespace boost::placeholders;
 
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
-int test_main(int, char* [])
+BOOST_AUTO_TEST_CASE(test_main)
 {
-  return 0;
 }
 #else // BOOST_NO_CXX11_VARIADIC_TEMPLATES
 
@@ -334,8 +336,7 @@ test_swap()
   BOOST_CHECK(sig2() == 2);
 }
 
-int
-test_main(int, char* [])
+BOOST_AUTO_TEST_CASE(test_main)
 {
   test_zero_args();
   test_one_arg();
@@ -346,7 +347,6 @@ test_main(int, char* [])
   test_extended_slot<int>();
   test_set_combiner();
   test_swap();
-  return 0;
 }
 
 #endif // BOOST_NO_CXX11_VARIADIC_TEMPLATES

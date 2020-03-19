@@ -10,8 +10,9 @@
 
 // For more information, see http://www.boost.org
 
-#include <boost/test/minimal.hpp>
 #include <boost/signals2.hpp>
+#define BOOST_TEST_MODULE regression_test
+#include <boost/test/included/unit_test.hpp>
 
 typedef boost::signals2::signal<void ()> sig0_type;
 
@@ -100,11 +101,9 @@ void reference_return_test()
   BOOST_CHECK(ref_returner::i == 1);
 }
 
-int test_main(int, char*[])
+BOOST_AUTO_TEST_CASE(test_main)
 {
   slot_connect_test();
   scoped_connection_test();
-	reference_return_test();
-	
-  return 0;
+  reference_return_test();
 }
