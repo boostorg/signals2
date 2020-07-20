@@ -230,10 +230,10 @@ namespace boost
     public:
       friend class shared_connection_block;
 
-      connection() {}
-      connection(const connection &other): _weak_connection_body(other._weak_connection_body)
+      connection() BOOST_NOEXCEPT {}
+      connection(const connection &other) BOOST_NOEXCEPT: _weak_connection_body(other._weak_connection_body)
       {}
-      connection(const boost::weak_ptr<detail::connection_body_base> &connectionBody):
+      connection(const boost::weak_ptr<detail::connection_body_base> &connectionBody) BOOST_NOEXCEPT:
         _weak_connection_body(connectionBody)
       {}
       
@@ -255,7 +255,7 @@ namespace boost
         return *this;
       }
 #endif // !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
-      connection & operator=(const connection & other)
+      connection & operator=(const connection & other) BOOST_NOEXCEPT
       {
         if(&other == this) return *this;
         _weak_connection_body = other._weak_connection_body;
@@ -314,15 +314,15 @@ namespace boost
     class scoped_connection: public connection
     {
     public:
-      scoped_connection() {}
-      scoped_connection(const connection &other):
+      scoped_connection() BOOST_NOEXCEPT {}
+      scoped_connection(const connection &other) BOOST_NOEXCEPT:
         connection(other)
       {}
       ~scoped_connection()
       {
         disconnect();
       }
-      scoped_connection& operator=(const connection &rhs)
+      scoped_connection& operator=(const connection &rhs) BOOST_NOEXCEPT
       {
         disconnect();
         connection::operator=(rhs);
