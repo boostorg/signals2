@@ -26,12 +26,12 @@ int main()
   typedef bs2::signal<void (void)> sig_type;
   sig_type sig;
   {
-    sig_type::extended_slot_type hello(&single_shot_slot, _1, "Hello");
+    sig_type::extended_slot_type hello(&single_shot_slot, boost::placeholders::_1, "Hello");
     sig.connect_extended(hello);
   }
   sig();  // prints "Hello"
   {
-    sig_type::extended_slot_type world(&single_shot_slot, _1, ", World!\n");
+    sig_type::extended_slot_type world(&single_shot_slot, boost::placeholders::_1, ", World!\n");
     sig.connect_extended(world);
   }
   sig();  // only prints ", World!\n" since hello slot has disconnected itself
