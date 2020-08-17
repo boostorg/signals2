@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string>
 #include <boost/signals2/signal.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp> 
 
 //[ document_def_code_snippet
 class Document

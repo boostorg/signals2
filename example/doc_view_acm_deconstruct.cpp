@@ -13,7 +13,7 @@
 
 #include <iostream>
 #include <string>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/ref.hpp>
 #include <boost/signals2/deconstruct.hpp>
 #include <boost/signals2/signal.hpp>

@@ -13,7 +13,7 @@
 
 #include <iostream>
 #include <string>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/shared_ptr.hpp>
