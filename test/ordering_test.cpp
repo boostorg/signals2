@@ -87,7 +87,7 @@ void test_group_compare()
 BOOST_AUTO_TEST_CASE(test_main)
 {
   using namespace std;
-  srand(time(0));
+  srand(static_cast<unsigned>(time(0)));
 
   std::vector<int> sortedValues;
 
