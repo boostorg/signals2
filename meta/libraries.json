@@ -11,5 +11,6 @@
     ],
     "maintainers": [
         "Frank Mori Hess <fmhess -at- users.sourceforge.net>"
-    ]
+    ],
+    "cxxstd": "03"
 }
