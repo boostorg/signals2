@@ -8,8 +8,6 @@
 cmake_minimum_required( VERSION 3.5...3.16 )
 project( BoostSignals2 LANGUAGES CXX)
 
-option( BOOST_SIGNALS2_INCLUDE_EXAMPLES "Add boost signals2 examples" OFF )
-
 add_library( boost_signals2 INTERFACE )
 add_library( Boost::signals2 ALIAS boost_signals2 )
 
@@ -34,8 +32,3 @@ target_link_libraries( boost_signals2
         Boost::type_traits
         Boost::variant
 )
-
-if( BOOST_SIGNALS2_INCLUDE_EXAMPLES )
-    add_subdirectory( example )
-endif()
-
