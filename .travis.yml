@@ -134,13 +134,13 @@ jobs:
     #     script: cd $BOOST_ROOT/libs/$SELF && ci/travis/intelicc.sh                               }
 
     - os: linux
-      env: CMAKE_TEST=True  # Just fo identification in Travis GUI
+      env: CMAKE_TEST=1  # Just for identification in Travis GUI
       script:
         - mkdir $BOOST_ROOT/__build_cmake__ && cd $BOOST_ROOT/__build_cmake__
         - git submodule update --init ../tools/cmake
-        - cmake .. -DBOOST_ENABLE_CMAKE=ON -DBOOST_INCLUDE_LIBRARIES=signals2 -DBOOST_SIGNALS2_INCLUDE_EXAMPLES=ON
-        - cmake --build .
-        - run-parts $BOOST_ROOT/__build_cmake__/stage/bin/
+        - cmake .. -DBOOST_ENABLE_CMAKE=ON -DBOOST_INCLUDE_LIBRARIES=signals2 -DBUILD_TESTING=ON
+        - cmake --build . --target tests -- -k
+        - ctest --output-on-failure
 
     - os: linux
       env:
