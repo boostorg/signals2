@@ -8,7 +8,7 @@ if(NOT HAVE_BOOST_TEST)
   return()
 endif()
 
-set(BOOST_TEST_LINK_LIBRARIES Boost::signals2 Boost::unit_test_framework)
+set(BOOST_TEST_LINK_LIBRARIES Boost::signals2 Boost::included_unit_test_framework)
 
 boost_test(TYPE run SOURCES connection_test.cpp)
 boost_test(TYPE run SOURCES dead_slot_test.cpp)
