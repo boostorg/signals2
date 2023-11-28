@@ -101,9 +101,24 @@ void reference_return_test()
   BOOST_CHECK(ref_returner::i == 1);
 }
 
+
+// disconnecting a function pointer by passing the function without an explicit 
+// address-of operator fails to compile in boost 1.83 due to 
+// commit 7a16fc1405f01e13463b6ce7723f30f40ba41fa4
+
+void foo() { }
+
+void disconnect_by_function_test()
+{
+  boost::signals2::signal<void ()> sig;
+  sig.connect(foo);
+  sig.disconnect(foo);  // compile failure in boost 1.83
+}
+
 BOOST_AUTO_TEST_CASE(test_main)
 {
   slot_connect_test();
   scoped_connection_test();
   reference_return_test();
+  disconnect_by_function_test();
 }
