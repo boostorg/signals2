@@ -166,6 +166,12 @@ test_signal_signal_connect()
     s1.disconnect(s2);
     BOOST_CHECK(s1(3) == -3);
 
+    // disconnect by reference wrapped slot
+    s1.connect(s2);
+    BOOST_CHECK(s1(3) == 6);
+    s1.disconnect(boost::ref(s2));
+    BOOST_CHECK(s1(3) == -3);
+
     // reconnect s2 to test auto-disconnect on destruction
     s1.connect(s2);
     BOOST_CHECK(s1(3) == 6);

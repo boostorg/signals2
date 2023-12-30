@@ -223,7 +223,7 @@ namespace boost
         void disconnect(const T &slot)
         {
           typedef mpl::bool_<(is_convertible<T, group_type>::value)> is_group;
-          do_disconnect(slot, is_group());
+          do_disconnect(unwrap_ref(slot), is_group());
         }
         // emit signal
         result_type operator ()(BOOST_SIGNALS2_SIGNATURE_FULL_ARGS(BOOST_SIGNALS2_NUM_ARGS))
