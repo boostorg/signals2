@@ -13,8 +13,8 @@
 import testing ;
 
 project
-    : source-location .
     : requirements
+        <source>/boost/test//boost_test
         <hardcode-dll-paths>true
 #        <library>/boost/test//boost_unit_test_framework
 #        <link>static
@@ -23,7 +23,7 @@ project
 rule thread-run ( sources )
 {
     return
-    [ run $(sources) : : : <library>/boost/thread//boost_thread/
+    [ run $(sources) : : : <library>/boost/thread//boost_thread
         <threading>multi ]
     ;
 }
