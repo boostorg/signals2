@@ -107,7 +107,7 @@ namespace boost {
           if (!cache->result) {
             BOOST_TRY
             {
-              cache->result.reset(cache->f(*iter));
+              cache->result = cache->f(*iter);
             }
             BOOST_CATCH(expired_slot &)
             {
