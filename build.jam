@@ -18,7 +18,6 @@ project /boost/signals2
         <library>/boost/mpl//boost_mpl
         <library>/boost/optional//boost_optional
         <library>/boost/parameter//boost_parameter
-        <library>/boost/predef//boost_predef
         <library>/boost/preprocessor//boost_preprocessor
         <library>/boost/smart_ptr//boost_smart_ptr
         <library>/boost/throw_exception//boost_throw_exception
