@@ -77,13 +77,11 @@ namespace boost {
       class slot_call_iterator_t
         : public boost::iterator_facade<slot_call_iterator_t<Function, Iterator, ConnectionBody>,
         typename Function::result_type,
-        boost::single_pass_traversal_tag,
-        typename boost::add_reference<typename boost::add_const<typename Function::result_type>::type>::type >
+        boost::single_pass_traversal_tag>
       {
         typedef boost::iterator_facade<slot_call_iterator_t<Function, Iterator, ConnectionBody>,
           typename Function::result_type,
-          boost::single_pass_traversal_tag,
-          typename boost::add_reference<typename boost::add_const<typename Function::result_type>::type>::type >
+          boost::single_pass_traversal_tag>
         inherited;
 
         typedef typename Function::result_type result_type;
