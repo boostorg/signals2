@@ -14,7 +14,7 @@ import testing ;
 
 project
     : requirements
-        <source>/boost/test//boost_test
+        <library>/boost/test//boost_test
         <hardcode-dll-paths>true
 #        <library>/boost/test//boost_unit_test_framework
 #        <link>static
