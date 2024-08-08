@@ -8,6 +8,8 @@
 
 # For more information, see http://www.boost.org
 
+project : requirements <library>/boost/signals2//boost_signals2 ;
+
 exe hello_world_slot : hello_world_slot.cpp ;
 
 exe hello_world_multi_slot : hello_world_multi_slot.cpp ;
