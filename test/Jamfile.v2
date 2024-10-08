@@ -17,6 +17,8 @@ project
         <library>/boost/signals2//boost_signals2
         <library>/boost/test//included
         <hardcode-dll-paths>true
+        <toolset>msvc-14.0:<cxxflags>"/bigobj"
+        <toolset>gcc,<target-os>windows:<cxxflags>"-Wa,-mbig-obj"
 #        <library>/boost/test//boost_unit_test_framework
 #        <link>static
     ;
